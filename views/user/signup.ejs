@@ -93,6 +93,11 @@
             text-decoration: none;
             color: #007bff;
         }
+        .error-message{
+            color: red;
+            font-size: 0.75 rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -104,26 +109,37 @@
         </div>
         <div class="rightchild" id="rightchild">
             <h2>Create Account</h2>
-            <form action="/signup" method="POST">
+            <form id="signform" action="/signup" method="POST">
                 <!-- Name -->
                 <input type="text" name="name" placeholder="Full Name" class="form-control mb-3" required>
-
+                <div id="error1" class="error-message"></div>
                 <!-- Email -->
                 <input type="email" name="email" placeholder="Email" class="form-control mb-3" required>
-
+                <div id="error2" class="error-message"></div>
                 <!-- Phone -->
                 <input type="text" name="phone" placeholder="Phone" class="form-control mb-3">
-
+                <div id="error3" class="error-message"></div>
                 <!-- Password -->
                 <input type="password" name="password" placeholder="Password" class="form-control mb-3" required>
+                <div id="error4" class="error-message"></div>
 
                 <!-- Confirm Password -->
-                <input type="password" name="confirmPassword" placeholder="Confirm Password" class="form-control mb-3" required>
+                <input type="password" name="cPassword" placeholder="Confirm Password" class="form-control mb-3" required>
+                <div id="error5" class="error-message"></div>
+                <%if(locals.message && message.length >0){%>
+                    <div class="alert alert-danger text-center"><%=message%></div>
+                  <% } %>
 
                 <!-- Social Media Icons -->
                 <div class="social-icons d-flex justify-content-center">
-                    <i class="fab fa-facebook text-primary"></i>
-                    <i class="fab fa-google text-danger"></i>
+                    <!--Facebook-->
+                    <a href="/auth/facebook" class="text-primary ms-3" title="Sign in with Facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <!--google-->
+                    <a href="/auth/google" class="text-danger" title="Sign in with Google">
+                        <i class="fab fa-google"></i>
+                    </a>
                 </div>
 
                 <!-- Submit Button -->
@@ -157,6 +173,115 @@
             alert("Redirecting to login page...");
             // window.location.href = "login.html"; // Uncomment to redirect to login page
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const signform = document.getElementById("signform");
+    const nameid = document.querySelector("input[name='name']");
+    const emailid = document.querySelector("input[name='email']");
+    const phoneid = document.querySelector("input[name='phone']");
+    const passid = document.querySelector("input[name='password']");
+    const cpassid = document.querySelector("input[name='cPassword']");
+
+    const error1 = document.getElementById("error1");
+    const error2 = document.getElementById("error2");
+    const error3 = document.getElementById("error3");
+    const error4 = document.getElementById("error4");
+    const error5 = document.getElementById("error5");
+
+    // Validation Functions
+    function nameValidateChecking() {
+        const nameval = nameid.value.trim();
+        const namepattern = /^[A-Za-z\s]+$/;
+
+        if (nameval === "") {
+            error1.style.display = "block";
+            error1.innerHTML = "Please enter a valid name.";
+            return false;
+        } else if (!namepattern.test(nameval)) {
+            error1.style.display = "block";
+            error1.innerHTML = "Name can only contain alphabets and spaces.";
+            return false;
+        } else {
+            error1.style.display = "none";
+            return true;
+        }
+    }
+
+    function emailValidateChecking() {
+        const emailval = emailid.value.trim();
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!emailPattern.test(emailval)) {
+            error2.style.display = "block";
+            error2.innerHTML = "Invalid email format.";
+            return false;
+        } else {
+            error2.style.display = "none";
+            return true;
+        }
+    }
+
+    function phoneValidateChecking() {
+        const phoneval = phoneid.value.trim();
+
+        if (phoneval === "") {
+            error3.style.display = "block";
+            error3.innerHTML = "Enter a valid phone number.";
+            return false;
+        } else if (phoneval.length !== 10 || isNaN(phoneval)) {
+            error3.style.display = "block";
+            error3.innerHTML = "Phone number must be 10 digits.";
+            return false;
+        } else {
+            error3.style.display = "none";
+            return true;
+        }
+    }
+
+    function passValidateChecking() {
+        const passval = passid.value;
+        const cpassval = cpassid.value;
+        const alpha = /^[a-zA-Z]/;
+        const digit = /\d/;
+
+        let valid = true;
+
+        if (passval.length < 8) {
+            error4.style.display = "block";
+            error4.innerHTML = "Password must contain at least 8 characters.";
+            valid = false;
+        } else if (!alpha.test(passval) || !digit.test(passval)) {
+            error4.style.display = "block";
+            error4.innerHTML = "Password must contain both letters and numbers.";
+            valid = false;
+        } else {
+            error4.style.display = "none";
+        }
+
+        if (passval !== cpassval) {
+            error5.style.display = "block";
+            error5.innerHTML = "Passwords do not match.";
+            valid = false;
+        } else {
+            error5.style.display = "none";
+        }
+
+        return valid;
+    }
+
+    // Form Submit Validation
+    signform.addEventListener("submit", function (e) {
+        const isNameValid = nameValidateChecking();
+        const isEmailValid = emailValidateChecking();
+        const isPhoneValid = phoneValidateChecking();
+        const isPassValid = passValidateChecking();
+
+        if (!isNameValid || !isEmailValid || !isPhoneValid || !isPassValid) {
+            e.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+});
+
     </script>
 </body>
 </html>

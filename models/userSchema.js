@@ -23,15 +23,17 @@ const userSchema=new Schema({
         default:null
 
     },
-    googleId:{
-        type:String,
-        unique:true
-    },
-    facebookId: {
+    googleId: {
         type: String,
         unique: true,
-      
     },
+    // facebookId: {
+    //     type: String,
+    //     unique: true,
+    //     sparse: true,
+    //     default: null,
+    // },
+    
     password:{
         type:String,
         required:false
