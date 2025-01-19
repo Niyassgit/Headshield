@@ -13,18 +13,19 @@ const pageNotFound=async (req,res)=>{
     res.redirect("/pageNotFound")
     }
 }
-const loadHomepage= async (req,res)=>{
-     
-    try{
-       
-        return res.render("home");
-         
-    }catch(error){
-         
-        console.log("Home page is not found",error);
-        res.status(500).send("server error")
+const loadHomepage = async (req, res) => {
+    try {
+        const user = req.session.user; // Get the logged-in user's ID from the session
+        if (user) {
+            const userData = await User.findOne({ _id: user }); // Fetch user details from the database
+            return res.render("home", { user: userData }); // Pass user data to the view
+        }
+        return res.render("home", { user: null }); // Pass null if no user is logged in
+    } catch (error) {
+        console.error("Error loading homepage:", error);
+        res.status(500).send("Server Error");
     }
-}
+};
 
 const loadSignup= async(req,res)=>{
 
