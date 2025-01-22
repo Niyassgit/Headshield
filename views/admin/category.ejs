@@ -1,0 +1,250 @@
+<%- include('../partials/admin/header') %>
+
+<body>
+  <section class="content-main">
+    <!-- Page Header -->
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Category Management</h2>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <header class="card-header text-center mb-4">
+      <form action="/admin/category" method="get" class="d-inline">
+        <div
+          class="input-group input-group-sm border border-1 rounded-pill"
+          style="width: 500px; margin: 0 auto;"
+        >
+          <input
+            type="text"
+            class="form-control border-0 rounded-pill"
+            placeholder="Search categories"
+            name="search"
+          />
+          <div class="input-group-append">
+            <button class="btn btn-primary btn-sm" type="submit">Search</button>
+          </div>
+        </div>
+      </form>
+    </header>
+
+    <!-- Category Management -->
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <!-- Add Category Form -->
+          <div class="col-md-3 mb-4">
+            <form method="post" action="/admin/addCategory" onsubmit="return handleFormSubmit(event)">
+              <div class="form-group">
+                <label for="category_name" class="form-label">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Type here"
+                  class="form-control"
+                  id="category_name"
+                />
+                <div id="name-error" class="error-message"></div>
+              </div>
+              <div class="form-group">
+                <label for="descriptionId" class="form-label">Description</label>
+                <textarea
+                  name="description"
+                  placeholder="Type here"
+                  class="form-control"
+                  id="descriptionId"
+                ></textarea>
+                <div id="description-error" class="error-message"></div>
+              </div>
+              <div class="d-grid">
+                <button class="btn btn-primary btn-block" type="submit">
+                  Create Category
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Category List -->
+          <div class="col-md-9">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                  <tr>
+                    <th class="text-center">#</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% cat.reverse().forEach((category, index) => { %>
+                    <tr>
+                      <td class="text-center"><%= (currentPage - 1) * 4 + (index+1) %></td>
+                      <td><%= category.name %></td>
+                      <td><%= category.description %></td>
+                      <td>
+                        <% if (category.isListed) { %>
+                          <span class="badge badge-success">Listed</span>
+                        <% } else { %>
+                          <span class="badge badge-danger">Unlisted</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (category.isListed) { %>
+                          <button class="btn btn-danger btn-sm">
+                            <a href="/admin/listCategory?id=<%= category._id %>" class="text-white">Unlist</a>
+                          </button>
+                        <% } else { %>
+                          <button class="btn btn-success btn-sm">
+                            <a href="/admin/unListCategory?id=<%= category._id %>" class="text-white">List</a>
+                          </button>
+                        <% } %>
+                        <a href="/admin/editCategory?id=<%= category._id %>" class="btn btn-info btn-sm text-white">Edit</a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-area mt-30 mb-50">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+    
+          <!-- Previous Page Link -->
+          <% if (currentPage > 1) { %>
+            <li class="page-item">
+              <a class="page-link" href="/admin/category?page=<%= currentPage - 1 %>">
+                <i class="material-icons md-chevron_left"></i>
+              </a>
+            </li>
+          <% } else { %>
+            <li class="page-item disabled">
+              <span class="page-link"><i class="material-icons md-chevron_left"></i></span>
+            </li>
+          <% } %>
+    
+          <!-- Page Number Links -->
+          <% for (let i = 1; i <= totalPage; i++) { %>
+            <% if (i === currentPage) { %>
+              <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
+            <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
+              <li class="page-item"><a class="page-link" href="/admin/category?page=<%= i %>">0<%= i %></a></li>
+            <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
+              <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+            <% } %>
+          <% } %>
+    
+          <!-- Next Page Link -->
+          <% if (currentPage < totalPage) { %>
+            <li class="page-item">
+              <a class="page-link" href="/admin/category?page=<%= currentPage + 1 %>">
+                <i class="material-icons md-chevron_right"></i>
+              </a>
+            </li>
+          <% } else { %>
+            <li class="page-item disabled">
+              <span class="page-link"><i class="material-icons md-chevron_right"></i></span>
+            </li>
+          <% } %>
+    
+        </ul>
+      </nav>
+    </div>
+    
+  </section>
+
+ 
+  <script>
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      if (!validateForm()) return false;
+
+      const name = document.getElementsByName("name")[0].value;
+      const description = document.getElementById("descriptionId").value;
+
+      fetch('/admin/addCategory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description })
+      })
+      .then(response=>{
+        if(!response.ok){
+            return response.json().then(err=>{
+                throw new Error(err.error); 
+            })
+        }
+        return response.json();
+      })
+      .then(data => {
+       if (data.success) { 
+         Swal.fire({
+         icon: 'success',
+         title: 'Success',
+         text: data.message || 'Category added  successfully',
+         }).then(() => {
+        location.reload(); // Refresh the page
+      });
+    } else {
+      throw new Error(data.message || 'Unexpected response format');
+    }
+  })
+        .catch(error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message === 'Category already exists'
+              ? 'Category already exists!'
+              : error.message,
+          });
+        });
+    }
+
+    function validateForm() {
+      clearErrorMessages();
+      const name = document.getElementsByName("name")[0].value.trim();
+      const description = document.getElementById("descriptionId").value.trim();
+      let isValid = true;
+
+      if (!name) {
+        displayErrorMessage("name-error", "Please enter a name");
+        isValid = false;
+      } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+        displayErrorMessage("name-error", "Category name must contain only letters");
+        isValid = false;
+      }
+
+      if (!description) {
+        displayErrorMessage("description-error", "Please enter a description");
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function displayErrorMessage(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerText = message;
+      errorElement.style.display = "block";
+    }
+
+    function clearErrorMessages() {
+      var errorElements=document.querySelectorAll(".error-message");
+      Array.from(errorElements).forEach(el => {
+        el.innerText = "";
+        el.style.display = "none";
+      });
+    }
+  </script>
+<%- include('../partials/admin/footer') %>
+</body>
+
+

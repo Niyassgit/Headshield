@@ -8,11 +8,7 @@ const { ProfilingLevel } = require("mongodb");
 
 const pageError=async(req,res)=>{
 
-    res.render("admin-error", {
-        title: "Error - Admin",
-        message: "Something went wrong. Please try again later.",
-        active: 'dashboard',
-    });
+   res.render("admin-error");
 }
 const loadLogin = (req, res) => {
     if (req.session.admin) {
@@ -47,12 +43,12 @@ const login = async (req, res) => {
     }
 };
 const loadDashboard = async (req, res) => {
-
-
-    res.render('dashboard', {
-        title: 'Dashboard',
-        active: 'dashboard',
-    });
+    
+        try {
+            res.render("dashboard");
+        } catch (err) {
+            res.status(500).send("Server Error");
+        }
 };
 
 const logout= async(req,res)=>{
@@ -70,10 +66,12 @@ const logout= async(req,res)=>{
         res.redirect("/pageerror")
     }
 }
+
 module.exports = {
     loadLogin,
     login,
     loadDashboard,
     pageError,
     logout,
+  
 };

@@ -14,9 +14,12 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="admin-assets/assets/imgs/theme/favicon.svg">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/admin-assets/assets/imgs/theme/favicon.svg">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
     <!-- Template CSS -->
-    <link href="admin-assets/assets/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="/admin-assets/assets/css/main.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -24,7 +27,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="admin-assets/assets/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                <img src="/admin-assets/assets/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -33,7 +36,7 @@
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item">
-                    <a class="menu-link" href="index.html"> <i class="icon material-icons md-home"></i>
+                    <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
@@ -50,14 +53,14 @@
                    
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-person"></i>
-                        <span class="text">Users</span>
+                    <a class="menu-link" href="/admin/users"> <i class="icon material-icons md-person"></i>
+                        <span class="text">Customers</span>
                     </a>
                    
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="page-form-product-1.html"> <i class="icon material-icons md-add_box"></i>
-                        <span class="text">Sales Report</span>
+                        <span class="text">Add products</span>
                     </a>
                 </li>
                 <li class="menu-item">
@@ -66,7 +69,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
+                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-person"></i>
                         <span class="text">Category</span>
                     </a>
                     
@@ -105,26 +108,14 @@
     </aside>
     <main class="main-wrap">
         <header class="main-header navbar">
-            <div class="col-search">
-                <form class="searchform">
-                    <div class="input-group">
-                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
-                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
-                    </div>
-                    <datalist id="search_terms">
-                        <option value="Products">
-                        <option value="New orders">
-                        <option value="Apple iphone">
-                        <option value="Ahmed Hassan">
-                    </datalist>
-                </form>
-            </div>
-            <div class="col-nav">
-                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
-                <ul class="nav">    
+            <div class="col-nav d-flex justify-content-between w-100"> 
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> 
+                    <i class="material-icons md-apps"></i> 
+                </button>
+                <ul class="nav ml-auto"> 
                     <li class="dropdown nav-item" style="margin-right: 10px;">
                         <a class="dropdown-toggle nav-link btn-icon" href="#" id="dropdownUser" data-toggle="dropdown" aria-expanded="false">
-                            <img class="img-xs rounded-circle" src="admin-assets/assets/imgs/people/avatar2.jpg" alt="User">
+                            <img class="img-xs rounded-circle" src="/admin-assets/assets/imgs/people/avatar2.jpg" alt="User">
                         </a>
                         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownUser">
                             <li><a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i> Edit Profile</a></li>
@@ -139,3 +130,5 @@
                 </ul>
             </div>
         </header>
+        
+        <section class="content-main">

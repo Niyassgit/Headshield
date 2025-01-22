@@ -1,58 +1,14 @@
-
 <%- include('../partials/admin/header') %>
-<div class="admin-container">
-    <%- include('../partials/admin/sidebar') %>
-<main class="admin-main-content">
-    <div class="error-container">
-        <h1><%= title %></h1>
-        <p><%= message %></p>
-        <a href="/admin">Go back to Dashboard</a>
+<section class="content-main">
+    <div class="row mt-60">
+        <div class="col-sm-12">
+            <div class="w-50 mx-auto text-center">
+                <img src="/admin-assets/assets/imgs/theme/404.png" width="350" alt="Page Not Found">
+                <h3 class="mt-40 mb-15">Oops! Page not found</h3>
+                <h4><%= message %></h4>
+                <a href="/admin/" class="btn btn-primary mt-4"><i class="material-icons md-keyboard_return"></i> Back to Dashboard</a>
+            </div>
+        </div>
     </div>
-</main>
-</div>
+</section> 
 <%- include('../partials/admin/footer') %>
-<style>
-    .admin-container {
-    display: flex;
-    min-height: 100vh; /* Full viewport height */
-}
-
-.admin-main-content {
-    flex: 1;
-    display: flex; /* Flexbox for centering */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    padding: 20px;
-}
-
-.error-container {
-    text-align: center;
-    max-width: 500px; /* Optional: Limit width for better readability */
-    margin: auto; /* Ensure it's centered */
-}
-
-.error-container h1 {
-    font-size: 3rem;
-    color: #d9534f;
-}
-
-.error-container p {
-    font-size: 1.5rem;
-    color: #555;
-}
-
-.error-container a {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #0275d8;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.error-container a:hover {
-    background-color: #025aa5;
-}
-
-</style>
