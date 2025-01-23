@@ -109,6 +109,30 @@ const getEditCategory = async (req, res) => {
 
 }
 
+const editCategory=async(req,res)=>{
+
+    try {
+
+        const id=req.params.id;
+        const {categoryName,description}=req.body;
+        const existCategory=await Category.findOne({name:categoryName});
+        
+        if(existCategory){
+            return res.status(400).json({error:"Category exists,please Choose another name"})
+        }
+        const updateCategory=await Category.findByIdAndUpdate(id,{name:categoryName,description:description,},{new:true});
+
+        if(updateCategory){
+            res.redirect("/admin/category");
+        }else{
+            res.status(404).json({error:"Category not found"})
+        }
+        
+    } catch (error) {
+        res.status(500).json({error:"Internl Server error"});
+    }
+}
+
 module.exports = {
 
     categoryInfo,
@@ -116,4 +140,5 @@ module.exports = {
     getListCategory,
     getUnlistCategory,
     getEditCategory,
+    editCategory
 }

@@ -43,6 +43,10 @@ const productSchema= new Schema({
         type:String,
         required:true
     },
+    size:{
+        type:String,
+        required:false
+    },
     productImage:{
          type:[String],
          required:true
