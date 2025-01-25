@@ -14,7 +14,7 @@ router.get("/page-error",adminController.pageError);
 //login management
 router.get("/login",adminController.loadLogin);
 router.post("/login",adminController.login);
-router.get("/",adminController.loadDashboard);
+router.get("/",adminAuth,adminController.loadDashboard);
 router.get("/logout",adminController.logout);
 //customer management
 router.get("/users",adminAuth,customerController.customerInfo);
@@ -36,5 +36,6 @@ router.get("/unBlockBrand",adminAuth,brandController.unBlockBrand);
 router.get("/deleteBrand",adminAuth,brandController.deleteBrand);
 //Product Management
 router.get("/addProducts",adminAuth,productController.getProductAddPage);
+router.post("/addProducts",adminAuth,uploads.array("images",4),productController.addProducts);
 module.exports=router;
 //private router

@@ -2,6 +2,7 @@ const User=require("../../models/userSchema");
 const nodemailer=require("nodemailer");
 const env=require("dotenv").config();
 const bcrypt=require("bcrypt");
+const { session } = require("passport");
 
 const pageNotFound=async (req,res)=>{
 
@@ -17,7 +18,7 @@ const loadHomepage = async (req, res) => {
     try {
         const user = req.session.user; // Get the logged-in user's ID from the session
         if (user) {
-            const userData = await User.findOne({ _id: user }); // Fetch user details from the database
+            const userData = await User.findOne({ _id:user }); // Fetch user details from the database
             return res.render("home", { user: userData }); // Pass user data to the view
         }
         return res.render("home", { user: null }); // Pass null if no user is logged in
@@ -211,12 +212,29 @@ const login =async (req,res)=>{
         if(!passwordMatch){
             return res.render("login",{message:"Incorrect Password"})
         }
+        
         req.session.user=findUser._id;
+        console.log("Session after login:", req.session);
         res.redirect("/")
     } catch (error) {
         
         console.error("login error",error);
         res.render("login",{message:"login failed.Please try again later"})
+    }
+}
+const logout=async(req,res)=>{
+
+    try{
+           req.session.destroy(err=>{
+            if(err){
+                console.log("Error destroy session",err);
+                return res.redirect("/page-404");
+            }
+           });
+            return res.redirect("/");
+    } catch (error) {
+        console.error('logout error:',error);
+        res.redirect("/page-404");
     }
 }
 module.exports={
@@ -227,5 +245,6 @@ module.exports={
     signup,
     verifyOtp,
     loadLogin,
-    login
+    login,
+    logout
 }

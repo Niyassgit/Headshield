@@ -2,7 +2,7 @@ const express=require("express");
 const passport =require("passport");
 const router=express.Router();
 const userController=require("../controllers/user/userController")
-
+const Auth=require("../middlewares/auth");
 
 
 router.get("/pageNotFound",userController.pageNotFound)
@@ -21,6 +21,7 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
 
 router.get("/login",userController.loadLogin);
 router.post("/login",userController.login);
+router.get("/logout",userController.logout);
 
 
 module.exports=router;

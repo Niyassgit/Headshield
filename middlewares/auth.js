@@ -1,45 +1,29 @@
-const User=require("../models/userSchema");
 
-const userAuth = (req,res,next)=>{
+const userAuth = (req, res, next) => {
+  console.log("Session in middleware:", req.session);
+  if (req.session && req.session.user) {
+      console.log("User is logged in.");
+      return next(); 
+  }
+  console.log("User not logged in, redirecting to login page.");
+  return res.redirect("/login"); 
+};
 
-    if(req.session.user){
 
-        User.findById(req.session.user).then (data=>{
+const adminAuth = (req, res, next) => {
+  if (req.session.admin) {
+    next();
+  } else {
 
-            if(data && !data.isBlocked){
-                next();
-            }else{
-                res.redirect("/login");
-            }
-        })
-        .catch(error=>{
+    res.redirect('/admin/login');
+  }
+};
 
-            console.error("Error in user auth middleware");
-            res.status(500).send("Internal server error");
-        })
-    }else{
 
-        res.redirect("/login");
-    }
-}
 
-const adminAuth=(req,res,next)=>{
 
-    User.findOne({isAdmin:true}).then(data=>{
-
-        if(data){
-            next();
-        }else{
-            res.redirect("/admin/login");
-        }
-    }).catch(error=>{
-        console.error("Error in admin middleware");
-        res.status(500).send("Internal Server Error");
-    })
-}
 
 module.exports={
-    
-userAuth,
-adminAuth,
+  userAuth,
+  adminAuth
 }
