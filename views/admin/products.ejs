@@ -1,0 +1,123 @@
+<%- include("../partials/admin/header") %>
+<div class="container my-4">
+    <!-- Search Bar -->
+    <div class="row mb-3">
+      <div class="col-md-8">
+        <h3>Product Listing</h3>
+      </div>
+      <div class="col-md-4">
+        <input type="text" id="search" class="form-control" placeholder="Search by Product Name or Brand">
+      </div>
+    </div>
+  
+    <!-- Product Table -->
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-primary">
+          <tr>
+            <th>Product Name</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Sale Price</th>
+            <th>Quantity</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="product-list">
+          <!-- Sample Row -->
+         
+            <% for(let i=data.length-1;i>=0;i--){ %>
+         <tr>
+            <td><%= data[i].productName %></td>
+            <td><%= data[i].brand %></td>
+            <td><%= data[i].category.name %></td>
+            <td><%= data[i].salePrice %></td>
+            <td><%= data[i].quantity %></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-success me-1" onclick="editProduct('1')">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProduct('1')">Delete</button>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+     <!-- Pagination -->
+     <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+      
+            <!-- Previous Page Link -->
+            <% if (currentPage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/products?page=<%= currentPage - 1 %>">
+                  <i class="material-icons md-chevron_left"></i>
+                </a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <span class="page-link"><i class="material-icons md-chevron_left"></i></span>
+              </li>
+            <% } %>
+      
+            <!-- Page Number Links -->
+            <% for (let i = 1; i <= totalPage; i++) { %>
+              <% if (i === currentPage) { %>
+                <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
+              <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
+                <li class="page-item"><a class="page-link" href="/admin/products?page=<%= i %>">0<%= i %></a></li>
+              <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+              <% } %>
+            <% } %>
+      
+            <!-- Next Page Link -->
+            <% if (currentPage < totalPage) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/products?page=<%= currentPage + 1 %>">
+                  <i class="material-icons md-chevron_right"></i>
+                </a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <span class="page-link"><i class="material-icons md-chevron_right"></i></span>
+              </li>
+            <% } %>
+      
+          </ul>
+        </nav>
+      </div>
+  </div>
+  
+  <script>
+    // Search functionality
+    const searchInput = document.getElementById('search');
+    searchInput.addEventListener('input', function () {
+      const filter = searchInput.value.toLowerCase();
+      const rows = document.querySelectorAll('#product-list tr');
+      rows.forEach(row => {
+        const productName = row.cells[0].textContent.toLowerCase();
+        const brand = row.cells[1].textContent.toLowerCase();
+        if (productName.includes(filter) || brand.includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  
+    // Placeholder functions for Edit and Delete
+    function editProduct(productId) {
+      alert(`Edit product with ID: ${productId}`);
+    }
+  
+    function deleteProduct(productId) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        alert(`Delete product with ID: ${productId}`);
+      }
+    }
+  </script>
+  
+
+
+<%- include("../partials/admin/footer") %>

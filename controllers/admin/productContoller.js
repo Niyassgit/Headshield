@@ -69,8 +69,57 @@ const addProducts= async(req,res)=>{
         return res.redirect("/admin/admin-pageerror");
     }
 }
+const getAllProducts = async (req, res) => {
+    try {
+      const search = req.query.search || "";
+      const page = req.query.page || 1;
+      const limit = 4;
+  
+   
+      const productData = await Product.find({
+        $or: [
+          { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
+          { brand: { $regex: new RegExp(".*" + search + ".*", "i") } }
+        ]
+      })
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .populate('category')
+        .exec();
+  
+      
+      const count = await Product.find({
+        $or: [
+          { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
+          { brand: { $regex: new RegExp(".*" + search + ".*", "i") } }
+        ]
+      }).countDocuments();
+  
+     
+      const category = await Category.find({ isListed: true });
+      const brand = await Brand.find({ isBlocked: false });
+  
+     
+     
+      if (category && brand) {
+        res.render("products", {
+          data: productData,
+          currentPage: page,
+          totalPage: Math.ceil(count / limit),
+          cat: category,
+          brand: brand
+        });
+      }
+     } catch (error) {
+   
+      console.error("Error fetching product data:", error);
+      res.redirect("/admin-error?message=" + encodeURIComponent("Error loading product data"));
+    }
+  };
+  
 
 module.exports={
     getProductAddPage,
-    addProducts,    
+    addProducts,  
+    getAllProducts,  
 }
