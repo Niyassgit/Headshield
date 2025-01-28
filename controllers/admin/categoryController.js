@@ -131,7 +131,7 @@ const editCategory=async(req,res)=>{
     } catch (error) {
         res.status(500).json({error:"Internl Server error"});
     }
-}
+};
 
 module.exports = {
 

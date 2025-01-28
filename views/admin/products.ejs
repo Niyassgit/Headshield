@@ -24,24 +24,35 @@
           </tr>
         </thead>
         <tbody id="product-list">
-          <!-- Sample Row -->
-         
-            <% for(let i=data.length-1;i>=0;i--){ %>
-         <tr>
-            <td><%= data[i].productName %></td>
-            <td><%= data[i].brand %></td>
-            <td><%= data[i].category.name %></td>
-            <td><%= data[i].salePrice %></td>
-            <td><%= data[i].quantity %></td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-success me-1" onclick="editProduct('1')">Edit</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteProduct('1')">Delete</button>
-            </td>
-          </tr>
+          <% for (let i = data.length - 1; i >= 0; i--) { %>
+            <tr>
+              <td><%= data[i].productName %></td>
+              <td><%= data[i].brand %></td>
+              <td><%= data[i].category.name %></td>
+              <td><%= data[i].salePrice %></td>
+              <td><%= data[i].quantity %></td>
+              <td class="text-center">
+                <div class="btn-group" role="group">
+                  <% if (data[i].isBlocked === false) { %>
+                    <a href="/admin/blockProduct?id=<%= data[i]._id %>" class="btn btn-danger btn-sm text-white">
+                      Block
+                    </a>
+                  <% } else { %>
+                    <a href="/admin/unBlockProduct?id=<%= data[i]._id %>" class="btn btn-success btn-sm text-white">
+                      Unblock
+                    </a>
+                  <% } %>
+                  <a href="/admin/editProduct?id=<%= data[i]._id %>" class="btn btn-info btn-sm text-white">
+                    Edit
+                  </a>
+                </div>
+              </td>
+            </tr>
           <% } %>
         </tbody>
       </table>
     </div>
+    
      <!-- Pagination -->
      <div class="pagination-area mt-30 mb-50">
         <nav aria-label="Page navigation example">
