@@ -46,14 +46,14 @@
     </head>
     <section class="content-main">
         <div class="row">
-            <div class="col-9">
+            <div class="col-12">
                 <div class="content-header">
                     <h2 class="content-title">Edit Product</h2>
 
 
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="card mb-4">
 
 
@@ -184,8 +184,8 @@
                                                 <img src="" alt="" id="imgView1">
                                                 <input class="form-control" type="file" name="images" id="input1"
                                                     accept="image/png, image/jpeg, image/jpg"
-                                                    onchange="viewImage(event, 1)">
-                                                <div id="images-error" class="error-message"></div>
+                                                    onchange="viewImage(event, 1)"> 
+        
                                             </div>
                                             <div class="image-cropper d-flex align-items-center"
                                                 style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
@@ -199,6 +199,7 @@
                                                     <input class="form-control" type="file" name="images" id="input2"
                                                         accept="image/png, image/jpeg, image/jpg"
                                                         onchange="viewImage(event, 2)">
+                                                       
                                                 </div>
                                                 <div class="image-cropper d-flex align-items-center"
                                                     style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
@@ -214,6 +215,7 @@
                                                     <input class="form-control" type="file" name="images" id="input3"
                                                         accept="image/png, image/jpeg, image/jpg"
                                                         onchange="viewImage(event, 3)">
+                                                     
                                                 </div>
                                                 <div class="image-cropper d-flex align-items-center"
                                                     style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
@@ -229,6 +231,7 @@
                                                     <input class="form-control" type="file" name="images" id="input4"
                                                         accept="image/png, image/jpeg, image/jpg"
                                                         onchange="viewImage(event, 4)">
+                                                        
                                                 </div>
                                                 <div class="image-cropper d-flex align-items-center"
                                                     style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
@@ -260,11 +263,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script>
         let selectedImages = [];
-       
 
         // Handle Image Selection and Thumbnails
         function handleFileSelect(event) {
             const files = event.target.files;
+            console.log('files',files);
+            
             const addedImagesContainer = document.getElementById("addedImagesContainer");
             addedImagesContainer.innerHTML = "";
 
@@ -333,8 +337,7 @@
     });
 }
 
-
-        function updateImageSlots() {
+function updateImageSlots() {
             // Get the current number of images
             const remainingImages = $("[id^='image_']").length;
 
@@ -391,6 +394,17 @@ function viewImage(event, index) {
             const fileName = `cropped-img-${Date.now()}-${index}.png`;
             await croppedCanvas.toBlob((blob) => {
                 const imgFile = new File([blob], fileName, { type: "image/png" });
+
+                const existingIndex = selectedImages.findIndex(
+                    (image)=> image.index === index
+                )
+
+                if (existingIndex !== -1) {
+            selectedImages[existingIndex] = { index, file: imgFile };
+        } else {
+            selectedImages.push({ index, file: imgFile });
+        }
+
                 const fileList = new DataTransfer();
                 fileList.items.add(imgFile);
                 const inputField = document.getElementById(`input${index}`);
@@ -458,15 +472,21 @@ function viewImage(event, index) {
                 isValid = false;
             }
 
+    
+
             return isValid;
         }
 
         // Display Error Messages
         function displayErrorMessage(elementId, message) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.innerText = message;
-            errorElement.style.display = "block";
-        }
+    const errorElement = document.getElementById(elementId);
+    if (errorElement) {
+        errorElement.innerText = message;
+        errorElement.style.display = "block";
+    } else {
+        console.error(`Error element with id ${elementId} not found.`);
+    }
+}
 
         // Clear Error Messages
         function clearErrorMessages() {
@@ -478,29 +498,62 @@ function viewImage(event, index) {
         }
 
         // Submit Form
-       function validateAndSubmit() {
-    if (validateForm()) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to add this product?",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, add it!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit the form programmatically
-                document.getElementById("productForm").submit();
-                Swal.fire(
-                    "Success!",
-                    "Product added successfully!",
-                    "success"
-                );
-            }
-        });
-    }
+        function validateAndSubmit() {
+    // Delay validation slightly to ensure the cropped image is added to selectedImages
+    setTimeout(() => {
+        const existingImages = $("[id^='image_']").length; // Count existing images
+        const selectedImagesCount = selectedImages.length; // Count newly added images
+        const totalImages = existingImages + selectedImagesCount;
+
+        if (totalImages < 3) {
+            Swal.fire({
+                title: "Insufficient Images",
+                text: "You must have at least 3 images to update the product.",
+                icon: "warning",
+                confirmButtonText: "Ok"
+            });
+            return;
+        }
+
+
+        
+        if (totalImages > 4) {
+            Swal.fire({
+                title: "Too Many Images",
+                text: "You cannot have more than 4 images for a product.",
+                icon: "warning",
+                confirmButtonText: "Ok"
+            });
+            return;
+        }
+
+        // Validate other form fields
+        if (validateForm()) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to update this product?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, update it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form programmatically
+                    document.getElementById("productForm").submit();
+                    Swal.fire(
+                        "Success!",
+                        "Product updated successfully!",
+                        "success"
+                    );
+                }
+            });
+        }
+    }, 100); // Allow time for cropped images to be added
 }
+
+  
+
 
     </script>
 

@@ -23,12 +23,12 @@
     </style>
     <section class="content-main">
         <div class="row">
-            <div class="col-9">
+            <div class="col-12">
                 <div class="content-header">
                     <h2 class="content-title">Add New Product</h2>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="card mb-4">
                     <div class="card-body">
                         <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return validateForm()
@@ -313,52 +313,70 @@
                 errorMessages.push('Please enter a product name.');
                 displayErrorMessage('productName-error', 'Please enter a product name.');
                 isValid = false;
+                return;
+            
             } else if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
                 errorMessages.push('Product name should contain only alphabetic characters.');
                 displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters.');
                 isValid = false;
+                return;
+            
             }
 
             if (description.trim() === "") {
                 errorMessages.push('Please enter a product description.');
                 displayErrorMessage('description-error', 'Please enter a product description.');
                 isValid = false;
+                return;
+                
             }
 
             if (parseInt(quantity) < 0 || quantity.trim() === "") {
                 errorMessages.push('Please enter a valid non-negative quantity.');
                 displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
                 isValid = false;
+                return;
             }
 
             if (!/^\d+(\.\d{1,2})?$/.test(price) || parseFloat(price) < 0) {
                 errorMessages.push('Please enter a valid non-negative price.');
                 displayErrorMessage('regularPrice-error', 'Please enter a valid non-negative price.');
                 isValid = false;
+                return;
             }
 
             if (!/^\d+(\.\d{1,2})?$/.test(saleprice) || parseFloat(saleprice) < 0) {
                 errorMessages.push('Please enter a valid non-negative sale price.');
                 displayErrorMessage('salePrice-error', 'Please enter a valid non-negative sale price.');
                 isValid = false;
+                return;
             }
 
             if (parseFloat(price) <= parseFloat(saleprice)) {
                 errorMessages.push('Regular price must be greater than sale price.');
                 displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
                 isValid = false;
+                return;
             }
 
             if (color.trim() === "") {
                 errorMessages.push('Please enter a color.');
                 displayErrorMessage('color-error', 'Please enter a color.');
                 isValid = false;
+                return;
             }
+            
 
             if (images.files.length === 0) {
                 errorMessages.push('Please select an image.');
                 displayErrorMessage("images-error", 'Please select an image.');
                 isValid = false;
+            }
+
+            if(images.files.length < 3){
+                errorMessages.push('At least 3 images are required.');
+                displayErrorMessage("images-error",'At least 3 images are required');
+                isValid=false;
             }
 
             if (!isValid) {
