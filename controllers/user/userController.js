@@ -1,4 +1,7 @@
 const User=require("../../models/userSchema");
+const Category=require("../../models/categorySchema");
+const Product=require("../../models/productSchema");
+const Brand=require("../../models/brandSchema");
 const nodemailer=require("nodemailer");
 const env=require("dotenv").config();
 const bcrypt=require("bcrypt");
@@ -16,17 +19,31 @@ const pageNotFound=async (req,res)=>{
 }
 const loadHomepage = async (req, res) => {
     try {
-        const user = req.session.user; // Get the logged-in user's ID from the session
+        const user = req.session.user;
+  
+        const categories = await Category.find({ isListed: true });
+        let productData = await Product.find({
+            isBlocked: false,
+            category: { $in: categories.map(category => category._id) },
+            quantity: { $gt: 0 }
+        });
+
+        productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+        productData = productData.slice(0, 3);
+
         if (user) {
-            const userData = await User.findOne({ _id:user }); // Fetch user details from the database
-            return res.render("home", { user: userData }); // Pass user data to the view
+            const userData = await User.findOne({ _id: user });
+            return res.render("home", { user: userData, products: productData });
+        } else {
+            return res.render("home", { user: null, products: productData });
         }
-        return res.render("home", { user: null }); // Pass null if no user is logged in
+
     } catch (error) {
         console.error("Error loading homepage:", error);
         res.status(500).send("Server Error");
     }
 };
+
 
 const loadSignup= async(req,res)=>{
 
@@ -237,6 +254,48 @@ const logout=async(req,res)=>{
         res.redirect("/page-404");
     }
 }
+
+const loadShoppingPage=async(req,res)=>{
+    try {
+        const user=req.session.user;
+        const userData= await User.find({_id:user});
+        const categories=await Category.find({isListed:true});
+        const categoryIds=categories.map((category)=>category._id.toString());
+        const page=parseInt(req.query.page)|| 1;
+        const limit=9;
+        const skip=(page-1)*limit;
+        const products = await Product.find({isBlocked:false,
+            category:{$in:categoryIds},
+            quantity:{$gt:0}
+        }).sort({createdOn:-1}).skip(skip).limit(limit);
+
+        const totalProducts= await Product.countDocuments({
+            isBlocked:false,
+            category:{$in:categoryIds},
+            quantity:{$gt:0}
+        });
+        const totalPages=Math.ceil(totalProducts/limit);
+        const brands=await Brand.find({isBlocked:false});
+        const categoriesWithIds =categories.map(category=>({
+            _id:category._id,
+            name:category.name
+        }))
+
+        return res.render("shop", {
+            user: userData,
+            products:products,
+            category:categoriesWithIds,
+            brand:brands,
+            totalProducts:totalProducts,
+            currentPage:page,
+            totalPages:totalPages,
+
+        }); 
+    b   } catch (error) {
+                res.redirect("/pageNotFound");
+                console.error("error loading shop page",error)
+        }
+        }
 module.exports={
 
     loadHomepage,
@@ -246,5 +305,6 @@ module.exports={
     verifyOtp,
     loadLogin,
     login,
-    logout
+    logout,
+    loadShoppingPage,
 }

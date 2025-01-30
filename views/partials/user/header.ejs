@@ -16,8 +16,11 @@
     <!-- Load fonts style after rendering the layout styles -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
     <link rel="stylesheet" href="assets/css/fontawesome.min.css">
-<!--
-    
+
+  <!-- Slick -->
+    <link rel="stylesheet" type="text/css" href="assets/css/slick.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/slick-theme.css">
+   <!-- 
 TemplateMo 559 Zay Shop
 
 https://templatemo.com/tm-559-zay-shop
@@ -64,13 +67,13 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="index.html">Home</a>
+                            <a class="nav-link" href="/">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="about.html">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="shop.html">Shop</a>
+                            <a class="nav-link" href="/shop">Shop</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="contact.html">Contact</a>
@@ -102,7 +105,7 @@ https://templatemo.com/tm-559-zay-shop
                         <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">+99</span>
                     </a>
                     <div class="navbar align-self-center d-flex">
-                        <% if (user) { %>
+                        <% if (user && user.name) { %>
                             <div class="dropdown">
                                 <a href="#" class="sign-in-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                     <%= user.name %>
@@ -125,6 +128,7 @@ https://templatemo.com/tm-559-zay-shop
                             </a>
                         <% } %>
                     </div>
+                    
                     
                     
                 

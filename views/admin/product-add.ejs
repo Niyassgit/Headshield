@@ -23,12 +23,12 @@
     </style>
     <section class="content-main">
         <div class="row">
-            <div class="col-12">
+            <div class="col-9">
                 <div class="content-header">
                     <h2 class="content-title">Add New Product</h2>
                 </div>
             </div>
-            <div class="col-lg-12">
+            <div class="col-lg-6">
                 <div class="card mb-4">
                     <div class="card-body">
                         <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return validateForm()
@@ -373,11 +373,11 @@
                 isValid = false;
             }
 
-            if(images.files.length < 3){
-                errorMessages.push('At least 3 images are required.');
-                displayErrorMessage("images-error",'At least 3 images are required');
-                isValid=false;
-            }
+            // if(images.files.length < 3){
+            //     errorMessages.push('At least 3 images are required.');
+            //     displayErrorMessage("images-error",'At least 3 images are required');
+            //     isValid=false;
+            // }
 
             if (!isValid) {
                 Swal.fire({

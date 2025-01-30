@@ -2,11 +2,15 @@ const express=require("express");
 const passport =require("passport");
 const router=express.Router();
 const userController=require("../controllers/user/userController")
-const Auth=require("../middlewares/auth");
+const {userAuth}=require("../middlewares/auth");
+const productController=require("../controllers/user/productController");
 
 
 router.get("/pageNotFound",userController.pageNotFound)
+
+//home page & shope Page
 router.get("/",userController.loadHomepage);
+router.get("/shop",userController.loadShoppingPage);
 
 //Authentication Routes
 router.get("/signup",userController.loadSignup);
@@ -23,5 +27,7 @@ router.get("/login",userController.loadLogin);
 router.post("/login",userController.login);
 router.get("/logout",userController.logout);
 
+//product management
+router.get("/productDetails",userAuth,productController.productDetails);
 
 module.exports=router;
