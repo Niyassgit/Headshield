@@ -36,12 +36,12 @@ router.get("/unBlockBrand",adminAuth,brandController.unBlockBrand);
 router.get("/deleteBrand",adminAuth,brandController.deleteBrand);
 //Product Management
 router.get("/addProducts",adminAuth,productController.getProductAddPage);
-router.post("/addProducts",adminAuth,uploads.array("images",4),productController.addProducts);
+router.post("/addProducts",adminAuth,uploads.array("images",5),productController.addProducts);
 router.get("/products",adminAuth,productController.getAllProducts);
 router.get("/blockProduct",adminAuth,productController.productBlock);
 router.get("/unBlockProduct",adminAuth,productController.unBlockProduct);
 router.get("/editProduct",adminAuth,productController.getEditProduct);
-router.post("/editProduct/:id",adminAuth,uploads.array("images",4),productController.editProduct);
+router.post("/editProduct/:id",adminAuth,uploads.array("images",5),productController.editProduct);
 router.post("/deleteImage",adminAuth,productController.deleteSingleImage);
 
 

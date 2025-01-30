@@ -196,6 +196,21 @@
                                 <button type="button" id="saveButton4" class="btn-sm btn-primary">Save</button>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                                <img src="" alt="" id="imgView5" >
+
+
+
+                                <input class="form-control" type="file" name="images" id="input5"
+                                    accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 5)">
+                            </div>
+                            <div class="image-cropper d-flex align-items-center"
+                                style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                <img src="" id="croppedImg5" alt="">
+                                <button type="button" id="saveButton5" class="btn-sm btn-primary">Save</button>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -314,14 +329,14 @@
                 displayErrorMessage('productName-error', 'Please enter a product name.');
                 isValid = false;
                 return;
-            
-            } else if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
-                errorMessages.push('Product name should contain only alphabetic characters.');
-                displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters.');
-                isValid = false;
-                return;
-            
             }
+            // } else if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
+            //     errorMessages.push('Product name should contain only alphabetic characters.');
+            //     displayErrorMessage('productName-error', 'Product name should contain only alphabetic characters.');
+            //     isValid = false;
+            //     return;
+            
+            // }
 
             if (description.trim() === "") {
                 errorMessages.push('Please enter a product description.');

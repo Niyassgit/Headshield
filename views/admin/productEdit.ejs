@@ -505,10 +505,10 @@ function viewImage(event, index) {
         const selectedImagesCount = selectedImages.length; // Count newly added images
         const totalImages = existingImages + selectedImagesCount;
 
-        if (totalImages < 3) {
+        if (totalImages < 4) {
             Swal.fire({
                 title: "Insufficient Images",
-                text: "You must have at least 3 images to update the product.",
+                text: "You must have at least 4 images to update the product.",
                 icon: "warning",
                 confirmButtonText: "Ok"
             });
@@ -517,10 +517,10 @@ function viewImage(event, index) {
 
 
         
-        if (totalImages > 4) {
+        if (totalImages > 5) {
             Swal.fire({
                 title: "Too Many Images",
-                text: "You cannot have more than 4 images for a product.",
+                text: "You cannot have more than 5 images for a product.",
                 icon: "warning",
                 confirmButtonText: "Ok"
             });

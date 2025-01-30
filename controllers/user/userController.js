@@ -258,7 +258,7 @@ const logout=async(req,res)=>{
 const loadShoppingPage=async(req,res)=>{
     try {
         const user=req.session.user;
-        const userData= await User.find({_id:user});
+        const userData= await User.findOne({_id:user});
         const categories=await Category.find({isListed:true});
         const categoryIds=categories.map((category)=>category._id.toString());
         const page=parseInt(req.query.page)|| 1;
@@ -296,6 +296,7 @@ const loadShoppingPage=async(req,res)=>{
                 console.error("error loading shop page",error)
         }
         }
+
 module.exports={
 
     loadHomepage,

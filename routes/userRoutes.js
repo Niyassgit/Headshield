@@ -10,7 +10,7 @@ router.get("/pageNotFound",userController.pageNotFound)
 
 //home page & shope Page
 router.get("/",userController.loadHomepage);
-router.get("/shop",userController.loadShoppingPage);
+router.get("/shop",userAuth,userController.loadShoppingPage);
 
 //Authentication Routes
 router.get("/signup",userController.loadSignup);
