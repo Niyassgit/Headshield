@@ -24,23 +24,19 @@ const login = async (req, res) => {
         const admin = await User.findOne({ email, isAdmin: true });
 
         if (admin) {
-            // Await the password comparison
             const passwordMatch = await bcrypt.compare(password, admin.password);
             if (passwordMatch) {
-                console.log("password matched");
-                req.session.admin = true; // Set the session variable
-                return res.redirect("/admin"); // Redirect to the admin dashboard
+                req.session.admin = true; 
+                return res.redirect("/admin"); 
             } else {
-                console.log("matching password filed")
-                return res.redirect("/admin/login"); // Redirect to the login page if password is incorrect
+                return res.render("admin-login",{message:"Incorrect Password"}); 
             }
         } else {
-            console.log("not An admin")
-            return res.redirect("/admin/login"); // Redirect to the login page if admin not found
+            return res.render("admin-login",{message:"Not an Admin"});
         }
     } catch (error) {
         console.error("Login error", error);
-        return res.redirect("/pageerror"); // Redirect to an error page
+        return res.redirect("/pageerror"); 
     }
 };
 const loadDashboard=async (req,res) => {

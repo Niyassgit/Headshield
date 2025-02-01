@@ -165,7 +165,7 @@ const verifyOtp = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 password: passwordHash,
-                ...(user.googleId && { googleId: user.googleId }), // Add googleId only if it exists
+                ...(user.googleId && { googleId: user.googleId }), 
             });
 
             try {
@@ -198,7 +198,9 @@ const loadLogin = async (req,res)=>{
     try {
         
         if(!req.session.user){
-            return res.render("login");
+            const blockedUser=req.session?.userLoginError;
+            req.session.userLoginError=null;
+            return res.render("login",{message:blockedUser});
         }else{
 
             res.redirect("/")
@@ -221,17 +223,13 @@ const login =async (req,res)=>{
             return res.render("login",{message:"User not found"});
 
         }
-        if(findUser.isBlocked){
-            return res.render("login",{message:"User is blocked by admin"});
-        }
         const passwordMatch=await bcrypt.compare(password,findUser.password);
 
         if(!passwordMatch){
             return res.render("login",{message:"Incorrect Password"})
         }
         
-        req.session.user=findUser._id;
-        console.log("Session after login:", req.session);
+        req.session.user=findUser._id;;
         res.redirect("/")
     } catch (error) {
         

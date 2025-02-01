@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,22 +33,56 @@
         .login-container .btn {
             width: 100%;
         }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Style for input-group with icon inside input field */
+        .input-group .form-control {
+            padding-right: 45px;
+        }
+
+        .input-group-append {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: gray;
+        }
     </style>
 </head>
-
 <body>
 
     <div class="login-container">
         <h2>Admin Login</h2>
-        <form action="/admin/login" method="POST"> <!-- Adjust the action URL as needed -->
+        <form id="loginForm" action="/admin/login" method="POST" novalidate>
             <div class="form-group">
-                <label for="email">Email</label> <!-- Changed from Username to Email -->
-                <input type="email" class="form-control" id="email" name="email" required> <!-- Changed name from username to email -->
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email">
+                <div class="error-message" id="emailError"></div>
             </div>
+
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" name="password">
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="error-message" id="passwordError"></div>
             </div>
+
+            <% if (message) { %>
+                <div class="alert alert-danger text-center"><%= message %></div>
+            <% } %>
+
             <div class="form-group form-check">
                 <input type="checkbox" class="form-check-input" id="rememberMe">
                 <label class="form-check-label" for="rememberMe">Remember Me</label>
@@ -61,9 +94,56 @@
         </div>
     </div>
 
+    <script>
+        // Toggle Password Visibility
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            let passwordInput = document.getElementById("password");
+            let icon = this.querySelector("i");
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        });
+
+        // Form Validation
+        document.getElementById("loginForm").addEventListener("submit", function (event) {
+            let isValid = true;
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
+
+            emailError.innerText = "";
+            passwordError.innerText = "";
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                emailError.innerText = "Please enter a valid email address.";
+                isValid = false;
+            }
+
+            if (password.length < 6) {
+                passwordError.innerText = "Password must be at least 6 characters long.";
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
 
+</body>
 </html>
