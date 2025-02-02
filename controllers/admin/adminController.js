@@ -11,12 +11,17 @@ const pageError=async(req,res)=>{
    res.render("admin-error");
 }
 
-const loadLogin = (req, res) => {
-    if (req.session.admin) {
-        return res.redirect("/admin");
+
+const loadLogin=(req,res)=>{
+    if(req.session.admin){
+     return res.redirect("/admin");
     }
-    res.render("admin-login", { message: null });
-};
+    const errorMessage=req.session.adminLoginError
+    req.session.adminLoginError=null;
+    return res.render('admin-login',{
+        message:errorMessage
+    })
+}
 
 const login = async (req, res) => {
     try {
@@ -29,10 +34,12 @@ const login = async (req, res) => {
                 req.session.admin = true; 
                 return res.redirect("/admin"); 
             } else {
-                return res.render("admin-login",{message:"Incorrect Password"}); 
+                req.session.adminLoginError="Incorrect Password"
+                return res.redirect('/admin/login')
             }
         } else {
-            return res.render("admin-login",{message:"Not an Admin"});
+            req.session.adminLoginError="Not an Admin"
+            return res.redirect("/admin/login");
         }
     } catch (error) {
         console.error("Login error", error);

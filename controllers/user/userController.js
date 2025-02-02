@@ -48,7 +48,14 @@ const loadHomepage = async (req, res) => {
 const loadSignup= async(req,res)=>{
 
     try{
-       return res.render("signup");
+
+        if(req.session){
+
+            const errorMessage=req.session.errorMessage;
+            req.session.errorMessage=null;
+
+         return res.render("signup",{message:errorMessage});
+        }
 
     }catch(error){
         console.log("Signup page is not found",error);
@@ -57,6 +64,8 @@ const loadSignup= async(req,res)=>{
 
     }
 }
+
+
 
 function generateOtp(){
  
@@ -97,32 +106,29 @@ async function sendVerificationEmail(email,otp){
         return false;
     }
 }
+
 const signup = async (req, res) => {
     try {
         const { name, phone, email, password, cPassword } = req.body;
 
         if (password !== cPassword) {
-            console.log("Passwords do not match");
-            return res.render("signup", { message: "Passwords do not match" });
+            req.session.errorMessage="Password do not match";
+            return res.redirect("/signup");
         }
 
         const findUser = await User.findOne({ email });
         if (findUser) {
-            console.log("User already exists");
-            return res.render("signup", { message: "User with the same email already exists" });
+            req.session.errorMessage="User with the same email already exists";
+            return res.redirect("signup");
         }
 
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
         if (!emailSent) {
-            console.log("Failed to send email");
             return res.status(500).json({ success: false, message: "Failed to send OTP email" });
         }
 
-        // Debugging session
-        console.log("Session before setting OTP:", req.session);
 
-        // Store OTP and user data in the session
         req.session.userOtp = otp;
         req.session.userData = { name, phone, email, password };
 
@@ -198,9 +204,9 @@ const loadLogin = async (req,res)=>{
     try {
         
         if(!req.session.user){
-            const blockedUser=req.session?.userLoginError;
+            const loginFailedMessage=req.session?.userLoginError;
             req.session.userLoginError=null;
-            return res.render("login",{message:blockedUser});
+            return res.render("login",{message:loginFailedMessage});
         }else{
 
             res.redirect("/")
@@ -211,30 +217,33 @@ const loadLogin = async (req,res)=>{
 }
 
 
-const login =async (req,res)=>{
-
+const login= async (req,res)=>{
     try {
-        
+
         const {email,password}=req.body;
+        const findUser= await User.findOne({isAdmin:0,email:email});
 
-        const findUser=await User.findOne({isAdmin:0,email:email});
-        if(!findUser){
+        if(findUser){
 
-            return res.render("login",{message:"User not found"});
+            const passwordMatch= await bcrypt.compare(password,findUser.password);
 
-        }
-        const passwordMatch=await bcrypt.compare(password,findUser.password);
+            if(passwordMatch){
 
-        if(!passwordMatch){
-            return res.render("login",{message:"Incorrect Password"})
+                req.session.user=findUser._id;
+                return res.redirect("/");
+            }else{
+                req.session.userLoginError="Incorrect Password";
+                return res.redirect("/login")
+            }
+        }else{
+            req.session.userLoginError="User is not Found";
+            return res.redirect("/login");
         }
         
-        req.session.user=findUser._id;;
-        res.redirect("/")
     } catch (error) {
-        
-        console.error("login error",error);
-        res.render("login",{message:"login failed.Please try again later"})
+        req.session.userLoginError="Login failed.Please try again later"
+        console.error("login Error",error);
+        return res.redirect("/login");
     }
 }
 const logout=async(req,res)=>{

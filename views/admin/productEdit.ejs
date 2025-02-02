@@ -338,10 +338,7 @@
 }
 
 function updateImageSlots() {
-            // Get the current number of images
             const remainingImages = $("[id^='image_']").length;
-
-            // Show available upload slots based on remaining images
             for (let i = 1; i <= 4; i++) {
                 if (i > remainingImages) {
                     $(`#input${i}`).closest('.card-body').show();
@@ -350,8 +347,6 @@ function updateImageSlots() {
         }
 
 
-
-        // View and Crop Images
         let croppers = {};
 
 function viewImage(event, index) {
@@ -418,7 +413,7 @@ function viewImage(event, index) {
         });
     }
 }
-        // Validate Form Fields
+     
         function validateForm() {
             let isValid = true;
             clearErrorMessages();
