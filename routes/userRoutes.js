@@ -4,6 +4,7 @@ const router=express.Router();
 const userController=require("../controllers/user/userController")
 const {userAuth,isBlocked}=require("../middlewares/auth");
 const productController=require("../controllers/user/productController");
+const profileController =require("../controllers/user/profileController");
 
 
 router.get("/pageNotFound",userController.pageNotFound)
@@ -28,6 +29,14 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
 router.get("/login",userController.loadLogin);
 router.post("/login",userController.login);
 router.get("/logout",userController.logout);
+ 
+//profile management
+router.get("/forgot-password",profileController.forgotPassPage);
+router.post("/forgot-email-valid",profileController.forgotEmailValid);
+router.post("/verify-passForgot-otp",profileController.verifyForgotPassOtp);
+router.get("/reset-password",profileController.getResetPassPage);
+router.post("/resend-forgot-otp",profileController.resendOtp);
+router.post("/reset-password",profileController.postNewPassword);
 
 
 
