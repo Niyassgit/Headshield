@@ -148,21 +148,28 @@ let otpTimerInterval;
   }
 
   function startOtpTimer(){
-    const timerElement=document.getElementById('otpTimer')
-    otpTimerInterval=setInterval(function(){
-      const minutes=Math.floor(timer/60)
-      const seconds=timer % 60;
-      timerElement.textContent=`${minutes}:${seconds <10?'0':''}${seconds}`
-      updateTimerColor((timer/60)*100)
+    const timerElement = document.getElementById('otpTimer');
+    const otpInput = document.getElementById('otp');
+    otpTimerInterval = setInterval(function() {
+        const minutes = Math.floor(timer / 60);
+        const seconds = timer % 60;
+        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        updateTimerColor((timer / 60) * 100);
 
-      if(--timer <0){
-        clearInterval(otpTimerInterval)
-        timerElement.textContent='Expired'
-        timerElement.style.backgroundColor='red'
-      }
-
-    },1000)
-  }
+        if (--timer < 0) {
+            clearInterval(otpTimerInterval);
+            timerElement.textContent = 'Expired';
+            timerElement.style.backgroundColor = 'red';
+            otpInput.disabled = true; 
+            document.getElementById("btn1").disabled = true; 
+            Swal.fire({
+                icon: 'error',
+                title: 'OTP Expired',
+                text: 'Your OTP has expired. Please request a new one.',
+            });
+        }
+    }, 1000);
+}
 
 
   initializeOtpTimer()
@@ -211,43 +218,40 @@ let otpTimerInterval;
     return false
   }
 
-  function resendOtp(){
-  
-    clearInterval(otpTimerInterval);
-    timer=60;
-    startOtpTimer();
+  function resendOtp(event) {
+    event.preventDefault();
+    clearInterval(otpTimerInterval); // Stop existing timer
+    timer = 60; // Reset timer
+    startOtpTimer(); // Restart timer
+
     $.ajax({
-        type:"POST",
-        url:"/resend-forgot-otp",
-        success:function(response){
-            if(response.success){
+        type: "POST",
+        url: "/resend-forgot-otp",
+        success: function (response) {
+            if (response.success) {
                 Swal.fire({
                     icon: 'success',
-                    title:"Resend OTP Successfull",
-                    showConfirmButton:false,
-                    timer:1500,
-
-                })
-            }else{
+                    title: "Resend OTP Successful",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            } else {
                 Swal.fire({
-                    icon:'error',
-                    title:'Error',
-                    text:'Failed to resend OTP.Please try again later',
-                })
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to resend OTP. Please try again later.',
+                });
             }
         },
-        error:function(){
-
+        error: function () {
             Swal.fire({
-                icon:'error',
-                title:'Error',
-                text:'Failed to resend OTP. Please try again later'
-            })
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to resend OTP. Please try again later.'
+            });
         }
-    })
-  
- 
-  }
+    });
+}
 
 
 

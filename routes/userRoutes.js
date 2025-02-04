@@ -46,4 +46,5 @@ router.post("/reset-password-user",userAuth,profileController.postNewPassword);
 
 
 
+
 module.exports=router;
