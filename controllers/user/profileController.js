@@ -3,6 +3,7 @@ const nodemailer=require("nodemailer");
 const env=require("dotenv").config();
 const session=require("express-session");
 const bcrypt=require("bcrypt");
+const Address=require("../../models/addressSchema");
 
 
 function generateOtp(){
@@ -183,6 +184,7 @@ const userProfile=async(req,res)=>{
     try {
         const userId=req.session.user;
         const userData= await User.findById(userId);
+       ({userId:userId});
         res.render("userProfile",{
             user:userData,
         })
@@ -273,6 +275,45 @@ const getResetPassPageUser =async(req,res)=>{
         res.redirect("/pageNotFound");
     }
 };
+const addAddress = async(req,res)=>{
+
+    try {
+        const userId=req.session.user;
+        const userData=await User.findById(userId);
+        res.render("add-address",{
+         user:userData,
+
+        })
+        
+    } catch (error) {
+        
+    }
+};
+const postAddAddress= async(req,res)=>{
+    try {
+        const userId=req.session.user;
+        const userData=await User.findOne({_id:userId});
+        const {addressType,name,phone,altPhone,address,landMark,city,state,country,pincode}= req.body
+
+        const userAddress = await Address.findOne({userId:userData._id});
+
+        if(!userAddress){
+            const newAddress = new Address({
+                userId:userData._id,
+                address:[{addressType,name,phone,altPhone,address,landMark,city,state,country,pincode}]
+            });
+            await newAddress.save();
+
+        }else{
+            userAddress.address.push({addressType,name,phone,altPhone,address,landMark,city,state,country,pincode});
+            await userAddress.save();
+        }
+        res.redirect("/userProfile");
+    } catch (error) {
+        console.log("Error adding Address:",error);
+        res.redirect("/pageNotFound");
+    }
+}
 
 module.exports={
 
@@ -286,5 +327,7 @@ module.exports={
     changePassword,
     changePasswordValid,
     verifyChangePassOtp,
-    getResetPassPageUser
+    getResetPassPageUser,
+    addAddress,
+    postAddAddress
 }

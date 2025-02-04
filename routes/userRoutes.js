@@ -43,7 +43,9 @@ router.post("/change-password",userAuth,profileController.changePasswordValid);
 router.post("/verify-changepassword-otp",userAuth,profileController.verifyChangePassOtp);
 router.get("/reset-password-user",userAuth,profileController.getResetPassPageUser);
 router.post("/reset-password-user",userAuth,profileController.postNewPassword);
-
+//adress management
+router.get("/addAddress",userAuth,profileController.addAddress);
+router.post("/addAddress",userAuth,profileController.postAddAddress);
 
 
 

@@ -8,7 +8,7 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    min-height: 100vh;
+    min-height: 100%;
   }
 
   .sidebar .nav-link {
@@ -43,18 +43,18 @@
     }
   }
 </style>
-
 <main class="main">
   <div class="container">
     <div class="row">
+      <!-- Sidebar -->
       <div class="col-md-3">
         <div class="sidebar">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link active" href="#dashboard">Dashboard</a>
+              <a class="nav-link active" href="/userProfile">Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#address">My Address</a>
+              <a class="nav-link" href="/addAddress">My Address</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#orders">Orders</a>
@@ -74,3 +74,6 @@
           </ul>
         </div>
       </div>
+        <!-- Main Content -->
+        <div class="col-md-9">
+          <section class="content-main">
