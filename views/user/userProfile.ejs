@@ -1,0 +1,41 @@
+
+<%- include("../../views/partials/user/header") %>
+<%- include("../../views/partials/user/sidebar") %>
+
+<style>
+
+.card-header {
+    background-color: #212934;
+    color: white;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  .content-section {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+</style>
+        <div class="col-md-9">
+          <div class="content-section" id="dashboard">
+            <div class="card">
+              <div class="card-header text-center">
+                <h5>User Profile</h5>
+              </div>
+              <div class="card-body text-center">
+                <p><strong><%= user.name %></strong></p>
+                <p><strong>Phone:<%= user.phone %></strong></p>
+                <p><strong>Email:<%= user.email %></strong></p>
+                <a href="/change-password" class="btn btn-sm btn-success">Change Password</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </main>
+
+  <%- include("../../views/partials/user/footer") %>

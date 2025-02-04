@@ -37,7 +37,12 @@ router.post("/verify-passForgot-otp",profileController.verifyForgotPassOtp);
 router.get("/reset-password",profileController.getResetPassPage);
 router.post("/resend-forgot-otp",profileController.resendOtp);
 router.post("/reset-password",profileController.postNewPassword);
-
+router.get("/userProfile",userAuth,profileController.userProfile);
+router.get("/change-password",userAuth,profileController.changePassword);
+router.post("/change-password",userAuth,profileController.changePasswordValid);
+router.post("/verify-changepassword-otp",userAuth,profileController.verifyChangePassOtp);
+router.get("/reset-password-user",userAuth,profileController.getResetPassPageUser);
+router.post("/reset-password-user",userAuth,profileController.postNewPassword);
 
 
 
