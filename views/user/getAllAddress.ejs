@@ -1,0 +1,54 @@
+<%- include("../../views/partials/user/header") %>
+    <%- include("../../views/partials/user/sidebar") %>
+
+        <div class="container mt-5">
+
+            <!-- Add New Address Card -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-lg border-0 p-4 text-center d-flex align-items-center justify-content-center"
+                    style="border-radius: 12px; height: 200px; cursor: pointer; background: #f8f9fa;"
+                    onclick="window.location.href='/addAddress'">
+                    <div>
+                        <i class="fas fa-plus-circle fa-3x" style="color: #212934;"></i>
+                        <h5 class="mt-2">Add New Address</h5>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-center mb-4">Your Addresses</h2>
+            <div class="row">
+                <% if(address.length > 0) { %>
+                    <% for(let i = 0; i < address.length; i++) { %>
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-lg border-0 p-3" style="border-radius: 12px;">
+                                <h5 class="text-center" style="font-weight: 600;">
+                                    <%= address[i].addressType %>
+                                </h5>
+                                <p><strong>Name:</strong> <%= address[i].name %></p>
+                                <p><strong>Phone:</strong> <%= address[i].phone %></p>
+                                <p><strong>Alternate Phone:</strong> <%= address[i].altPhone %></p>
+                                <p><strong>Address:</strong> <%= address[i].landMark %>, <%= address[i].city %>, <%= address[i].state %>, <%= address[i].country %>, <%= address[i].pincode %></p>
+                                
+                                <!-- Edit & Remove Links in One Row -->
+                                <div class="d-flex justify-content-between mt-2">
+                                    <a href="/editAddress?id=<%= address[i]._id %>" class="text-decoration-none">Edit</a>
+                                    <a href="/deleteAddress?id=<%= address[i]._id %>" class="text-decoration-none" onclick="return confirm('Are you sure you want to remove this Address?')">Remove</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <p class="text-center">No addresses found.</p>
+                <% } %>
+            </div>     
+            
+        </div>
+
+        <!--sidebar Footer section-->
+        </section>
+        </div>
+        </div>
+        </div>
+        </main>
+
+        <%- include("../../views/partials/user/footer") %>

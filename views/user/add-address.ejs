@@ -49,13 +49,6 @@
                     <div id="altPhone" class="text-danger mt-1" style="font-size: 14px;"></div>
                 </div>
 
-                <!-- Address -->
-                <div class="form-group mt-3">
-                    <label for="address" class="mb-2" style="font-weight: 500;">Address</label>
-                    <textarea class="form-control p-3" id="address" name="address" rows="3" placeholder="Enter Address"
-                        style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;"></textarea>
-                    <div id="address-error" class="text-danger mt-1" style="font-size: 14px;"></div>
-                </div>
 
                 <!-- Landmark -->
                 <div class="form-group mt-3">
@@ -147,13 +140,6 @@
                     isValid = false;
                 } else if (!/^\d{10}$/.test(phone)) {
                     document.getElementById('phone-error').textContent = 'Phone Number must be 10 digits.';
-                    isValid = false;
-                }
-
-                // Validate Address
-                const address = document.getElementById('address').value.trim();
-                if (!address) {
-                    document.getElementById('address-error').textContent = 'Address is required.';
                     isValid = false;
                 }
 

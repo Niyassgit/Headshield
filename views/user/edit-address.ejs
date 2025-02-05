@@ -1,0 +1,206 @@
+<%- include("../../views/partials/user/header") %>
+<%- include("../../views/partials/user/sidebar") %>
+
+  <!-- SweetAlert2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.css" rel="stylesheet">
+
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.js"></script>
+
+
+  <div class="card p-4 shadow-lg border-0" style="max-width: 500px; width: 100%; border-radius: 12px;">
+      <h3 class="text-center mb-4" style="font-weight: 600;">Edit Address</h3>
+
+      <form id="addressForm" action="/editAddress" method="POST" class="d-flex flex-column" novalidate>
+
+        <input type="hidden" name="id" value="<%= address._id %>">
+
+          <div class="form-group">
+              <label for="addressType" class="mb-2" style="font-weight: 500;">Address Type</label>
+              <select class="form-control p-3" id="addressType" name="addressType"
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;">
+                  <option value="">Select Address Type</option>
+                  <option value="Home">Home</option>
+                  <option value="Work">Work</option>
+                  <option value="Other">Other</option>
+              </select>
+              <div id="addressType-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- Full Name -->
+          <div class="form-group mt-3">
+              <label for="fullName" class="mb-2" style="font-weight: 500;">Full Name</label>
+              <input type="text" class="form-control p-3" id="fullName" name="name" 
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;" value="<%= address.name %>">
+              <div id="fullName-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="form-group mt-3">
+              <label for="phone" class="mb-2" style="font-weight: 500;">Phone Number</label>
+              <input type="text" class="form-control p-3" id="phone" name="phone" 
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;" value="<%= address.phone %>">
+              <div id="phone-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- Alternate Phone -->
+          <div class="form-group mt-3">
+              <label for="altPhone" class="mb-2" style="font-weight: 500;">Alternate Phone</label>
+              <input type="text" class="form-control p-3" id="altPhone" name="altPhone"
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;" value="<%= address.altPhone %>">
+              <div id="altPhone" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- Landmark -->
+          <div class="form-group mt-3">
+              <label for="landMark" class="mb-2" style="font-weight: 500;">Landmark</label>
+              <input type="text" class="form-control p-3" id="landMark" name="landMark"
+               value="<%= address.landMark %>"
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;">
+              <div id="landMark-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- City -->
+          <div class="form-group mt-3">
+              <label for="city" class="mb-2" style="font-weight: 500;">City</label>
+              <input type="text" class="form-control p-3" id="city" name="city" value="<%= address.city %>"
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;">
+              <div id="city-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- State -->
+          <div class="form-group mt-3">
+              <label for="state" class="mb-2" style="font-weight: 500;">State</label>
+              <input type="text" class="form-control p-3" id="state" name="state" value="<%= address.state %>"
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;">
+              <div id="state-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- Country -->
+          <div class="form-group mt-3">
+              <label for="country" class="mb-2" style="font-weight: 500;">Country</label>
+              <input type="text" class="form-control p-3" id="country" name="country" value="<%= address.country %>"
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;">
+              <div id="country-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+          <!-- Zip Code -->
+          <div class="form-group mt-3">
+              <label for="zip" class="mb-2" style="font-weight: 500;">Zip Code</label>
+              <input type="number" class="form-control p-3" id="zip" name="pincode" value="<%= address.pincode %>"
+                  style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;">
+              <div id="zip-error" class="text-danger mt-1" style="font-size: 14px;"></div>
+          </div>
+
+
+          <button type="submit" class="btn btn-primary mt-4 p-3"
+              style="border-radius: 8px; font-size: 16px; font-weight: 500; background: #59ab6e; border: none;">
+              Save Address
+          </button>
+
+      </form>
+  </div>
+
+ <!--sidebar Footer section-->
+</section>
+</div>
+</div>
+</div>
+</main>
+
+<script>
+    document.getElementById('addressForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Clear previous error messages
+        document.querySelectorAll('.text-danger').forEach(function (element) {
+            element.textContent = '';
+        });
+
+        // Validate form fields
+        let isValid = true;
+
+        // Validate Address Type
+        const addressType = document.getElementById('addressType').value;
+        if (!addressType) {
+            document.getElementById('addressType-error').textContent = 'Address Type is required.';
+            isValid = false;
+        }
+
+        // Validate Full Name
+        const fullName = document.getElementById('fullName').value.trim();
+        if (!fullName) {
+            document.getElementById('fullName-error').textContent = 'Full Name is required.';
+            isValid = false;
+        }
+
+        // Validate Phone Number
+        const phone = document.getElementById('phone').value.trim();
+        if (!phone) {
+            document.getElementById('phone-error').textContent = 'Phone Number is required.';
+            isValid = false;
+        } else if (!/^\d{10}$/.test(phone)) {
+            document.getElementById('phone-error').textContent = 'Phone Number must be 10 digits.';
+            isValid = false;
+        }
+
+        // Validate City
+        const city = document.getElementById('city').value.trim();
+        if (!city) {
+            document.getElementById('city-error').textContent = 'City is required.';
+            isValid = false;
+        }
+
+        // Validate State
+        const state = document.getElementById('state').value.trim();
+        if (!state) {
+            document.getElementById('state-error').textContent = 'State is required.';
+            isValid = false;
+        }
+
+        // Validate Country
+        const country = document.getElementById('country').value.trim();
+        if (!country) {
+            document.getElementById('country-error').textContent = 'Country is required.';
+            isValid = false;
+        }
+
+        // Validate Zip Code
+        const zip = document.getElementById('zip').value.trim();
+        if (!zip) {
+            document.getElementById('zip-error').textContent = 'Zip Code is required.';
+            isValid = false;
+        } else if (!/^\d{6}$/.test(zip)) {
+            document.getElementById('zip-error').textContent = 'Zip Code must be 6 digits.';
+            isValid = false;
+        }
+
+        // If form is valid, submit and show success alert
+        if (isValid) {
+            setTimeout(()=>{
+                this.submit();
+            },1500)
+
+            // Show success alert
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your address has been added successfully.',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        } else {
+            // Show error alert
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please fill in all required fields correctly.',
+                icon: 'error',
+                showConfirmButton: false,
+                timer: 1500,
+
+            });
+        }
+    });
+</script>
+
+<%- include("../../views/partials/user/footer") %>
