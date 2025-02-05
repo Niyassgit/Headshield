@@ -26,6 +26,64 @@ TemplateMo 559 Zay Shop
 https://templatemo.com/tm-559-zay-shop
 
 -->
+
+<style>
+/* Background Overlay */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1040;
+}
+.cart-overlay.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Cart Sidebar */
+.wrap-header-cart {
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 350px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease-in-out;
+    z-index: 1050;
+    overflow-y: auto;
+}
+.wrap-header-cart.active {
+    right: 0;
+}
+
+/* Cart Button (Fixing Position) */
+.cart-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+}
+
+/* Disable Scroll when Cart is Open */
+body.no-scroll {
+    overflow: hidden;
+}
+.btn-close {
+    font-size: 18px !important; /* Reduce size */
+    padding: 5px; /* Adjust spacing */
+}
+
+
+
+</style>
+
 </head>
 
 <body>
@@ -95,10 +153,11 @@ https://templatemo.com/tm-559-zay-shop
                         <i class="fa fa-fw fa-search text-dark mr-2"></i>
                     </a>
                     <!-- Cart Icon -->
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
-                        <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
-                    </a>
+                    <a class="nav-icon position-relative text-decoration-none" href="javascript:void(0);" onclick="toggleCart()">
+    <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
+    <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
+</a>
+
                     <!-- User Icon -->
                     <a class="nav-icon position-relative text-decoration-none" href="#">
                         <i class="fa fa-fw fa-user text-dark mr-3"></i>
@@ -137,4 +196,44 @@ https://templatemo.com/tm-559-zay-shop
 
         </div>
     </nav>
+
+    
+<!-- CART OVERLAY (Disables Background Clicks) -->
+<div class="cart-overlay js-hide-cart"></div>
+
+<!-- CART SIDEBAR -->
+<div class="wrap-header-cart js-panel-cart">
+    <div class="header-cart flex-col-l">
+        <!-- Cart Header -->
+        <div class="header-cart-title d-flex justify-content-between align-items-center p-3 border-bottom">
+            <h5 class="m-0">Your Cart</h5>
+            <!-- <button class="btn-close fs-3 js-hide-cart"></button> -->
+        </div>
+
+        <!-- Cart Content -->
+        <div class="header-cart-content">
+            <ul class="header-cart-wrapitem list-unstyled">
+                <!-- Example cart item (Replace with dynamic data later) -->
+                <li class="header-cart-item d-flex align-items-center p-2">
+                    <div class="header-cart-item-img">
+                        <img src="product-image.jpg" alt="Product">
+                    </div>
+                    <div class="header-cart-item-txt ms-3">
+                        <a href="#" class="cart-item-name">Product Name</a>
+                        <p class="cart-item-info">2 x $50.00</p>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Cart Footer -->
+            <div class="cart-footer p-3">
+                <div class="header-cart-total">Total: $100.00</div>
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="/cart" class="btn btn-dark w-50 me-2">View Cart</a>
+                    <a href="/checkout" class="btn btn-success w-50">Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
    

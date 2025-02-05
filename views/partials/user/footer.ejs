@@ -132,6 +132,26 @@
                }
            ]
        });
+       function toggleCart() {
+    let cartSidebar = document.querySelector('.wrap-header-cart');
+    let overlay = document.querySelector('.cart-overlay');
+    
+    if (cartSidebar.classList.contains('active')) {
+        cartSidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.classList.remove('no-scroll'); // Enable scrolling
+    } else {
+        cartSidebar.classList.add('active');
+        overlay.classList.add('active');
+        document.body.classList.add('no-scroll'); // Disable scrolling when cart is open
+    }
+}
+
+// Close cart when clicking outside
+document.querySelector('.cart-overlay').addEventListener('click', toggleCart);
+document.querySelector('.js-hide-cart').addEventListener('click', toggleCart);
+
+
    </script>
 </body>
 
