@@ -1,11 +1,9 @@
 <%- include("../../views/partials/user/header") %>
-<!-- Cart Page Section -->
 <div class="container my-5">
     <!-- Heading Row -->
     <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
         <h2>Your Cart</h2>
         <a href="/shop" class="btn btn-outline-black" style="color:#59ab6e; border-color: #59ab6e;">Continue Shopping</a>
-
     </div>
 
     <!-- Cart Layout -->
@@ -13,50 +11,43 @@
         <!-- Left Side: Cart Items -->
         <div class="col-lg-8">
             <!-- Product Item -->
-            <div class="cart-item d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
-                <div class="cart-item-info d-flex align-items-center">
-                    <img src="product-image.jpg" alt="Product Name" width="100" class="me-3">
-                    <div>
-                        <h5>Product Name</h5>
-                        <p>Price: $50.00</p>
-                        <p>
-                            Quantity: 
-                            <input type="number" value="2" min="1" class="form-control quantity-input" style="width: 80px;">
-                        </p>
+            <% if (cart.items.length > 0) { %>
+                <% cart.items.forEach(item=>{ %>
+                    <div class="cart-item d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
+                        <div class="cart-item-info d-flex align-items-center">
+                            <img src="/uploads/re-image/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" width="100" class="me-3">
+                            <div>
+                                <h5><%= item.productId.productName %></h5>
+                                <p>Price: $<%= item.productId.salePrice %></p>
+                                <p>
+                                    Quantity: 
+                                    <input type="number" value="<%= item.quantity %>" min="1" class="form-control quantity-input" style="width: 80px;">
+                                </p>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger remove-item-btn">Remove</button>
                     </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-cart text-center">
+                    <h5>Your shopping cart is empty.</h5>
+                    <p>Browse our products and add items to your cart.</p>
                 </div>
-                <button class="btn btn-danger remove-item-btn">Remove</button>
-            </div>
-
-            <!-- Another Product -->
-            <div class="cart-item d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
-                <div class="cart-item-info d-flex align-items-center">
-                    <img src="product-image2.jpg" alt="Product Name" width="100" class="me-3">
-                    <div>
-                        <h5>Another Product</h5>
-                        <p>Price: $75.00</p>
-                        <p>
-                            Quantity: 
-                            <input type="number" value="1" min="1" class="form-control quantity-input" style="width: 80px;">
-                        </p>
-                    </div>
-                </div>
-                <button class="btn btn-danger remove-item-btn">Remove</button>
-            </div>
+            <% } %>
         </div>
-
-        <!-- Right Side: Cart Summary (Dimmed) -->
+        <!-- Right Side: Cart Summary -->
         <div class="col-lg-4">
             <div class="cart-summary p-4 rounded" style="background: rgba(0, 0, 0, 0.05);">
                 <h4>Cart Summary</h4>
                 <div class="border-bottom pb-3">
-                    <p>Total: <strong>$125.00</strong></p>
+                    <p>Total: <strong>$<%= cart.cartTotal %></strong></p>
                 </div>
                 <a href="/checkout" class="btn btn-success w-100 mt-4">Proceed to Checkout</a>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <%- include("../../views/partials/user/footer") %>

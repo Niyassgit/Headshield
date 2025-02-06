@@ -6,6 +6,7 @@ const nodemailer=require("nodemailer");
 const env=require("dotenv").config();
 const bcrypt=require("bcrypt");
 const { session } = require("passport");
+const Cart=require("../../models/cartSchema");
 
 const pageNotFound=async (req,res)=>{
 
@@ -19,8 +20,8 @@ const pageNotFound=async (req,res)=>{
 }
 const loadHomepage = async (req, res) => {
     try {
+
         const user = req.session.user;
-  
         const categories = await Category.find({ isListed: true });
         let productData = await Product.find({
             isBlocked: false,
@@ -33,7 +34,7 @@ const loadHomepage = async (req, res) => {
 
         if (user) {
             const userData = await User.findOne({ _id: user });
-            return res.render("home", { user: userData, products: productData });
+            return res.render("home", { user: userData, products: productData,});
         } else {
             return res.render("home", { user: null, products: productData });
         }

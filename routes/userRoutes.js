@@ -53,6 +53,8 @@ router.post("/editAddress",userAuth,profileController.postEditAddress);
 router.get("/deleteAddress",userAuth,profileController.deleteAddress);
 //cart management
 router.get("/cart",userAuth,cartController.viewCartPage);
+router.post("/addToCart",userAuth,cartController.addToCart);
+
 
 
 
