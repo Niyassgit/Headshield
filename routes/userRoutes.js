@@ -58,7 +58,7 @@ router.delete("/cart/deleteItem",userAuth,cartController.deleteItem);
 router.post('/cart/updateQuantity', cartController.updateQuantity);
 //checkout page
 router.get("/checkoutPage",userAuth,checkoutController.getcheckoutPage);
-
+router.post("/addNewAddress",userAuth,checkoutController.postAddAddress);
 
 
 

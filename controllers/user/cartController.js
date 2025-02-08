@@ -36,12 +36,13 @@ const viewCartPage = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-        
+
             const userId = req.session.user;
             
             if (!userId) {
                 return res.json({ success: false, redirectUrl: '/login'});
              }
+            console.log("body",req.body);
 
         const { productId, quantity } = req.body;  
         const cleanProductId = productId.trim(); 

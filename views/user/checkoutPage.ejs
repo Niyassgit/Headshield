@@ -24,6 +24,14 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
+        .address-box {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
 
         .address-card:hover {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -93,7 +101,7 @@
             background: #45a049;
         }
 
-        .order-summary {
+        .order-summary, .product-card {
             background: #fff;
             border-radius: 10px;
             padding: 1.5rem;
@@ -141,147 +149,259 @@
             background: #f1f8f1;
         }
     </style>    
-    <div class="checkout-container">
-        <h1 class="section-title text-center mb-5">Secure Checkout</h1>
-        
-        <div class="row">
-            <!-- Left Column -->
-            <div class="col-lg-7">
-                <!-- Delivery Address Section -->
-                <div class="mb-5">
-                    <h2 class="section-title">Delivery Address</h2>
-                    <% if(address.length > 0) { %>
-                        <% address.forEach(addr => { %>
-                            <div class="address-card selected">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="address">
-                                    <label class="form-check-label">
-                                        <strong><%= addr.addressType %></strong><br>
-                                        <%= addr.name %><br>
-                                        <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %>,<br>
-                                        <%= addr.country %>-<%= addr.pincode %>,<br>
-                                        <%= addr.phone %>
-                                    </label>
-                                </div>
+   <div class="checkout-container">
+    <h1 class="section-title text-center mb-5">Secure Checkout</h1>
+    
+    <div class="row">
+        <!-- Left Column (Addresses) -->
+        <div class="col-lg-6">
+            <div class="address-box">
+                <h2 class="section-title">Delivery Address</h2>
+                <% if(address.length > 0) { %>
+                    <% address.forEach(addr => { %>
+                        <div class="address-card">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="address">
+                                <label class="form-check-label">
+                                    <strong><%= addr.addressType %></strong><br>
+                                    <%= addr.name %><br>
+                                    <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %>,<br>
+                                    <%= addr.country %>-<%= addr.pincode %>,<br>
+                                    <%= addr.phone %>
+                                </label>
                             </div>
-                        <% }) %>
-                    <% } else { %>
-                        <p>No saved addresses found.</p>
-                    <% } %>
-                    
-                    
-                    <button class="add-address-btn mt-3">
-                        <i class="fas fa-plus me-2"></i> Add New Address
-                    </button>
-                </div>
-
-                <!-- Order Summary Section -->
-                <div class="order-summary mb-5">
-                    <h2 class="section-title">Order Summary</h2>
-                    <div class="summary-item">
-                        <div>
-                            <h6 class="mb-1">Premium Helmet Model A</h6>
-                            <small class="text-muted">Quantity: 1</small>
                         </div>
-                        <span>₹2,500</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Shipping</span>
-                        <span>Free</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Discount</span>
-                        <span class="text-success">-₹0</span>
-                    </div>
-                    <div class="summary-item">
-                        <strong>Total</strong>
-                        <strong>₹2,500</strong>
-                    </div>
-                </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No saved addresses found.</p>
+                <% } %>
 
-                <!-- Coupon Section -->
-                <div class="coupon-section">
-                    <h2 class="section-title">Have a Coupon?</h2>
-                    <div class="input-group">
-                        <input type="text" class="coupon-input" placeholder="Enter coupon code">
-                        <button class="apply-btn ms-2">Apply</button>
-                    </div>
+                <button class="add-address-btn mt-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                    <i class="fas fa-plus me-2"></i> Add New Address
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Column (Order Summary, Payment, Coupon) -->
+        <div class="col-lg-6">
+            <!-- Order Summary Box -->
+            <div class="order-summary">
+                <h2 class="section-title">Order Summary</h2>
+                <% if(cart.length > 0){ %>
+                    <% cart.forEach(item => { %>
+                        <div class="summary-item">
+                            <div>
+                                <h6 class="mb-1"><%= item.productId.productName %></h6>
+                                <small class="text-muted"><%= item.quantity %> x ₹<%= item.price %></small>
+                            </div>
+                            <span><strong>₹<%= item.quantity * item.price %></strong></span>  
+                        </div>
+                    <% }) %>
+                <% } %>
+
+                <div class="summary-item">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="summary-item">
+                    <span>Discount</span>
+                    <span class="text-success">-₹0</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Total</strong>
+                    <strong>₹<%= cartTotal %></strong> 
                 </div>
             </div>
 
-            <!-- Right Column -->
-            <div class="col-lg-5">
-                <!-- Payment Method Section -->
-                <div class="product-card">
-                    <h2 class="section-title">Payment Method</h2>
-                    <div class="payment-option selected">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked>
-                            <label class="form-check-label" for="cod">
-                                <i class="fas fa-money-bill-wave me-2"></i>
-                                Cash on Delivery
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="payment-option">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="wallet">
-                            <label class="form-check-label" for="wallet">
-                                <i class="fas fa-wallet me-2"></i>
-                                Wallet Balance: ₹3,000
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="payment-option">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="upi">
-                            <label class="form-check-label" for="upi">
-                                <i class="fas fa-mobile-alt me-2"></i>
-                                UPI Payment
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="payment-option">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="card">
-                            <label class="form-check-label" for="card">
-                                <i class="fas fa-credit-card me-2"></i>
-                                Credit/Debit Card
-                            </label>
-                        </div>
-                    </div>
-
-                    <button class="place-order-btn mt-4">
-                        <i class="fas fa-lock me-2"></i> Place Order Securely
-                    </button>
+            <!-- Coupon Section -->
+            <div class="coupon-section mt-3">
+                <h2 class="section-title">Have a Coupon?</h2>
+                <div class="input-group">
+                    <input type="text" class="coupon-input" placeholder="Enter coupon code">
+                    <button class="apply-btn ms-2">Apply</button>
                 </div>
+            </div>
+
+            <!-- Payment Method Box -->
+            <div class="product-card mt-3">
+                <h2 class="section-title">Payment Method</h2>
+                <div class="payment-option selected">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked>
+                        <label class="form-check-label" for="cod">
+                            <i class="fas fa-money-bill-wave me-2"></i> Cash on Delivery
+                        </label>
+                    </div>
+                </div>
+
+                <div class="payment-option">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="wallet">
+                        <label class="form-check-label" for="wallet">
+                            <i class="fas fa-wallet me-2"></i> Wallet Balance: ₹3,000
+                        </label>
+                    </div>
+                </div>
+
+                <div class="payment-option">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="upi">
+                        <label class="form-check-label" for="upi">
+                            <i class="fas fa-mobile-alt me-2"></i> UPI Payment
+                        </label>
+                    </div>
+                </div>
+
+                <div class="payment-option">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="card">
+                        <label class="form-check-label" for="card">
+                            <i class="fas fa-credit-card me-2"></i> Credit/Debit Card
+                        </label>
+                    </div>
+                </div>
+
+                <button class="place-order-btn mt-4">
+                    <i class="fas fa-lock me-2"></i> Place Order Securely
+                </button>
             </div>
         </div>
     </div>
+</div>
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Address Form -->
+                <form id="addAddressForm" action="/addNewAddress" method="POST">
+                    <!-- Address Type with Toggle -->
+                    <div class="mb-3">
+                        <label for="addressType" class="mb-2" style="font-weight: 500;">Address Type</label>
+                        <select class="form-control p-3" id="addressType" name="addressType"
+                            style="border-radius: 8px; border: 1px solid #ddd; font-size: 16px;" required>
+                            <option value="">Select Address Type</option>
+                            <option value="Home">Home</option>
+                            <option value="Work">Work</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    
 
-    <script>
-        // Add interactive elements
-        document.querySelectorAll('.address-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                const radio = card.querySelector('input[type="radio"]');
-                radio.checked = true;
-            });
-        });
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
 
-        document.querySelectorAll('.payment-option').forEach(option => {
-            option.addEventListener('click', () => {
-                document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-                option.classList.add('selected');
-                const radio = option.querySelector('input[type="radio"]');
-                radio.checked = true;
-            });
+                    <!-- Landmark -->
+                    <div class="mb-3">
+                        <label for="landmark" class="form-label">Landmark</label>
+                        <input type="text" class="form-control" id="landmark" name="landMark" required>
+                    </div>
+
+                    <!-- City -->
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="city" required>
+                    </div>
+
+                    <!-- State -->
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" name="state" required>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" class="form-control" id="country" name="country" required>
+                    </div>
+
+                    <!-- Pincode -->
+                    <div class="mb-3">
+                        <label for="pincode" class="form-label">Pincode</label>
+                        <input type="number" class="form-control" id="pincode" name="pincode" required>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="phone" name="phone" required>
+                    </div>
+
+                    <!-- Alternate Phone Number -->
+                    <div class="mb-3">
+                        <label for="altPhone" class="form-label">Alternate Phone Number</label>
+                        <input type="text" class="form-control" id="altPhone" name="altPhone">
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Save Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Address Selection
+    document.querySelectorAll('.address-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            const radio = card.querySelector('input[type="radio"]');
+            radio.checked = true;
         });
-    </script>
+    });
+
+    // Payment Selection
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            const radio = option.querySelector('input[type="radio"]');
+            radio.checked = true;
+        });
+    });
+
+    document.getElementById("addAddressForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const addressType = document.getElementById("addressType").value;
+
+    if (!addressType) {
+        Swal.fire("Error", "Please select an address type!", "error");
+        return;
+    }
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to save this new address?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, save it!',
+        cancelButtonText: 'No, cancel!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            setTimeout(() => {
+                this.submit();
+            }, 1000);
+        } else {
+            console.log("Address saving cancelled.");
+        }
+    });
+});
+
+
+</script>
+
 
 
 
