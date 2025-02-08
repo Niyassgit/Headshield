@@ -1,0 +1,288 @@
+<%- include("../../views/partials/user/header") %>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #2d3436;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .address-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .address-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .address-card.selected {
+            border: 2px solid #4CAF50;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .payment-option {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .payment-option:hover {
+            background: #f8f9fa;
+        }
+
+        .payment-option.selected {
+            border-color: #4CAF50;
+            background: #f1f8f1;
+        }
+
+        .payment-icon {
+            width: 24px;
+            margin-right: 10px;
+        }
+
+        .coupon-section {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .coupon-input {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            width: 70%;
+        }
+
+        .apply-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .apply-btn:hover {
+            background: #45a049;
+        }
+
+        .order-summary {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .place-order-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .place-order-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .add-address-btn {
+            background: transparent;
+            border: 2px dashed #4CAF50;
+            color: #4CAF50;
+            border-radius: 8px;
+            padding: 1rem;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-address-btn:hover {
+            background: #f1f8f1;
+        }
+    </style>    
+    <div class="checkout-container">
+        <h1 class="section-title text-center mb-5">Secure Checkout</h1>
+        
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-lg-7">
+                <!-- Delivery Address Section -->
+                <div class="mb-5">
+                    <h2 class="section-title">Delivery Address</h2>
+                    <% if(address.length > 0) { %>
+                        <% address.forEach(addr => { %>
+                            <div class="address-card selected">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="address">
+                                    <label class="form-check-label">
+                                        <strong><%= addr.addressType %></strong><br>
+                                        <%= addr.name %><br>
+                                        <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %>,<br>
+                                        <%= addr.country %>-<%= addr.pincode %>,<br>
+                                        <%= addr.phone %>
+                                    </label>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p>No saved addresses found.</p>
+                    <% } %>
+                    
+                    
+                    <button class="add-address-btn mt-3">
+                        <i class="fas fa-plus me-2"></i> Add New Address
+                    </button>
+                </div>
+
+                <!-- Order Summary Section -->
+                <div class="order-summary mb-5">
+                    <h2 class="section-title">Order Summary</h2>
+                    <div class="summary-item">
+                        <div>
+                            <h6 class="mb-1">Premium Helmet Model A</h6>
+                            <small class="text-muted">Quantity: 1</small>
+                        </div>
+                        <span>₹2,500</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Shipping</span>
+                        <span>Free</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Discount</span>
+                        <span class="text-success">-₹0</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Total</strong>
+                        <strong>₹2,500</strong>
+                    </div>
+                </div>
+
+                <!-- Coupon Section -->
+                <div class="coupon-section">
+                    <h2 class="section-title">Have a Coupon?</h2>
+                    <div class="input-group">
+                        <input type="text" class="coupon-input" placeholder="Enter coupon code">
+                        <button class="apply-btn ms-2">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-5">
+                <!-- Payment Method Section -->
+                <div class="product-card">
+                    <h2 class="section-title">Payment Method</h2>
+                    <div class="payment-option selected">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                <i class="fas fa-money-bill-wave me-2"></i>
+                                Cash on Delivery
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="payment-option">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="wallet">
+                            <label class="form-check-label" for="wallet">
+                                <i class="fas fa-wallet me-2"></i>
+                                Wallet Balance: ₹3,000
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="payment-option">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="upi">
+                            <label class="form-check-label" for="upi">
+                                <i class="fas fa-mobile-alt me-2"></i>
+                                UPI Payment
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="payment-option">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="card">
+                            <label class="form-check-label" for="card">
+                                <i class="fas fa-credit-card me-2"></i>
+                                Credit/Debit Card
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="place-order-btn mt-4">
+                        <i class="fas fa-lock me-2"></i> Place Order Securely
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive elements
+        document.querySelectorAll('.address-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                const radio = card.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                const radio = option.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+    </script>
+
+
+
+<%- include("../../views/partials/user/footer") %>

@@ -6,7 +6,7 @@ const nodemailer=require("nodemailer");
 const env=require("dotenv").config();
 const bcrypt=require("bcrypt");
 const { session } = require("passport");
-const Cart=require("../../models/cartSchema");
+
 
 const pageNotFound=async (req,res)=>{
 
@@ -28,6 +28,7 @@ const loadHomepage = async (req, res) => {
             category: { $in: categories.map(category => category._id) },
             quantity: { $gt: 0 }
         });
+      
 
         productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
         productData = productData.slice(0, 3);
@@ -36,7 +37,7 @@ const loadHomepage = async (req, res) => {
             const userData = await User.findOne({ _id: user });
             return res.render("home", { user: userData, products: productData,});
         } else {
-            return res.render("home", { user: null, products: productData });
+            return res.render("home", { user: null, products: productData, });
         }
 
     } catch (error) {
@@ -288,7 +289,7 @@ const loadShoppingPage=async(req,res)=>{
             _id:category._id,
             name:category.name
         }))
-
+        
         return res.render("shop", {
             user: userData,
             products:products,

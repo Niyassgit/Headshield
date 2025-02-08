@@ -1,4 +1,5 @@
 <%- include("../../views/partials/user/header") %>
+
 <div class="container my-5">
     <!-- Heading Row -->
     <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
@@ -9,23 +10,23 @@
     <!-- Cart Layout -->
     <div class="row mt-4">
         <!-- Left Side: Cart Items -->
-        <div class="col-lg-8">
-            <!-- Product Item -->
+        <div class="col-lg-8" id="cart-items-container">
             <% if (cart.items.length > 0) { %>
-                <% cart.items.forEach(item=>{ %>
-                    <div class="cart-item d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
+                <% cart.items.forEach(item => { %>
+                    <div class="cart-item d-flex justify-content-between align-items-center mb-4 border-bottom pb-4" data-product-id="<%= item.productId._id %>">
                         <div class="cart-item-info d-flex align-items-center">
                             <img src="/uploads/re-image/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" width="100" class="me-3">
                             <div>
                                 <h5><%= item.productId.productName %></h5>
-                                <p>Price: $<%= item.productId.salePrice %></p>
-                                <p>
-                                    Quantity: 
-                                    <input type="number" value="<%= item.quantity %>" min="1" class="form-control quantity-input" style="width: 80px;">
-                                </p>
+                                <p>Price: ₹<span class="item-price"><%= item.productId.salePrice %></span></p>
+                                <div class="quantity-controls d-flex align-items-center">
+                                    <button class="btn btn-sm btn-outline-secondary minus-btn" data-product-id="<%= item.productId._id %>">-</button>
+                                    <span class="quantity-display mx-3"><%= item.quantity %></span>
+                                    <button class="btn btn-sm btn-outline-secondary plus-btn" data-product-id="<%= item.productId._id %>">+</button>
+                                </div>
                             </div>
                         </div>
-                        <button class="btn btn-danger remove-item-btn">Remove</button>
+                        <button class="btn btn-danger remove-item-btn" data-product-id="<%= item.productId._id %>">Remove</button>
                     </div>
                 <% }); %>
             <% } else { %>
@@ -40,14 +41,145 @@
             <div class="cart-summary p-4 rounded" style="background: rgba(0, 0, 0, 0.05);">
                 <h4>Cart Summary</h4>
                 <div class="border-bottom pb-3">
-                    <p>Total: <strong>$<%= cart.cartTotal %></strong></p>
+                    <p>Total: <strong>₹<span id="cart-total"><%= cart.cartTotal %></span></strong></p>
                 </div>
-                <a href="/checkout" class="btn btn-success w-100 mt-4">Proceed to Checkout</a>
+                <a href="/checkoutPage" class="btn btn-success w-100 mt-4">Proceed to Checkout</a>
             </div>
         </div>
     </div>
-</div>
+</div> 
 
+<!-- Toastify CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<!-- Toastify JS -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+    const removeButtons = document.querySelectorAll(".remove-item-btn");
+
+    removeButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const productId = this.getAttribute("data-product-id");
+        
+            fetch("/cart/deleteItem", {
+                method: "DELETE", 
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ productId: productId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
+                    if (cartItem) {
+                        cartItem.remove();
+                    }
+                    const cartTotalElement = document.getElementById("cart-total");
+                    if (cartTotalElement) {
+                         cartTotalElement.innerText = data.cartTotal;
+                    }
+
+                    Toastify({
+                        text: data.message,
+                        duration: 3000,
+                        backgroundColor: "green",
+                        close: true
+                    }).showToast();
+                } else {
+                   
+                    Toastify({
+                        text: data.message,
+                        duration: 3000,
+                        backgroundColor: "red",
+                        close: true
+                    }).showToast();
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Toastify({
+                    text: "Something went wrong. Please try again later.",
+                    duration: 3000,
+                    backgroundColor: "red",
+                    close: true
+                }).showToast();
+            });
+        });
+    });
+
+    const plusButtons = document.querySelectorAll(".plus-btn");
+    const minusButtons = document.querySelectorAll(".minus-btn");
+
+    function updateQuantity(productId, change) {
+        const quantityDisplay = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-display`);
+        const currentQuantity = parseInt(quantityDisplay.textContent);
+        const newQuantity = currentQuantity + change;
+
+        fetch("/cart/updateQuantity", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 
+                productId: productId,
+                quantity: change 
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                quantityDisplay.textContent = newQuantity;
+                
+                const cartTotalElement = document.getElementById("cart-total");
+                cartTotalElement.textContent = data.cartTotal;
+
+                Toastify({
+                    text: "Cart updated successfully",
+                    duration: 3000,
+                    backgroundColor: "green",
+                    close: true
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message,
+                    duration: 3000,
+                    backgroundColor: "red",
+                    close: true
+                }).showToast();
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            Toastify({
+                text: "Something went wrong. Please try again later.",
+                duration: 3000,
+                backgroundColor: "red",
+                close: true
+            }).showToast();
+        });
+    }
+
+    plusButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const productId = this.getAttribute("data-product-id");
+            updateQuantity(productId, 1);
+        });
+    });
+
+    minusButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const productId = this.getAttribute("data-product-id");
+            updateQuantity(productId, -1);
+        });
+    });
+});
+
+
+
+       
+</script>
 
 
 <%- include("../../views/partials/user/footer") %>

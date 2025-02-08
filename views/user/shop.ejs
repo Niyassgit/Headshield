@@ -299,8 +299,6 @@ document.querySelectorAll('.add-to-cart').forEach(button => {
         
         
         try {
-
-            console.log('pr',productQuantity);
             
             const response = await fetch("/addToCart", {
                 method: 'POST',
@@ -310,7 +308,7 @@ document.querySelectorAll('.add-to-cart').forEach(button => {
                 },
                 body: JSON.stringify({ 
                     productId: productId,
-                    productQuantity: productQuantity
+                    quantity: productQuantity
                 }),
             });
 

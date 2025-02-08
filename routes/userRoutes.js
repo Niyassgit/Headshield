@@ -6,7 +6,7 @@ const {userAuth,isBlocked}=require("../middlewares/auth");
 const productController=require("../controllers/user/productController");
 const profileController =require("../controllers/user/profileController");
 const cartController=require("../controllers/user/cartController");
-
+const checkoutController=require("../controllers/user/checkoutController");
 
 router.get("/pageNotFound",userController.pageNotFound)
 
@@ -54,7 +54,10 @@ router.get("/deleteAddress",userAuth,profileController.deleteAddress);
 //cart management
 router.get("/cart",userAuth,cartController.viewCartPage);
 router.post("/addToCart",userAuth,cartController.addToCart);
-
+router.delete("/cart/deleteItem",userAuth,cartController.deleteItem);
+router.post('/cart/updateQuantity', cartController.updateQuantity);
+//checkout page
+router.get("/checkoutPage",userAuth,checkoutController.getcheckoutPage);
 
 
 
