@@ -149,141 +149,142 @@
             background: #f1f8f1;
         }
     </style>    
-   <div class="checkout-container">
-    <h1 class="section-title text-center mb-5">Secure Checkout</h1>
-    
-    <div class="row">
-        <!-- Left Column (Addresses) -->
-        <div class="col-lg-6">
-            <div class="address-box">
-                <h2 class="section-title">Delivery Address</h2>
-                <% address.forEach(addr => { %>
-                    <div class="address-card">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="address" value="<%= addr._id %>">
-                            <label class="form-check-label">
-                                <strong><%= addr.addressType %></strong><br>
-                                <%= addr.name %><br>
-                                <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %>,<br>
-                                <%= addr.country %>-<%= addr.pincode %>,<br>
-                                <%= addr.phone %>
-                            </label>
-                        </div>
-                        <div class="address-actions mt-2">
-                            <button class="btn btn-sm btn-outline-primary edit-address" 
-                            data-address-id="<%= addr._id %>"
-                            data-address-type="<%= addr.addressType %>"
-                            data-name="<%= addr.name %>"
-                            data-phone="<%= addr.phone %>"
-                            data-altphone="<%= addr.altPhone %>"
-                            data-landmark="<%= addr.landMark %>"
-                            data-city="<%= addr.city %>"
-                            data-state="<%= addr.state %>"
-                            data-country="<%= addr.country %>"
-                            data-pincode="<%= addr.pincode %>"
-                            data-bs-toggle="modal" data-bs-target="#editAddressModal">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        
-                            <!-- <button class="btn btn-sm btn-outline-danger delete-address" data-address-id="<%= addr._id %>">
-                                <i class="fas fa-trash"></i> Delete
-                            </button> -->
-                        </div>
-                    </div>
-                <% }) %>
+  <form action="/placeOrder" method="POST">
+    <div class="checkout-container">
+        <h1 class="section-title text-center mb-5">Secure Checkout</h1>
 
-                <button class="add-address-btn mt-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
-                    <i class="fas fa-plus me-2"></i> Add New Address
-                </button>
-            </div>
-        </div>
-
-        <!-- Right Column (Order Summary, Payment, Coupon) -->
-        <div class="col-lg-6">
-            <!-- Order Summary Box -->
-            <div class="order-summary">
-                <h2 class="section-title">Order Summary</h2>
-                <% if(cart.length > 0){ %>
-                    <% cart.forEach(item => { %>
-                        <div class="summary-item">
-                            <div>
-                                <h6 class="mb-1"><%= item.productId.productName %></h6>
-                                <small class="text-muted"><%= item.quantity %> x ₹<%= item.price %></small>
+        <div class="row">
+            <!-- Left Column (Addresses) -->
+            <div class="col-lg-6">
+                <div class="address-box">
+                    <h2 class="section-title">Delivery Address</h2>
+                    <% address.forEach(addr => { %>
+                        <div class="address-card">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="address" value="<%= addr._id %>">
+                                <label class="form-check-label">
+                                    <strong><%= addr.addressType %></strong><br>
+                                    <%= addr.name %><br>
+                                    <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %>,<br>
+                                    <%= addr.country %>-<%= addr.pincode %>,<br>
+                                    <%= addr.phone %>
+                                </label>
                             </div>
-                            <span><strong>₹<%= item.quantity * item.price %></strong></span>  
+                            <div class="address-actions mt-2">
+                                <button class="btn btn-sm btn-outline-primary edit-address" 
+                                    data-address-id="<%= addr._id %>"
+                                    data-address-type="<%= addr.addressType %>"
+                                    data-name="<%= addr.name %>"
+                                    data-phone="<%= addr.phone %>"
+                                    data-altphone="<%= addr.altPhone %>"
+                                    data-landmark="<%= addr.landMark %>"
+                                    data-city="<%= addr.city %>"
+                                    data-state="<%= addr.state %>"
+                                    data-country="<%= addr.country %>"
+                                    data-pincode="<%= addr.pincode %>"
+                                    data-bs-toggle="modal" data-bs-target="#editAddressModal">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </div>
                         </div>
                     <% }) %>
-                <% } %>
 
-                <div class="summary-item">
-                    <span>Shipping</span>
-                    <span>Free</span>
-                </div>
-                <div class="summary-item">
-                    <span>Discount</span>
-                    <span class="text-success">-₹0</span>
-                </div>
-                <div class="summary-item">
-                    <strong>Total</strong>
-                    <strong>₹<%= cartTotal %></strong> 
+                    <button class="add-address-btn mt-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <i class="fas fa-plus me-2"></i> Add New Address
+                    </button>
                 </div>
             </div>
 
-            <!-- Coupon Section -->
-            <div class="coupon-section mt-3">
-                <h2 class="section-title">Have a Coupon?</h2>
-                <div class="input-group">
-                    <input type="text" class="coupon-input" placeholder="Enter coupon code">
-                    <button class="apply-btn ms-2">Apply</button>
-                </div>
-            </div>
+            <!-- Right Column (Order Summary, Payment, Coupon) -->
+            <div class="col-lg-6">
+                <!-- Order Summary Box -->
+                <div class="order-summary">
+                    <h2 class="section-title">Order Summary</h2>
+                    <% if(cart.length > 0){ %>
+                        <% cart.forEach(item => { %>
+                            <div class="summary-item">
+                                <div>
+                                    <h6 class="mb-1"><%= item.productId.productName %></h6>
+                                    <small class="text-muted"><%= item.quantity %> x ₹<%= item.price %></small>
+                                </div>
+                                <span><strong>₹<%= item.quantity * item.price %></strong></span>  
+                            </div>
+                        <% }) %>
+                    <% } %>
 
-            <!-- Payment Method Box -->
-            <div class="product-card mt-3">
-                <h2 class="section-title">Payment Method</h2>
-                <div class="payment-option selected">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked>
-                        <label class="form-check-label" for="cod">
-                            <i class="fas fa-money-bill-wave me-2"></i> Cash on Delivery
-                        </label>
+                    <div class="summary-item">
+                        <span>Shipping</span>
+                        <span>Free</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Discount</span>
+                        <span class="text-success">-₹0</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Total</strong>
+                        <strong>₹<%= cartTotal %></strong> 
                     </div>
                 </div>
 
-                <div class="payment-option">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="wallet">
-                        <label class="form-check-label" for="wallet">
-                            <i class="fas fa-wallet me-2"></i> Wallet Balance: ₹3,000
-                        </label>
+                <!-- Coupon Section -->
+                <div class="coupon-section mt-3">
+                    <h2 class="section-title">Have a Coupon?</h2>
+                    <div class="input-group">
+                        <input type="text" name="coupon" class="coupon-input" placeholder="Enter coupon code">
+                        <button class="apply-btn ms-2">Apply</button>
                     </div>
                 </div>
 
-                <div class="payment-option">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="upi">
-                        <label class="form-check-label" for="upi">
-                            <i class="fas fa-mobile-alt me-2"></i> UPI Payment
-                        </label>
+                <!-- Payment Method Box -->
+                <div class="product-card mt-3">
+                    <h2 class="section-title">Payment Method</h2>
+                    <div class="payment-option selected">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked value="cod">
+                            <label class="form-check-label" for="cod">
+                                <i class="fas fa-money-bill-wave me-2"></i> Cash on Delivery
+                            </label>
+                        </div>
                     </div>
-                </div>
 
-                <div class="payment-option">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="card">
-                        <label class="form-check-label" for="card">
-                            <i class="fas fa-credit-card me-2"></i> Credit/Debit Card
-                        </label>
+                    <div class="payment-option">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="wallet">
+                            <label class="form-check-label" for="wallet">
+                                <i class="fas fa-wallet me-2"></i> Wallet Balance: ₹3,000
+                            </label>
+                        </div>
                     </div>
-                </div>
 
-                <button class="place-order-btn mt-4">
-                    <i class="fas fa-lock me-2"></i> Place Order Securely
-                </button>
+                    <div class="payment-option">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
+                            <label class="form-check-label" for="upi">
+                                <i class="fas fa-mobile-alt me-2"></i> UPI Payment
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="payment-option">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="card" value="card">
+                            <label class="form-check-label" for="card">
+                                <i class="fas fa-credit-card me-2"></i> Credit/Debit Card
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Place Order Button Inside Payment Method -->
+                    <button type="submit" class="btn btn-success mt-4 w-100">
+                        <i class="fas fa-check me-2"></i> Place Order
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
+
+
 <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -551,31 +552,90 @@
         }
     });
 
+  
 
-    });
-
-
-    // Address Selection
     document.querySelectorAll('.address-card').forEach(card => {
         card.addEventListener('click', () => {
             document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
+
             const radio = card.querySelector('input[type="radio"]');
             radio.checked = true;
+            radio.dispatchEvent(new Event("change")); 
         });
     });
 
-    // Payment Selection
     document.querySelectorAll('.payment-option').forEach(option => {
         option.addEventListener('click', () => {
             document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
             option.classList.add('selected');
+
             const radio = option.querySelector('input[type="radio"]');
             radio.checked = true;
+            radio.dispatchEvent(new Event("change")); 
         });
     });
 
+    const formA = document.querySelector("form[action='/placeOrder']");
+if (formA) {
+    formA.addEventListener("submit", function (event) {
+        event.preventDefault();
 
+        const selectedAddress = document.querySelector("input[name='address']:checked");
+        const selectedPayment = document.querySelector("input[name='paymentMethod']:checked");
+
+        if (!selectedAddress || !selectedPayment) {
+            Swal.fire("Error!", "Please select an address and payment method.", "error");
+            return;
+        }
+
+        const formData = new FormData(formA);
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to confirm your order?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, place order!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("/placeOrder", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        address: selectedAddress.value,
+                        paymentMethod: selectedPayment.value,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: "Success!",
+                            text: data.message,
+                            icon: "success"
+                        }).then(() => {
+                            window.location.href = "/cart";
+                        });
+                    } else {
+                        Swal.fire("Failed!", data.message || "Something went wrong.", "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire("Error!", "An unexpected error occurred.", "error");
+                });
+            }
+        });
+    });
+} else {
+    console.error("Error: The form with action='/placeOrder' was not found.");
+}
+    });
 
 
 </script>

@@ -7,7 +7,7 @@ const productController=require("../controllers/user/productController");
 const profileController =require("../controllers/user/profileController");
 const cartController=require("../controllers/user/cartController");
 const checkoutController=require("../controllers/user/checkoutController");
-
+const orderController =require("../controllers/user/orderController");
 router.get("/pageNotFound",userController.pageNotFound)
 
 //public Routes
@@ -60,6 +60,9 @@ router.post('/cart/updateQuantity', cartController.updateQuantity);
 router.get("/checkoutPage",userAuth,checkoutController.getcheckoutPage);
 router.post("/addNewAddress",userAuth,checkoutController.postAddAddress);
 router.post("/checkoutPage/editAddress",userAuth,checkoutController.postEditAddress);
+//place order
+router.post("/placeOrder",userAuth,orderController.placeOrder);
+router.get("/Orders",userAuth,orderController.getOrders);
 
 
 module.exports=router;

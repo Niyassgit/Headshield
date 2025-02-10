@@ -1,0 +1,152 @@
+<%- include("../../views/partials/user/header") %>
+<style>
+    body {
+        background-color: #f7f7f7;
+    }
+
+    .order-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .order-card-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .order-card-body {
+        display: none; /* Hidden by default */
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .order-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-right: 15px;
+    }
+
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        border-radius: 15px;
+        margin-left: 10px;
+    }
+
+    .btn-view {
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-view:hover {
+        background-color: #0056b3;
+    }
+
+    .total-price {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container py-5">
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Order History</h2>
+
+        <!-- Order 1 -->
+        <div class="order-card">
+            <div class="order-card-header">
+                <div>Order ID: 12345</div>
+                <div><span class="badge bg-warning">Pending</span></div>
+            </div>
+            <div class="order-card-body">
+                <div class="order-item">
+                    <img src="https://via.placeholder.com/60" alt="Product Image">
+                    <div>Full Face Helmet (x2) - $150</div>
+                    <span class="status-badge bg-warning">Pending</span>
+                </div>
+                <div class="order-item">
+                    <img src="https://via.placeholder.com/60" alt="Product Image">
+                    <div>Gloves (x1) - $50</div>
+                    <span class="status-badge bg-success">Shipped</span>
+                </div>
+                <div class="total-price">
+                    <p><strong>Total: </strong>$350</p>
+                </div>
+                <p><strong>Shipping Address:</strong> John Doe, 123 Main St, City, Country, 12345</p>
+                <p><strong>Payment Method:</strong> Credit Card</p>
+            </div>
+            <button class="btn-view" onclick="toggleDetails(this)">View Item</button>
+        </div>
+
+        <!-- Order 2 -->
+        <div class="order-card">
+            <div class="order-card-header">
+                <div>Order ID: 12346</div>
+                <div><span class="badge bg-success">Shipped</span></div>
+            </div>
+            <div class="order-card-body">
+                <div class="order-item">
+                    <img src="https://via.placeholder.com/60" alt="Product Image">
+                    <div>Boots (x1) - $100</div>
+                    <span class="status-badge bg-success">Shipped</span>
+                </div>
+                <div class="order-item">
+                    <img src="https://via.placeholder.com/60" alt="Product Image">
+                    <div>Jacket (x1) - $200</div>
+                    <span class="status-badge bg-warning">Pending</span>
+                </div>
+                <div class="total-price">
+                    <p><strong>Total: </strong>$300</p>
+                </div>
+                <p><strong>Shipping Address:</strong> Jane Smith, 456 Another St, Town, Country, 654321</p>
+                <p><strong>Payment Method:</strong> PayPal</p>
+            </div>
+            <button class="btn-view" onclick="toggleDetails(this)">View Item</button>
+        </div>
+
+    </div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleDetails(button) {
+    const orderCard = button.closest('.order-card');
+    const orderBody = orderCard.querySelector('.order-card-body');
+    const isVisible = orderBody.style.display === 'block';
+    
+    // Toggle the body visibility
+    orderBody.style.display = isVisible ? 'none' : 'block';
+    
+    // Update button text
+    button.textContent = isVisible ? 'View Item' : 'Hide Item';
+}
+</script>
+
+
+
+
+
+
+<%- include("../../views/partials/user/footer") %>
