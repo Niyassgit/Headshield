@@ -61,7 +61,42 @@ const postAddAddress= async(req,res)=>{
         res.redirect("/checkoutPage");
     }
 };
+const postEditAddress = async (req, res) => {
+    try {
+        const { addressId, addressType, name, phone, altPhone, landMark, city, state, country, pincode } = req.body;
+
+        const findAddress = await Address.findOne({ "address._id": addressId });
+        if (!findAddress) {
+            return res.redirect("/pageNotFound");
+        }
+
+        await Address.updateOne(
+            { "address._id": addressId },
+            {
+                $set: {
+                    "address.$.addressType": addressType,
+                    "address.$.name": name,
+                    "address.$.phone": phone,
+                    "address.$.altPhone": altPhone,
+                    "address.$.landMark": landMark,
+                    "address.$.city": city,
+                    "address.$.state": state,
+                    "address.$.pincode": pincode,
+                    "address.$.country": country
+                }
+            }
+        );
+
+        return res.redirect("/checkoutPage");
+    } catch (error) {
+        console.log("Error updating address:", error);
+        res.redirect("/pageNotFound");
+    }
+};
+
 module.exports={
     getcheckoutPage,
-    postAddAddress
+    postAddAddress,
+    postEditAddress,
+
 }

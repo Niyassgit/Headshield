@@ -110,31 +110,27 @@
 
 <script>
     document.getElementById('addressForm').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent form submission
+        event.preventDefault(); 
 
-        // Clear previous error messages
         document.querySelectorAll('.text-danger').forEach(function (element) {
             element.textContent = '';
         });
 
-        // Validate form fields
         let isValid = true;
 
-        // Validate Address Type
         const addressType = document.getElementById('addressType').value;
         if (!addressType) {
             document.getElementById('addressType-error').textContent = 'Address Type is required.';
             isValid = false;
         }
 
-        // Validate Full Name
+
         const fullName = document.getElementById('fullName').value.trim();
         if (!fullName) {
             document.getElementById('fullName-error').textContent = 'Full Name is required.';
             isValid = false;
         }
 
-        // Validate Phone Number
         const phone = document.getElementById('phone').value.trim();
         if (!phone) {
             document.getElementById('phone-error').textContent = 'Phone Number is required.';
@@ -144,28 +140,22 @@
             isValid = false;
         }
 
-        // Validate City
+       
         const city = document.getElementById('city').value.trim();
         if (!city) {
             document.getElementById('city-error').textContent = 'City is required.';
             isValid = false;
         }
-
-        // Validate State
         const state = document.getElementById('state').value.trim();
         if (!state) {
             document.getElementById('state-error').textContent = 'State is required.';
             isValid = false;
         }
-
-        // Validate Country
         const country = document.getElementById('country').value.trim();
         if (!country) {
             document.getElementById('country-error').textContent = 'Country is required.';
             isValid = false;
         }
-
-        // Validate Zip Code
         const zip = document.getElementById('zip').value.trim();
         if (!zip) {
             document.getElementById('zip-error').textContent = 'Zip Code is required.';
@@ -174,14 +164,10 @@
             document.getElementById('zip-error').textContent = 'Zip Code must be 6 digits.';
             isValid = false;
         }
-
-        // If form is valid, submit and show success alert
         if (isValid) {
             setTimeout(()=>{
                 this.submit();
             },1500)
-
-            // Show success alert
             Swal.fire({
                 title: 'Success!',
                 text: 'Your address has been added successfully.',
@@ -190,7 +176,6 @@
                 timer: 1500,
             });
         } else {
-            // Show error alert
             Swal.fire({
                 title: 'Error!',
                 text: 'Please fill in all required fields correctly.',
