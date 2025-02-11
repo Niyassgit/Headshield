@@ -62,7 +62,9 @@ router.post("/addNewAddress",userAuth,checkoutController.postAddAddress);
 router.post("/checkoutPage/editAddress",userAuth,checkoutController.postEditAddress);
 //place order
 router.post("/placeOrder",userAuth,orderController.placeOrder);
-router.get("/Orders",userAuth,orderController.getOrders);
+router.get("/orders",userAuth,orderController.getOrders);
+router.get("/order-details/",userAuth,orderController.getOrderDetails);
+
 
 
 module.exports=router;

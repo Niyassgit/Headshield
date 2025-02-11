@@ -1,48 +1,69 @@
 <style>
-  .main {
-    padding: 30px 0;
-  }
+/* Main container style */
+.main {
+  padding: 30px 0;
+  display: flex;
+  flex-wrap: wrap;
+}
 
+/* Sidebar container that fills the entire height */
+.sidebar-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Make sure the sidebar takes up full height */
+}
+
+/* Sidebar styling */
+.sidebar {
+  background-color: #59ab6e;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  flex-grow: 1; /* Sidebar will stretch to fill the available height */
+  min-height: 100%; /* Makes the sidebar extend to full height, but can grow with content */
+}
+
+/* Flex behavior for the sidebar to stretch */
+.sidebar .nav {
+  flex-grow: 1; /* Allows the nav to take up remaining space */
+}
+
+/* Sidebar links styling */
+.sidebar .nav-link {
+  font-weight: bold;
+  color: #fff;
+  padding: 12px;
+  display: block;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+/* Active and hover states for nav links */
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background: #4a965d;
+}
+
+/* Button styling */
+.btn-success {
+  background-color: #577194;
+  border-color: #6bb87d;
+}
+
+.btn-success:hover {
+  background-color: #506955;
+}
+
+/* Responsive design for small screens */
+@media (max-width: 768px) {
   .sidebar {
-    background-color: #59ab6e;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    min-height: 100%;
+    padding: 15px;
   }
-
-  .sidebar .nav-link {
-    font-weight: bold;
-    color: #fff;
-    padding: 10px;
-    display: block;
-    border-radius: 5px;
-    transition: background 0.3s;
-  }
-
-  .sidebar .nav-link:hover,
-  .sidebar .nav-link.active {
-    background: #4a965d;
-  }
+}
 
 
-
-  .btn-success {
-    background-color: #577194;
-    border-color: #6bb87d;
-  }
-
-  .btn-success:hover {
-    background-color: #506955;
-  }
-
-  @media (max-width: 768px) {
-    .sidebar {
-      min-height: auto;
-      padding: 15px;
-    }
-  }
 </style>
+
 <main class="main">
   <div class="container">
     <div class="row">
@@ -57,10 +78,10 @@
               <a class="nav-link" href="/getAllAddress">My Address</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/Orders">Orders</a>
+              <a class="nav-link" href="/orders">Orders</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#track-orders">Wallet Status</a>
+              <a class="nav-link" href="/walletStatus">Wallet Status</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#wallet-history">Wallet History</a>
@@ -74,6 +95,7 @@
           </ul>
         </div>
       </div>
-        <!-- Main Content -->
-        <div class="col-md-9">
-          <section class="content-main">
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <section class="content-main">

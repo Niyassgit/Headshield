@@ -42,7 +42,6 @@ const addToCart = async (req, res) => {
             if (!userId) {
                 return res.json({ success: false, redirectUrl: '/login'});
              }
-            console.log("body",req.body);
 
         const { productId, quantity } = req.body;  
         const cleanProductId = productId.trim(); 
