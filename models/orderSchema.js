@@ -9,7 +9,7 @@ const orderSchema = new Schema(
       default: () => uuidv4(),
       unique: true,
     },
-    userId: {
+    userId: { 
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -79,9 +79,12 @@ const orderSchema = new Schema(
       type: Boolean,
       default: false,
     },
-  },
-  { timestamps: true }
-);
+     cancelReason:{
+      type:String,
+      required:false
+    },
+
+  },{ timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);
 

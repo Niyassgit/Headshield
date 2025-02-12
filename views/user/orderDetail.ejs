@@ -104,17 +104,97 @@ body {
 .order-totals p strong {
     color: #000;
 }
+.cancel-btn {
+    background-color: red;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: block;
+    margin: 20px 0;
+}
+
+.cancel-btn:hover {
+    background-color: darkred;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    width: 50%;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.close-btn {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.submit-btn {
+    background-color: red;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background-color: darkred;
+}
 
 
 
     </style>
 </head>
 <body>
+    <% function getStatusBadgeClass(status) { 
+        switch (status) {
+            case "Pending": return "bg-warning text-dark"; 
+            case "Processing": return "bg-primary"; 
+            case "Shipped": return "bg-info text-dark"; 
+            case "Delivered": return "bg-success"; 
+            case "Cancelled": return "bg-danger"; 
+            case "Return Request": return "bg-secondary"; 
+            case "Returned": return "bg-dark"; 
+            default: return "bg-light text-dark"; 
+        }
+    } %>
     <div class="order-container">
         <!-- Order Header -->
         <div class="order-header">
             <h2>Order Details</h2>
-            <span id="orderStatus" class="status-badge">Pending</span>
+            <span class="badge <%= getStatusBadgeClass(order.status) %>">
+                <%= order.status %>
+            </span>
         </div>
 
         <!-- Order Information Section -->
@@ -171,13 +251,77 @@ body {
             <p><strong>Discount:</strong> ₹<span id="discount"><%= order.discount %></span></p>
             <p><strong>Final Amount:</strong> ₹<span id="finalAmount"><%= order.finalAmount %></span></p>
         </div>
+        <% if (order.status !== "Cancelled") { %>
+            <button id="cancelOrderBtn" class="cancel-btn">Cancel Order</button>
+        <% } %>
     </div>
+
+    <!-- Modal for Cancellation -->
+<div id="cancelModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h3>Cancel Order</h3>
+        <label for="cancelReason">Reason for cancellation:</label>
+        <textarea id="cancelReason" rows="4" placeholder="Enter reason here..."></textarea>
+        <button id="submitCancel" class="submit-btn">Cancel Order</button>
+    </div>
+</div>
+
         <!--sidebar Footer section-->
     </section>
 </div>
 </div>
 </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    document.getElementById("cancelOrderBtn").addEventListener("click", function() {
+        document.getElementById("cancelModal").style.display = "block";
+    });
+    
+    document.querySelector(".close-btn").addEventListener("click", function() {
+        document.getElementById("cancelModal").style.display = "none";
+    });
+    
+    document.getElementById("submitCancel").addEventListener("click", function() {
+        let reason = document.getElementById("cancelReason").value.trim();
+    
+        if (reason === "") {
+            alert("Please enter a cancellation reason.");
+            return;
+        }
+    
+        fetch(`/cancel-order/<%= order._id %>`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reason: reason })
+     })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire("Cancelled","Order cancelled successfully!","success")
+                .then(()=>{
+
+                    document.getElementById("cancelModal").style.display = "none";
+                document.getElementById("orderStatus").innerText = "Cancelled";
+                document.getElementById("orderStatus").style.backgroundColor = "gray";
+
+                });
+               
+            } else {
+                Swal.fire("Error!","Error cancelling order. Please try again.","error");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error!","Error cancelling order.","error");
+        });
+    });
+    </script>
 
    
 

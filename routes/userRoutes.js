@@ -64,6 +64,7 @@ router.post("/checkoutPage/editAddress",userAuth,checkoutController.postEditAddr
 router.post("/placeOrder",userAuth,orderController.placeOrder);
 router.get("/orders",userAuth,orderController.getOrders);
 router.get("/order-details/",userAuth,orderController.getOrderDetails);
+router.patch("/cancel-order/:id",userAuth,orderController.cancelOrder);
 
 
 

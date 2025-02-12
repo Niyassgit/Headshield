@@ -39,7 +39,7 @@ const placeOrder = async (req, res) => {
         const finalAmount = totalPrice;
         let couponNotApplied=false;
 
-        let status = 'Shipped';
+        let status = 'Pending';
 
         // Create order
         const order = await Order.create({
@@ -129,11 +129,34 @@ const getOrderDetails=async(req,res)=>{
     }
 };
 
+const cancelOrder =async(req,res)=>{
+        const {id}=req.params;
+        const {reason}=req.body;
+    try {
+       const order = await Order.findByIdAndUpdate(id,
+
+        {status:"Cancelled",cancelReason:reason},
+        {new:true}
+       );
+       if(!order){
+
+        return res.status(404).json({success:false,message:"Failed to find the order"})
+       }
+
+       return res.status(200).json({success:true,message:"Order Cancelled Successfully"});
+       
+              
+    } catch (error) {
+        console.error("Errror canceling order",error);
+        return res.status(500).json({success:false,message:"Internal Server Error"});
+    }
+}
 
 
 module.exports = {
     placeOrder,
     getOrders,
     getOrderDetails,
+    cancelOrder
   
 };
