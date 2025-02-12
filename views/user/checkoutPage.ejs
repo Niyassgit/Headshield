@@ -292,6 +292,7 @@
                 <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 <!-- Add Address Form -->
                 <form id="addAddressForm" action="/addNewAddress" method="POST" novalidate>
@@ -374,7 +375,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editAddressForm" novalidate>
+                <form id="editAddressForm" action="/chekoutPage/editAddress" method="POST" novalidate>
                     <input type="hidden" id="editAddressId" name="addressId">
                     <!-- Same fields as your add address form -->
                     <div class="mb-3">
@@ -428,190 +429,77 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-        // Attach click event to all edit buttons
-        document.querySelectorAll(".edit-address").forEach(button => {
-            button.addEventListener("click", function () {
-                // Get modal reference
-                const modal = document.getElementById("editAddressModal");
-
-                // Populate modal fields with existing address data
-                modal.querySelector("#editAddressId").value = this.dataset.addressId;
-                modal.querySelector("#editAddressType").value = this.dataset.addressType;
-                modal.querySelector("#editName").value = this.dataset.name;
-                modal.querySelector("#editPhone").value = this.dataset.phone;
-                modal.querySelector("#editAltPhone").value = this.dataset.altphone || "";
-                modal.querySelector("#editLandmark").value = this.dataset.landmark;
-                modal.querySelector("#editCity").value = this.dataset.city;
-                modal.querySelector("#editState").value = this.dataset.state;
-                modal.querySelector("#editCountry").value = this.dataset.country;
-                modal.querySelector("#editPincode").value = this.dataset.pincode;
-            });
+document.addEventListener("DOMContentLoaded", function () {
+    // Prevent the "Add New Address" button from triggering the place order form
+    const addNewAddressBtn = document.querySelector('[data-bs-target="#addAddressModal"]');
+    if (addNewAddressBtn) {
+        addNewAddressBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();  // Stop event from bubbling up
+            const modal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+            modal.show();
         });
+    }
 
-        // Handle form submission with SweetAlert confirmation
-        document.getElementById("editAddressForm").addEventListener("submit", function (e) {
-            e.preventDefault(); // Prevent default form submission
-
-            Swal.fire({
-                title: "Confirm Address Update",
-                text: "Are you sure you want to update this address?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, update it!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.submit(); // Submit the form if confirmed
-                }
-            });
-        });
-        const form = document.getElementById("addAddressForm");
-    const errorMessages = document.getElementById("errorMessages");
-
-    form.addEventListener("submit", function (event) {
-        let errors = [];
-
-        // Get all input values
-        const addressType = document.getElementById("addressType").value.trim();
-        const name = document.getElementById("name").value.trim();
-        const landmark = document.getElementById("landmark").value.trim();
-        const city = document.getElementById("city").value.trim();
-        const state = document.getElementById("state").value.trim();
-        const country = document.getElementById("country").value.trim();
-        const pincode = document.getElementById("pincode").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const altPhone = document.getElementById("altPhone").value.trim();
-
-        // Address Type Validation
-        if (addressType === "") {
-            errors.push("Please select an Address Type.");
-        }
-
-        // Name Validation
-        if (name === "") {
-            errors.push("Full Name is required.");
-        } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-            errors.push("Full Name must contain only letters and spaces.");
-        }
-
-        // Landmark Validation
-        if (landmark === "") {
-            errors.push("Landmark is required.");
-        }
-
-        // City Validation
-        if (city === "") {
-            errors.push("City is required.");
-        } else if (!/^[a-zA-Z\s]+$/.test(city)) {
-            errors.push("City must contain only letters.");
-        }
-
-        // State Validation
-        if (state === "") {
-            errors.push("State is required.");
-        } else if (!/^[a-zA-Z\s]+$/.test(state)) {
-            errors.push("State must contain only letters.");
-        }
-
-        // Country Validation
-        if (country === "") {
-            errors.push("Country is required.");
-        } else if (!/^[a-zA-Z\s]+$/.test(country)) {
-            errors.push("Country must contain only letters.");
-        }
-
-        // Pincode Validation (6-digit number)
-        if (pincode === "") {
-            errors.push("Pincode is required.");
-        } else if (!/^\d{6}$/.test(pincode)) {
-            errors.push("Pincode must be a 6-digit number.");
-        }
-
-        // Phone Number Validation (10-digit number)
-        if (phone === "") {
-            errors.push("Phone Number is required.");
-        } else if (!/^\d{10}$/.test(phone)) {
-            errors.push("Phone Number must be a 10-digit number.");
-        }
-
-        // Alternate Phone Number Validation (if provided, should be 10 digits)
-        if (altPhone !== "" && !/^\d{10}$/.test(altPhone)) {
-            errors.push("Alternate Phone Number must be a 10-digit number.");
-        }
-
-        // Display errors if any
-        if (errors.length > 0) {
-            event.preventDefault(); // Stop form submission
-            errorMessages.innerHTML = errors.join("<br>");
-            errorMessages.style.display = "block";
-        } else {
-            errorMessages.style.display = "none";
-        }
-    });
-
-  
-
-    document.querySelectorAll('.address-card').forEach(card => {
-        card.addEventListener('click', () => {
-            document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-
-            const radio = card.querySelector('input[type="radio"]');
-            radio.checked = true;
-            radio.dispatchEvent(new Event("change")); 
+    // Handle edit address functionality
+    document.querySelectorAll(".edit-address").forEach(button => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();  // Stop event from bubbling up
+            const modal = document.getElementById("editAddressModal");
+            
+            // Populate modal fields with existing address data
+            modal.querySelector("#editAddressId").value = this.dataset.addressId;
+            modal.querySelector("#editAddressType").value = this.dataset.addressType;
+            modal.querySelector("#editName").value = this.dataset.name;
+            modal.querySelector("#editPhone").value = this.dataset.phone;
+            modal.querySelector("#editAltPhone").value = this.dataset.altphone || "";
+            modal.querySelector("#editLandmark").value = this.dataset.landmark;
+            modal.querySelector("#editCity").value = this.dataset.city;
+            modal.querySelector("#editState").value = this.dataset.state;
+            modal.querySelector("#editCountry").value = this.dataset.country;
+            modal.querySelector("#editPincode").value = this.dataset.pincode;
         });
     });
-
-    document.querySelectorAll('.payment-option').forEach(option => {
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-            option.classList.add('selected');
-
-            const radio = option.querySelector('input[type="radio"]');
-            radio.checked = true;
-            radio.dispatchEvent(new Event("change")); 
-        });
-    });
-
-    const formA = document.querySelector("form[action='/placeOrder']");
-if (formA) {
-    formA.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const selectedAddress = document.querySelector("input[name='address']:checked");
-        const selectedPayment = document.querySelector("input[name='paymentMethod']:checked");
-
-        if (!selectedAddress || !selectedPayment) {
-            Swal.fire("Error!", "Please select an address and payment method.", "error");
-            return;
-        }
-
-        const formData = new FormData(formA);
+    const editAddressForm = document.getElementById("editAddressForm");
+if (editAddressForm) {
+    editAddressForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
 
         Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to confirm your order?",
+            title: "Confirm Address Update",
+            text: "Are you sure you want to update this address?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, place order!",
+            confirmButtonText: "Yes, update it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch("/placeOrder", {
-                    method: "POST",
+                // Create FormData object
+                const formData = new FormData(editAddressForm);
+                
+                // Convert FormData to JSON object
+                const jsonData = {};
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
+                });
+
+                // Send AJAX request to the correct route
+                fetch('/checkoutPage/editAddress', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        address: selectedAddress.value,
-                        paymentMethod: selectedPayment.value,
-                    }),
+                    body: JSON.stringify(jsonData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
@@ -619,24 +507,178 @@ if (formA) {
                             text: data.message,
                             icon: "success"
                         }).then(() => {
-                            window.location.href = "/cart";
+                            window.location.reload();
                         });
                     } else {
-                        Swal.fire("Failed!", data.message || "Something went wrong.", "error");
+                        Swal.fire("Error!", data.message || "Failed to update address", "error");
                     }
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    Swal.fire("Error!", "An unexpected error occurred.", "error");
+                    console.error('Error:', error);
+                    Swal.fire("Error!", "An unexpected error occurred while updating the address", "error");
                 });
             }
         });
     });
-} else {
-    console.error("Error: The form with action='/placeOrder' was not found.");
 }
+    // Handle add address form validation
+    const addAddressForm = document.getElementById("addAddressForm");
+    const errorMessages = document.getElementById("errorMessages");
+
+    if (addAddressForm) {
+        addAddressForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            event.stopPropagation();  // Stop event from bubbling up
+            let errors = [];
+
+            // Get all input values
+            const addressType = document.getElementById("addressType").value.trim();
+            const name = document.getElementById("name").value.trim();
+            const landmark = document.getElementById("landmark").value.trim();
+            const city = document.getElementById("city").value.trim();
+            const state = document.getElementById("state").value.trim();
+            const country = document.getElementById("country").value.trim();
+            const pincode = document.getElementById("pincode").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const altPhone = document.getElementById("altPhone").value.trim();
+
+            // Validation checks
+            if (addressType === "") errors.push("Please select an Address Type.");
+            if (name === "") {
+                errors.push("Full Name is required.");
+            } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+                errors.push("Full Name must contain only letters and spaces.");
+            }
+            if (landmark === "") errors.push("Landmark is required.");
+            if (city === "") {
+                errors.push("City is required.");
+            } else if (!/^[a-zA-Z\s]+$/.test(city)) {
+                errors.push("City must contain only letters.");
+            }
+            if (state === "") {
+                errors.push("State is required.");
+            } else if (!/^[a-zA-Z\s]+$/.test(state)) {
+                errors.push("State must contain only letters.");
+            }
+            if (country === "") {
+                errors.push("Country is required.");
+            } else if (!/^[a-zA-Z\s]+$/.test(country)) {
+                errors.push("Country must contain only letters.");
+            }
+            if (pincode === "") {
+                errors.push("Pincode is required.");
+            } else if (!/^\d{6}$/.test(pincode)) {
+                errors.push("Pincode must be a 6-digit number.");
+            }
+            if (phone === "") {
+                errors.push("Phone Number is required.");
+            } else if (!/^\d{10}$/.test(phone)) {
+                errors.push("Phone Number must be a 10-digit number.");
+            }
+            if (altPhone !== "" && !/^\d{10}$/.test(altPhone)) {
+                errors.push("Alternate Phone Number must be a 10-digit number.");
+            }
+
+            // Display errors if any
+            if (errors.length > 0) {
+                errorMessages.innerHTML = errors.join("<br>");
+                errorMessages.style.display = "block";
+            } else {
+                errorMessages.style.display = "none";
+                this.submit();
+            }
+        });
+    }
+
+    // Handle address card selection
+    document.querySelectorAll('.address-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Only handle address selection if we didn't click an edit button
+            if (!e.target.closest('.edit-address')) {
+                document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                radio.dispatchEvent(new Event("change"));
+            }
+        });
     });
 
+    // Handle payment option selection
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+
+            const radio = option.querySelector('input[type="radio"]');
+            radio.checked = true;
+            radio.dispatchEvent(new Event("change"));
+        });
+    });
+
+    // Handle place order form submission
+    const placeOrderForm = document.querySelector("form[action='/placeOrder']");
+    if (placeOrderForm) {
+        placeOrderForm.addEventListener("submit", function (event) {
+            // Check if the submit event was triggered by a nested form
+            const isNestedFormSubmit = event.target !== placeOrderForm;
+            if (isNestedFormSubmit) {
+                return; // Let the nested form handle its own submission
+            }
+
+            event.preventDefault();
+            const selectedAddress = document.querySelector("input[name='address']:checked");
+            const selectedPayment = document.querySelector("input[name='paymentMethod']:checked");
+
+            if (!selectedAddress || !selectedPayment) {
+                Swal.fire("Error!", "Please select an address and payment method.", "error");
+                return;
+            }
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to confirm your order?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, place order!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("/placeOrder", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            address: selectedAddress.value,
+                            paymentMethod: selectedPayment.value
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: data.message,
+                                icon: "success"
+                            }).then(() => {
+                                window.location.href = "/cart";
+                            });
+                        } else {
+                            Swal.fire("Failed!", data.message || "Something went wrong.", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire("Error!", "An unexpected error occurred.", "error");
+                    });
+                }
+            });
+        });
+    }
+});
 
 </script>
 

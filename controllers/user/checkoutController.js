@@ -60,14 +60,16 @@ const postAddAddress= async(req,res)=>{
         console.log("Error adding Address:",error);
         res.redirect("/checkoutPage");
     }
-};
-const postEditAddress = async (req, res) => {
+};const postEditAddress = async (req, res) => {
     try {
         const { addressId, addressType, name, phone, altPhone, landMark, city, state, country, pincode } = req.body;
 
         const findAddress = await Address.findOne({ "address._id": addressId });
         if (!findAddress) {
-            return res.redirect("/pageNotFound");
+            return res.status(404).json({ 
+                success: false, 
+                message: "Address not found" 
+            });
         }
 
         await Address.updateOne(
@@ -87,13 +89,18 @@ const postEditAddress = async (req, res) => {
             }
         );
 
-        return res.redirect("/checkoutPage");
+        return res.json({
+            success: true,
+            message: "Address updated successfully"
+        });
     } catch (error) {
         console.log("Error updating address:", error);
-        res.redirect("/pageNotFound");
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while updating the address"
+        });
     }
 };
-
 module.exports={
     getcheckoutPage,
     postAddAddress,
