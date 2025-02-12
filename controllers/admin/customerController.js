@@ -9,7 +9,7 @@ const customerInfo=async(req,res)=>{
         let page = parseInt(req.query.page) || 1;
         const limit=3
         const userData=await User.find({isAdmin:false,$or:[  { name: { $regex: ".*" + search + ".*", $options: "i" } },
-            { email: { $regex: ".*" + search + ".*", $options: "i" } },],}).limit((limit*1)).skip((page-1)*limit).exec();
+            { email: { $regex: ".*" + search + ".*", $options: "i" } },],}).limit((limit*1)).skip((page-1)*limit).sort({createdOn:-1}).exec();
         const count=await User.find({
 
             isAdmin:false,

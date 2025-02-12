@@ -1,0 +1,174 @@
+<%- include('../partials/admin/header') %>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .container {
+        margin-top: 30px;
+    }
+    .card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .table th {
+        background-color: grey;
+        color: white;
+    }
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+</style>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">User Orders</h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-3 d-flex justify-content-between">
+                <input type="text" id="searchInput" class="form-control w-25" placeholder="Search orders...">
+                <select id="filterStatus" class="form-control w-25">
+                    <option value="">All Orders</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTable">
+
+                        <% function getStatusBadgeClass(status) { 
+                            switch (status) {
+                                case "Pending": return "bg-warning text-dark"; 
+                                case "Processing": return "bg-primary"; 
+                                case "Shipped": return "bg-info text-dark"; 
+                                case "Delivered": return "bg-success"; 
+                                case "Cancelled": return "bg-danger"; 
+                                case "Return Request": return "bg-secondary"; 
+                                case "Returned": return "bg-dark"; 
+                                default: return "bg-light text-dark"; 
+                            }
+                        } %>
+
+                        <% if (orders.length > 0) { %>
+                            <% orders.forEach((order, index) => { %>
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td><%= order.orderId %></td>   
+                                    <td><%= order.userId ? order.userId.name : "Unknown User" %></td>
+                                    <td>₹<%= order.totalPrice %></td>
+                                    <td>
+                                        <span class="status-badge <%= getStatusBadgeClass(order.status) %>">
+                                            <%= order.status %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                                    <td>
+                                        <a href="/admin/order-details?orderId=<%= order._id %>" class="btn btn-info btn-sm">View</a>
+                                        <% if(order.status !== 'Cancelled') { %>
+                                            <button class="btn btn-danger btn-sm">Cancel</button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center">No orders found.</td>
+                            </tr>
+                        <% } %>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+     <!-- Pagination -->
+     <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+      
+            <!-- Previous Page Link -->
+            <% if (currentPage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/getOrders?page=<%= currentPage - 1 %>">
+                  <i class="material-icons md-chevron_left"></i>
+                </a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <span class="page-link"><i class="material-icons md-chevron_left"></i></span>
+              </li>
+            <% } %>
+      
+            <!-- Page Number Links -->
+            <% for (let i = 1; i <= totalPage; i++) { %>
+              <% if (i === currentPage) { %>
+                <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
+              <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
+                <li class="page-item"><a class="page-link" href="/admin/getOrders?page=<%= i %>">0<%= i %></a></li>
+              <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+              <% } %>
+            <% } %>
+      
+            <!-- Next Page Link -->
+            <% if (currentPage < totalPage) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/getOrders?page=<%= currentPage + 1 %>">
+                  <i class="material-icons md-chevron_right"></i>
+                </a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <span class="page-link"><i class="material-icons md-chevron_right"></i></span>
+              </li>
+            <% } %>
+      
+          </ul>
+        </nav>
+      </div>
+</div>
+
+<script>
+    // Search functionality
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#orderTable tr");
+        rows.forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(value) ? "" : "none";
+        });
+    });
+
+    // Filter by status
+    document.getElementById("filterStatus").addEventListener("change", function() {
+        let selectedStatus = this.value;
+        let rows = document.querySelectorAll("#orderTable tr");
+        rows.forEach(row => {
+            let rowStatus = row.querySelector(".status-badge")?.textContent.trim();
+            row.style.display = (selectedStatus === "" || rowStatus === selectedStatus) ? "" : "none";
+        });
+    });
+</script>
+
+<%- include('../partials/admin/footer') %>
+
+
+

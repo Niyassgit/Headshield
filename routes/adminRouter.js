@@ -6,6 +6,7 @@ const categoryController=require("../controllers/admin/categoryController");
 const {userAuth,adminAuth}=require("../middlewares/auth");
 const brandController=require("../controllers/admin/brandController");
 const productController=require("../controllers/admin/productContoller");
+const orderController =require("../controllers/admin/orderController");
 const multer=require("multer");
 const storage=require("../helpers/multer");
 const uploads=multer({storage:storage});
@@ -43,6 +44,9 @@ router.get("/unBlockProduct",adminAuth,productController.unBlockProduct);
 router.get("/editProduct",adminAuth,productController.getEditProduct);
 router.post("/editProduct/:id",adminAuth,uploads.array("images",5),productController.editProduct);
 router.post("/deleteImage",adminAuth,productController.deleteSingleImage);
+//orders management
+router.get("/getOrders",adminAuth,orderController.getOrderslist);
+router.get("/order-details",adminAuth,orderController.getOrderDetails);
 
 
 
