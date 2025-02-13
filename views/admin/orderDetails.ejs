@@ -201,6 +201,11 @@
                 <p><%= orders.cancelReason %></p>
             </div>
         <% } %>
+        <% if (orders.status === "Cancelled" && (!orders.cancelReason || orders.cancelReason.trim() === "")) { %>
+            <div class="cancellation-description">
+                <p><strong>Order has been cancelled by Admin</strong></p>
+            </div>
+        <% } %>
         <% if (orders.status === "Return Request"||orders.status==="Returned" && orders.returnReason) { %>
             <div class="return-description">
                 <p><strong>Cancellation Reason:</strong></p>

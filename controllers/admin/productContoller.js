@@ -12,7 +12,7 @@ const getProductAddPage=async (req,res)=>{
 
     try {
         const category=await Category.find({isListed:true}); 
-        const brand=await Brand.find({isBlocked:false});
+        const brand=await Brand.find({isBlocked:false}).sort({createdAt:-1});
         res.render("product-add",{
             cat:category,
             brand:brand,
@@ -226,7 +226,6 @@ const deleteSingleImage = async (req, res) => {
       const imagePath = path.join("public", "uploads", "re-image", imageNameToServer);
       if (fs.existsSync(imagePath)) {
           await fs.unlinkSync(imagePath);
-          console.log(`Image file ${imageNameToServer} deleted from server`);
       } else {
           console.log(`Image file ${imageNameToServer} not found on server`);
       }

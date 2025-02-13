@@ -48,6 +48,7 @@ router.post("/deleteImage",adminAuth,productController.deleteSingleImage);
 router.get("/getOrders",adminAuth,orderController.getOrderslist);
 router.get("/order-details",adminAuth,orderController.getOrderDetails);
 router.put("/update-order-status/:orderId",adminAuth,orderController.updateStatus);
+router.put("/cancelOrder",adminAuth,orderController.cancelOrder);
 
 
 

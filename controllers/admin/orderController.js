@@ -3,20 +3,16 @@ const User=require("../../models/userSchema");
 const Address=require("../../models/addressSchema");
 
 
-// Controller
 const getOrderslist = async (req, res) => {
     try {
         let page = parseInt(req.query.page) || 1;
         let limit = 5;
         let skip = (page - 1) * limit;
         
-        // Get search query from request
         let searchQuery = req.query.search || '';
         
-        // Create search conditions
         let searchConditions = {};
         if (searchQuery) {
-            // Using $or to search across multiple fields
             searchConditions = {
                 $or: [
                     { orderId: { $regex: searchQuery, $options: 'i' } },
@@ -25,7 +21,7 @@ const getOrderslist = async (req, res) => {
                 ]
             };
             
-            // Add user name search condition by joining with User collection
+    
             const userIds = await User.find(
                 { name: { $regex: searchQuery, $options: 'i' } },
                 { _id: 1 }
@@ -35,10 +31,9 @@ const getOrderslist = async (req, res) => {
             }
         }
 
-        // Get total count of filtered orders
+     
         const totalOrders = await Order.countDocuments(searchConditions);
         
-        // Get filtered orders
         const orders = await Order.find(searchConditions)
             .populate("userId", "name")
             .sort({ createdAt: -1 })
@@ -55,7 +50,7 @@ const getOrderslist = async (req, res) => {
             orders: orders,
             currentPage: page,
             totalPage: totalPage,
-            search: searchQuery // Pass search query back to view
+            search: searchQuery 
         });
 
     } catch (error) {
@@ -118,12 +113,39 @@ const updateStatus= async(req,res)=>{
         console.error("Error updating order status:", error);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
+const cancelOrder = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+
+        if (!orderId) {
+            return res.status(400).json({ success: false, message: "Order ID is required" });
+        }
+
+        const order = await Order.findOneAndUpdate(
+            { _id: orderId }, 
+            { status: "Cancelled" }, 
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        return res.json({ success: true, message: "Order cancelled successfully" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
 
 module.exports={
 
     getOrderslist,
     getOrderDetails,
     updateStatus,
+    cancelOrder
 
 }
