@@ -69,6 +69,7 @@ const orderSchema = new Schema(
         "Processing",
         "Shipped",
         "Delivered",
+        "Out for Delivery",
         "Cancelled",
         "Return Request",
         "Returned",
@@ -83,6 +84,10 @@ const orderSchema = new Schema(
       type:String,
       required:false
     },
+    returnReason:{
+      type:String,
+      required:false
+    }
 
   },{ timestamps: true });
 

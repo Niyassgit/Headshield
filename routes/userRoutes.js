@@ -2,7 +2,7 @@ const express=require("express");
 const passport =require("passport");
 const router=express.Router();
 const userController=require("../controllers/user/userController")
-const {userAuth,isBlocked}=require("../middlewares/auth");
+const {userAuth,isBlocked, adminAuth}=require("../middlewares/auth");
 const productController=require("../controllers/user/productController");
 const profileController =require("../controllers/user/profileController");
 const cartController=require("../controllers/user/cartController");
@@ -65,6 +65,7 @@ router.post("/placeOrder",userAuth,orderController.placeOrder);
 router.get("/orders",userAuth,orderController.getOrders);
 router.get("/order-details/",userAuth,orderController.getOrderDetails);
 router.patch("/cancel-order/:id",userAuth,orderController.cancelOrder);
+router.patch("/return-order/:id",userAuth,orderController.returnOrder);
 
 
 

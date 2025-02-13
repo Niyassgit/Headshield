@@ -29,16 +29,32 @@
             <h4 class="mb-0">User Orders</h4>
         </div>
         <div class="card-body">
-            <div class="mb-3 d-flex justify-content-between">
-                <input type="text" id="searchInput" class="form-control w-25" placeholder="Search orders...">
-                <select id="filterStatus" class="form-control w-25">
-                    <option value="">All Orders</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
-            </div>
+         <!-- Replace your existing search input with this form -->
+<div class="mb-3 d-flex justify-content-between">
+  <form id="searchForm" class="d-flex gap-2 w-50">
+      <input 
+          type="text" 
+          id="searchInput" 
+          name="search"
+          class="form-control" 
+          placeholder="Search orders..."
+          value="<%= locals.search || '' %>"
+      >
+      <button type="submit" class="btn btn-primary">
+          Search
+      </button>
+  </form>
+  <select id="filterStatus" class="form-control w-25">
+      <option value="">All Orders</option>
+      <option value="Pending">Pending</option>
+      <option value="Processing">Processing</option>
+      <option value="Shipped">Shipped</option>
+      <option value="Delivered">Delivered</option>
+      <option value="Cancelled">Cancelled</option>
+      <option value="Return Request">Return Request</option>
+      <option value="Returned">Returned</option>
+  </select>
+</div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -148,24 +164,39 @@
 </div>
 
 <script>
-    // Search functionality
-    document.getElementById("searchInput").addEventListener("keyup", function() {
-        let value = this.value.toLowerCase();
-        let rows = document.querySelectorAll("#orderTable tr");
-        rows.forEach(row => {
-            row.style.display = row.textContent.toLowerCase().includes(value) ? "" : "none";
-        });
-    });
+ // Search functionality
+const searchForm = document.getElementById('searchForm');
+const searchInput = document.getElementById('searchInput');
 
-    // Filter by status
-    document.getElementById("filterStatus").addEventListener("change", function() {
+if (searchForm && searchInput) {
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const searchValue = searchInput.value;
+        
+        // Update URL with search parameter
+        let url = new URL(window.location.href);
+        url.searchParams.set('search', searchValue);
+        url.searchParams.set('page', '1'); // Reset to first page on new search
+        window.location.href = url.toString();
+    });
+}
+
+// Filter by status
+const filterStatus = document.getElementById("filterStatus");
+if (filterStatus) {
+    filterStatus.addEventListener("change", function() {
         let selectedStatus = this.value;
         let rows = document.querySelectorAll("#orderTable tr");
+        
         rows.forEach(row => {
-            let rowStatus = row.querySelector(".status-badge")?.textContent.trim();
-            row.style.display = (selectedStatus === "" || rowStatus === selectedStatus) ? "" : "none";
+            let statusElement = row.querySelector(".status-badge");
+            if (statusElement) {
+                let rowStatus = statusElement.textContent.trim();
+                row.style.display = (selectedStatus === "" || rowStatus === selectedStatus) ? "" : "none";
+            }
         });
     });
+}
 </script>
 
 <%- include('../partials/admin/footer') %>

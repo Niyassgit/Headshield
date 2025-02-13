@@ -3,18 +3,45 @@ const User=require("../../models/userSchema");
 const Address=require("../../models/addressSchema");
 
 
-
+// Controller
 const getOrderslist = async (req, res) => {
     try {
-        let page = parseInt(req.query.page) || 1;  
-        let limit = 5; 
-        let skip = (page - 1) * limit; 
+        let page = parseInt(req.query.page) || 1;
+        let limit = 5;
+        let skip = (page - 1) * limit;
+        
+        // Get search query from request
+        let searchQuery = req.query.search || '';
+        
+        // Create search conditions
+        let searchConditions = {};
+        if (searchQuery) {
+            // Using $or to search across multiple fields
+            searchConditions = {
+                $or: [
+                    { orderId: { $regex: searchQuery, $options: 'i' } },
+                    { status: { $regex: searchQuery, $options: 'i' } },
+                    { totalPrice: searchQuery.match(/^[0-9]+$/) ? parseInt(searchQuery) : null }
+                ]
+            };
+            
+            // Add user name search condition by joining with User collection
+            const userIds = await User.find(
+                { name: { $regex: searchQuery, $options: 'i' } },
+                { _id: 1 }
+            );
+            if (userIds.length > 0) {
+                searchConditions.$or.push({ userId: { $in: userIds } });
+            }
+        }
 
-        const totalOrders = await Order.countDocuments();
-
-        const orders = await Order.find()
+        // Get total count of filtered orders
+        const totalOrders = await Order.countDocuments(searchConditions);
+        
+        // Get filtered orders
+        const orders = await Order.find(searchConditions)
             .populate("userId", "name")
-            .sort({ createdAt: -1 }) 
+            .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
@@ -27,7 +54,8 @@ const getOrderslist = async (req, res) => {
         return res.render("ordersList", {
             orders: orders,
             currentPage: page,
-            totalPage: totalPage
+            totalPage: totalPage,
+            search: searchQuery // Pass search query back to view
         });
 
     } catch (error) {
@@ -35,7 +63,6 @@ const getOrderslist = async (req, res) => {
         return res.redirect("/admin-error");
     }
 };
-
 const getOrderDetails=async(req,res)=>{
     try {
         const orderId=req.query.orderId;
@@ -73,10 +100,30 @@ const getOrderDetails=async(req,res)=>{
         return res.status(500).json({success:false,message:"Internal Server Error"});
         
     }
+};
+
+const updateStatus= async(req,res)=>{
+    try {
+        const {orderId}=req.params;
+        const {status } = req.body;
+        console.log(orderId,status);
+
+        const order = await Order.findByIdAndUpdate(orderId, { status: status }, { new: true });
+
+        if(!order){
+            return res.status(404).json({success:false,message:"Order not found"});
+        }
+        return res.json({success:true,message:"Order status updated successfully",order});
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
 }
 
 module.exports={
 
     getOrderslist,
-    getOrderDetails
+    getOrderDetails,
+    updateStatus,
+
 }

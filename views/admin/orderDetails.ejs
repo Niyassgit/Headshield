@@ -155,6 +155,22 @@
         margin: 0.5rem 0;
         line-height: 1.6;
     }
+    .cancellation-description {
+    background-color: #ffe3e3;
+    color: #d9534f;
+    padding: 1rem;
+    border-left: 4px solid #d9534f;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+.return-description {
+    background-color: rgb(198, 193, 193);
+    color: rgb(40, 39, 39);
+    padding: 1rem;
+    border-left: 4px solid rgb(40, 39, 39);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
 </style>
 
 <body>
@@ -178,6 +194,19 @@
             <%= orders.status %>
         </span>
     </div>
+            <!-- Cancellation Description (Only visible if the order is cancelled) -->
+        <% if (orders.status === "Cancelled" && orders.cancelReason) { %>
+            <div class="cancellation-description">
+                <p><strong>Cancellation Reason:</strong></p>
+                <p><%= orders.cancelReason %></p>
+            </div>
+        <% } %>
+        <% if (orders.status === "Return Request"||orders.status==="Returned" && orders.returnReason) { %>
+            <div class="return-description">
+                <p><strong>Cancellation Reason:</strong></p>
+                <p><%= orders.returnReason %></p>
+            </div>
+        <% } %>
 
     <p><strong>Invoice Date:</strong> <%= new Date(orders.createdAt).toLocaleDateString() %></p>
     <p><strong>Payment Method:</strong> <%= orders.paymentMethod %></p>
@@ -206,20 +235,20 @@
             </div>
         <% }) %>
     <% } %>
-    <!-- Status Update Section -->
-    <div class="status-update-container">
-        <label for="orderStatus">Update Order Status: </label>
-        <select id="orderStatus">
-            <option value="Pending">Pending</option>
-            <option value="Processing">Processing</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Return Request">Return Request</option>
-            <option value="Returned">Returned</option>
-        </select>
-        <button id="updateStatusBtn">Update Status</button>
-    </div>
+  <!-- Status Update Section -->    
+<div class="status-update-container">
+    <label for="orderStatus">Update Order Status: </label>
+    <select id="orderStatus" data-order-id="<%= orders._id %>">
+        <option value="Pending" <%= orders.status === "Pending" ? "selected" : "" %>>Pending</option>
+        <option value="Processing" <%= orders.status === "Processing" ? "selected" : "" %>>Processing</option>
+        <option value="Shipped" <%= orders.status === "Shipped" ? "selected" : "" %>>Shipped</option>
+        <option value="Delivered" <%= orders.status === "Delivered" ? "selected" : "" %>>Delivered</option>
+        <option value="Cancelled" <%= orders.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+        <option value="Return Request" <%= orders.status === "Return Request" ? "selected" : "" %>>Return Request</option>
+        <option value="Returned" <%= orders.status === "Returned" ? "selected" : "" %>>Returned</option>
+    </select>
+    <button id="updateStatusBtn">Update Status</button>
+</div>
     
     <!-- Footer Section -->
     <div class="footer">
@@ -227,17 +256,35 @@
         <p><strong>Discount:</strong> ₹<%= orders.discount %></p>
         <p><strong>Final Amount:</strong> ₹<%= orders.finalAmount %></p>
     </div>
-
-    <!-- Toggle Button to Change Status -->
-    <button class="toggle-btn" id="toggleStatusBtn">Change Status</button>
 </div>
 
 <script>
-    // Handle order status update
-    document.getElementById("updateStatusBtn").addEventListener("click", function() {
-        var status = document.getElementById("orderStatus").value;
-        alert("Order status updated to: " + status);
-        // Add your logic here to send the status update request to the server
+    document.getElementById("updateStatusBtn").addEventListener("click",async function(){
+        const selectElement=document.getElementById("orderStatus");
+        const orderId=selectElement.getAttribute("data-order-id");
+        const newStatus=selectElement.value;
+ 
+        console.log("orderid and new status:",orderId,newStatus)
+        try {
+            const response = await fetch(`/admin/update-order-status/${orderId}`,{
+                method:"PUT",
+                headers: {
+                "Content-Type": "application/json" ,
+                },
+                body:JSON.stringify({status:newStatus})
+            });
+            const result = await response.json();
+
+            if(result.success){
+                alert("order status updated successfully!");
+                window.location.reload();
+            }else{
+                alert("Failed to update order status.");
+            }
+        } catch (error) {
+            console.error("Error updating order status:", error);
+            alert("An error occurred. Please try again.");
+        }
     });
 </script>
 

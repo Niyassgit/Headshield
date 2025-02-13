@@ -150,6 +150,28 @@ const cancelOrder =async(req,res)=>{
         console.error("Errror canceling order",error);
         return res.status(500).json({success:false,message:"Internal Server Error"});
     }
+};
+
+const returnOrder=async(req,res)=>{
+        const {id}=req.params;
+        const {reason}=req.body;
+        console.log(id,reason);
+    try {
+        const order=await Order.findByIdAndUpdate(id,
+            {status:"Return Request",returnReason:reason},{new:true}
+        );
+        if(!order){
+
+            return res.status(404).json({success:false,message:"Failed to find the order"})
+           }
+    
+           return res.status(200).json({success:true,message:"Return request submitted Successfully"});
+        
+    } catch (error) {
+        console.error("Error while retrun request",error);
+        return res.status(500).json({success:false,message:"internal Server Error"});
+        
+    }
 }
 
 
@@ -157,6 +179,7 @@ module.exports = {
     placeOrder,
     getOrders,
     getOrderDetails,
-    cancelOrder
+    cancelOrder,
+    returnOrder,
   
 };
