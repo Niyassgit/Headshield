@@ -192,6 +192,23 @@ const userProfile=async(req,res)=>{
         console.error("Error while rendering user profile data:",error);
         res.redirect("/pageNotFound");
     }
+};
+
+const editProfile=async(req,res)=>{
+    try {
+        const userId=req.session.user;
+        const {name,phone}=req.body;
+
+        const user = await User.findByIdAndUpdate(userId, { $set: { name, phone } }, { new: true });
+        if(!user){
+            return res.status(404).json({success:false,message:"Failed to find the User."});
+        }
+        return res.status(200).json({success:true,message:"profile Updated successfully."});
+    } catch (error) {
+        console.error("Error while updating user profile");
+        return res.status(500).json({success:false,message:"Internal Server Error"});
+        
+    }
 }
 
 const changePassword = async(req,res)=>{
@@ -440,6 +457,7 @@ module.exports={
     resendOtp,
     postNewPassword,
     userProfile,
+    editProfile,
     changePassword,
     changePasswordValid,
     verifyChangePassOtp,
@@ -450,4 +468,5 @@ module.exports={
     editAddress,
     postEditAddress,
     deleteAddress,
+   
 }
