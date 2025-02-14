@@ -268,8 +268,12 @@ const loadShoppingPage = async (req, res) => {
 
         const categories = await Category.find({ isListed: true });
         const categoryIds = categories.map(category => category._id.toString());
+        const categoryMap = categories.reduce((map, cat) => {
+            map[cat._id.toString()] = cat.name.toLowerCase(); 
+            return map;
+        }, {});
 
-        const selectedCategory = req.query.category;
+        let selectedCategory = req.query.category;
         const searchQuery = req.query.q ? req.query.q.trim() : null;
         const sortOption = req.query.sort || "latest"; 
 
@@ -282,11 +286,13 @@ const loadShoppingPage = async (req, res) => {
             quantity: { $gt: 0 }
         };
 
+        // 🔥 Fix category filtering logic
         if (selectedCategory && categoryIds.includes(selectedCategory)) {
             filter.category = selectedCategory;
-        } else {
+        } else if (!selectedCategory) {
             filter.category = { $in: categoryIds };
         }
+
         if (searchQuery) {
             filter.productName = { $regex: searchQuery, $options: "i" }; 
         }
@@ -297,7 +303,6 @@ const loadShoppingPage = async (req, res) => {
         else if (sortOption === "name_asc") sortQuery = { productName: 1 };
         else if (sortOption === "name_desc") sortQuery = { productName: -1 };
         else if (sortOption === "latest") sortQuery = { createdAt: -1 };
-
 
         const products = await Product.find(filter)
             .sort(sortQuery)
@@ -326,8 +331,10 @@ const loadShoppingPage = async (req, res) => {
     } catch (error) {
         console.error("Error loading shop page:", error);
         res.redirect("/pageNotFound");
-    }
+    }   
 };
+
+
 
 module.exports={
 

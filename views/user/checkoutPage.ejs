@@ -148,7 +148,61 @@
         .add-address-btn:hover {
             background: #f1f8f1;
         }
-    </style>    
+        .breadcrumb {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+  }
+  
+  .breadcrumb-item {
+      font-size: 12px; 
+      color: #666;
+  }
+  
+  .breadcrumb-item a {
+      color: #333;
+      text-decoration: none;
+  }
+  
+  .breadcrumb-item a:hover {
+      text-decoration: underline;
+  }
+  
+  .breadcrumb-item:not(:last-child)::after {
+      content: "/";
+      margin-left: 4px;  
+  }
+  
+  .breadcrumb-item.active {
+      color: #999;
+  }
+  
+  .breadcrumb-item i {
+      font-size: 11px;  
+      margin-right: 3px;  
+  }
+  </style> 
+    
+    
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/"><i class="fas fa-home"></i> Home</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/cart"><i class="fas fa-shopping-cart"></i> Shopping Cart</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="fas fa-box"></i> Checkout
+        </li>
+    </ol>
+</nav>
+
+
   <form action="/placeOrder" method="POST">
     <div class="checkout-container">
         <h1 class="section-title text-center mb-5">Secure Checkout</h1>

@@ -59,6 +59,10 @@ const addToCart = async (req, res) => {
         if (!productData) {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
+
+        if(productData.isBlocked){
+            return res.status(404).json({success:false,message:"This product cannot be added to the cart as it is blocked."})
+        }
         const itemQuantity = parseInt(quantity) || 1;
     
         let cartData = await Cart.findOne({ userId });

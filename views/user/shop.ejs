@@ -48,13 +48,14 @@
                             <% for(let i=0; i<category.length; i++){ %>
                                 <li>
                                     <a class="text-decoration-none <%= selectedCategory == category[i]._id ? 'font-weight-bold text-primary' : '' %>" 
-                                       href="/shop?category=<%= category[i]._id %>">
+                                       href="/shop?category=<%= category[i]._id %>&sort=<%= sort || '' %>&q=<%= searchQuery || '' %>">
                                         <%= category[i].name %>
                                     </a>
                                 </li>
                             <% } %>
                         </ul>
                     </li>
+                    
                     <li class="pb-3">
                         <a class="collapsed d-flex justify-content-between h3 text-decoration-none" href="#">
                             Brands
@@ -77,9 +78,9 @@
                             <i class="pull-right fa fa-fw fa-chevron-circle-down mt-1"></i>
                         </a>
                         <ul id="collapseThree" class="collapse list-unstyled pl-3">
-                            <li><a class="text-decoration-none" href="#">&#8377;999-1999</a></li>
                             <li><a class="text-decoration-none" href="#">&#8377;1999-3999</a></li>
-                            <li><a class="text-decoration-none" href="#">&#8377;3999-8999</a></li>
+                            <li><a class="text-decoration-none" href="#">&#8377;3999-7999</a></li>
+                            <li><a class="text-decoration-none" href="#">&#8377;7999-12999</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -90,22 +91,29 @@
                     <div class="col-md-6">
                         <ul class="list-inline shop-top-menu pb-3 pt-1">
                             <li class="list-inline-item">
-                                <a class="h3 text-dark text-decoration-none mr-3" href="#">All</a>
+                                <a class="h3 text-dark text-decoration-none mr-3 <%= !selectedCategory ? 'font-weight-bold text-primary' : '' %>"
+                                   href="/shop?sort=<%= sort || '' %>&q=<%= searchQuery || '' %>">
+                                    All
+                                </a>
                             </li>
-                            <li class="list-inline-item">
-                                <a class="h3 text-dark text-decoration-none mr-3" href="#">Apex</a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a class="h3 text-dark text-decoration-none" href="#">Retro</a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a class="h3 text-dark text-decoration-none" href="#">X-Cross</a>
-                            </li>
+                            <% for (let i = 0; i < category.length; i++) { %>
+                                <li class="list-inline-item">
+                                    <a class="h3 text-dark text-decoration-none mr-3 <%= selectedCategory == category[i]._id ? 'font-weight-bold text-primary' : '' %>" 
+                                       href="/shop?category=<%= category[i]._id %>&sort=<%= sort || '' %>&q=<%= searchQuery || '' %>">
+                                        <%= category[i].name %>
+                                    </a>
+                                </li>
+                            <% } %>
                         </ul>
+                        
                     </div>
+                    
                     <div class="col-md-6 pb-4">
                         <div class="d-flex">
-                            <form id="sortForm" method="GET" action="">
+                            <form id="sortForm" method="GET" action="/shop">
+                                <input type="hidden" name="category" id="categoryInput" value="<%= selectedCategory || '' %>">
+                                <input type="hidden" name="q" value="<%= searchQuery || '' %>">
+                                
                                 <select name="sort" id="sortSelect" class="form-control">
                                     <option value="">New Arrivals</option>
                                     <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Low To High</option>
@@ -114,6 +122,8 @@
                                     <option value="name_desc" <%= sort === 'name_desc' ? 'selected' : '' %>>Z To A</option>
                                 </select>
                             </form>
+                            
+                            
                         </div>
                     </div>
                 </div>
@@ -311,11 +321,18 @@
     </section>
     
     <script>
-     
-    document.getElementById("sortSelect").addEventListener("change", function() {
-        document.getElementById("sortForm").submit();
+
+document.getElementById('sortSelect').addEventListener('change', function() {
+        const currentUrl = new URL(window.location.href);
+        const category = currentUrl.searchParams.get('category') || '';
+        const searchQuery = currentUrl.searchParams.get('q') || '';
+
+        // Update hidden input fields
+        document.getElementById('categoryInput').value = category;
+
+        // Submit the form
+        document.getElementById('sortForm').submit();
     });
-        
 document.querySelectorAll('.add-to-cart').forEach(button => {
     button.addEventListener('click', async function () {
         const productId = this.getAttribute('data-product-id'); 

@@ -4,11 +4,10 @@ const Product=require("../../models/productSchema");
 const Cart =require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 
-
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user; 
-        const { address, paymentMethod} = req.body;
+        const { address, paymentMethod } = req.body;
 
         if (!address || !paymentMethod) {
             return res.status(400).json({
@@ -18,7 +17,10 @@ const placeOrder = async (req, res) => {
         }
 
         const cart = await Cart.findOne({ userId })
-            .populate('items.productId');
+            .populate({
+                path: 'items.productId',
+                select: 'productName quantity isBlocked' 
+            });
 
         if (!cart || !cart.items.length) {
             return res.status(400).json({
@@ -27,17 +29,43 @@ const placeOrder = async (req, res) => {
             });
         }
 
+        let outOfStockItems = [];
+        let blockedItems = [];
+
+        for (let item of cart.items) {
+            if (item.productId.quantity < item.quantity) {
+                outOfStockItems.push(item.productId.productName);
+            }
+            if (item.productId.isBlocked) {
+                blockedItems.push(item.productId.productName);
+            }
+        }
+
+        if (blockedItems.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: `The following products are blocked and cannot be ordered: ${blockedItems.join(", ")}`
+            });
+        }
+
+        if (outOfStockItems.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: `These products are out of stock: ${outOfStockItems.join(", ")}`
+            });
+        }
+
         const orderedItems = cart.items.map(item => ({
             productId: item.productId._id,
-            productName:item.productId.productName,
+            productName: item.productId.productName,
             quantity: item.quantity,
             price: item.price
         }));
 
         const totalPrice = cart.cartTotal;
-        let  discount=0;
+        let discount = 0;
         const finalAmount = totalPrice;
-        let couponNotApplied=false;
+        let couponNotApplied = false;
 
         let status = 'Pending';
 
@@ -49,15 +77,22 @@ const placeOrder = async (req, res) => {
             discount,
             finalAmount,
             address: address,
-            paymentMethod:paymentMethod,
+            paymentMethod: paymentMethod,
             invoiceDate: new Date(),
             status,
-            couponApplied:couponNotApplied
+            couponApplied: couponNotApplied
         });
 
-         
+        for (let item of cart.items) {
+            await Product.updateOne(
+                { _id: item.productId._id },
+                { $inc: { quantity: -item.quantity } }
+            );
+        }
+
         await Cart.findByIdAndDelete(cart._id);
-       return  res.status(200).json({success: true, message: "Order placed successfully!", order });
+
+        return res.status(200).json({ success: true, message: "Order placed successfully!", order });
 
     } catch (error) {
         console.error('Place order error:', error);
@@ -68,6 +103,7 @@ const placeOrder = async (req, res) => {
         });
     }
 };
+
 const getOrders= async(req,res)=>{
     try {
         const userId=req.session.user;
@@ -138,6 +174,13 @@ const cancelOrder =async(req,res)=>{
         {status:"Cancelled",cancelReason:reason},
         {new:true}
        );
+
+       for (let item of order.orderedItems) {
+        await Product.updateOne(
+            { _id: item.productId },
+            { $inc: { quantity: item.quantity } } 
+        );
+    }
        if(!order){
 
         return res.status(404).json({success:false,message:"Failed to find the order"})
@@ -155,11 +198,11 @@ const cancelOrder =async(req,res)=>{
 const returnOrder=async(req,res)=>{
         const {id}=req.params;
         const {reason}=req.body;
-        console.log(id,reason);
     try {
         const order=await Order.findByIdAndUpdate(id,
             {status:"Return Request",returnReason:reason},{new:true}
         );
+        
         if(!order){
 
             return res.status(404).json({success:false,message:"Failed to find the order"})

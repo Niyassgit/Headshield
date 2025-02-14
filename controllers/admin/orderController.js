@@ -1,6 +1,7 @@
 const Order=require("../../models/orderSchema");
 const User=require("../../models/userSchema");
 const Address=require("../../models/addressSchema");
+const Product=require("../../models/productSchema");    
 
 
 const getOrderslist = async (req, res) => {
@@ -101,12 +102,21 @@ const updateStatus= async(req,res)=>{
     try {
         const {orderId}=req.params;
         const {status } = req.body;
-        console.log(orderId,status);
 
         const order = await Order.findByIdAndUpdate(orderId, { status: status }, { new: true });
 
         if(!order){
             return res.status(404).json({success:false,message:"Order not found"});
+        }
+
+        if(status=="Returned"){
+
+            for (let item of order.orderedItems) {
+                await Product.updateOne(
+                    { _id: item.productId },
+                    { $inc: { quantity: item.quantity } } 
+                );
+            }
         }
         return res.json({success:true,message:"Order status updated successfully",order});
     } catch (error) {
@@ -114,6 +124,7 @@ const updateStatus= async(req,res)=>{
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
 const cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.body;
@@ -146,6 +157,6 @@ module.exports={
     getOrderslist,
     getOrderDetails,
     updateStatus,
-    cancelOrder
+    cancelOrder,
 
 }
