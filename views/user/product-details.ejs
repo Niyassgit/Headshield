@@ -1,5 +1,35 @@
 <%- include("../partials/user/header") %>
 
+<style>
+  .zoom-container {
+  position: relative;
+  overflow: hidden; /* Add this to contain the zoomed image */
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.zoomed-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  background-repeat: no-repeat;
+}
+
+.zoom-container:hover .zoomed-image {
+  opacity: 1;
+}
+
+</style>
+
     <!-- Modal -->
     <div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog"
         aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -20,187 +50,167 @@
 
 
 
-    <!-- Open Content -->
-    <section class="bg-light">
-        <div class="container pb-5">
-            <div class="row">
-                <div class="col-lg-5 mt-5">
-                    <div class="card mb-3">
-                        <img class="card-img img-fluid" src="/uploads/re-image/<%= product.productImage[0] %>"
-                            alt="Product image 1" id="product-detail">
-                    </div>
-                    <div class="row">
-                        <!--Start Controls-->
-                        <div class="col-1 align-self-center">
-                            <a href="#multi-item-example" role="button" data-bs-slide="prev">
-                                <i class="text-dark fas fa-chevron-left"></i>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </div>
-                        <!--End Controls-->
-                        <!--Start Carousel Wrapper-->
-                        <div id="multi-item-example" class="col-10 carousel slide carousel-multi-item"
-                            data-bs-ride="carousel">
-                            <!--Start Slides-->
-                            <div class="carousel-inner product-links-wap" role="listbox">
-
-                                <!--First slide-->
-                                <div class="carousel-item active">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <a href="#">
-                                                <img class="card-img img-fluid"
-                                                    src="/uploads/re-image/<%=product.productImage[1]  %>"
-                                                    alt="Product Image 2">
-                                            </a>
-                                        </div>
-                                        <div class="col-4">
-                                            <a href="#">
-                                                <img class="card-img img-fluid"
-                                                    src="/uploads/re-image/<%= product.productImage[2] %>"
-                                                    alt="Product Image 3">
-                                            </a>
-                                        </div>
-                                        <div class="col-4">
-                                            <a href="#">
-                                                <img class="card-img img-fluid"
-                                                    src="/uploads/re-image/<%= product.productImage[3] %>"
-                                                    alt="Product Image 4">
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--/.First slide-->
-
-                                <!--Second slide-->
-                                <div class="carousel-item">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <a href="#">
-                                                <img class="card-img img-fluid"
-                                                    src="/uploads/re-image/<%= product.productImage[3] %>"
-                                                    alt="Product Image 5">
-                                            </a>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <!--/.Second slide-->
-
-                            </div>
-                            <!--End Slides-->
-                        </div>
-                        <!--End Carousel Wrapper-->
-                        <!--Start Controls-->
-                        <div class="col-1 align-self-center">
-                            <a href="#multi-item-example" role="button" data-bs-slide="next">
-                                <i class="text-dark fas fa-chevron-right"></i>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </div>
-                        <!--End Controls-->
+  <!-- Open Content -->
+<section class="bg-light">
+    <div class="container pb-5">
+        <div class="row">
+            <div class="col-lg-5 mt-5">
+                <div class="card mb-3">
+                    <div class="zoom-container">
+                        <img class="product-image" 
+                             src="/uploads/re-image/<%= product.productImage[0] %>" 
+                             alt="Product image 1" 
+                             id="product-detail">
+                        <div class="zoomed-image" id="zoomedImage"></div>
                     </div>
                 </div>
-                <!-- col end -->
-                <div class="col-lg-7 mt-5">
-                    <div class="card">
-                        <div class="card-body">
-                            <h1 class="h2">
-                                <%= product.productName %>
-                            </h1>
-                            <p class="h3 py-2">&#8377;<%= product.salePrice.toLocaleString('en-IN') %> <span
-                                        class="text-muted"><s>&#8377;<%= product.regularPrice.toLocaleString('en-IN') %>
-                                                </s></span></p>
-                            <p class="py-2">
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <span class="list-inline-item text-dark">Rating 4.8 | 36 Comments</span>
-                            </p>
-                            <ul class="list-inline">
-                                <li class="list-inline-item">
-                                    <h6>Brand:</h6>
-                                </li>
-                                <li class="list-inline-item">
-                                    <p class="text-muted"><strong>
-                                            <%= product.brand %>
-                                        </strong></p>
-                                </li>
-                            </ul>
 
-                            <h6>Description:</h6>
-                            <p>
-                                <%= product.description %>
-                            </p>
-                            <ul class="list-inline">
-                                <li class="list-inline-item">
-                                    <h6>Avaliable Color :</h6>
-                                </li>
-                                <li class="list-inline-item">
-                                    <p class="text-muted"><strong>
-                                            <%=product.color %>
-                                        </strong></p>
-                                </li>
-                            </ul>
+                <div class="row">
+                    <!-- Start Controls -->
+                    <div class="col-1 align-self-center">
+                        <a href="#multi-item-example" role="button" data-bs-slide="prev">
+                            <i class="text-dark fas fa-chevron-left"></i>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </div>
+                    <!-- End Controls -->
 
-                            <!-- <h6>Specification:</h6>
-                            <ul class="list-unstyled pb-3">
-                                <li>Lorem ipsum dolor sit</li>
-                                <li>Amet, consectetur</li>
-                                <li>Adipiscing elit,set</li>
-                                <li>Duis aute irure</li>
-                                <li>Ut enim ad minim</li>
-                                <li>Dolore magna aliqua</li>
-                                <li>Excepteur sint</li>
-                            </ul> -->
+                    <!-- Start Carousel Wrapper -->
+                    <div id="multi-item-example" class="col-10 carousel slide carousel-multi-item"
+                         data-bs-ride="carousel">
+                        <!-- Start Slides -->
+                        <div class="carousel-inner product-links-wap" role="listbox">
 
-                            
-                            <div class="add-to-cart-section">
-                                <input type="hidden" id="productId" value="<%= product._id %>">
+                            <!-- First slide -->
+                            <div class="carousel-item active">
                                 <div class="row">
-                                    <div class="col-auto">
-                                        <ul class="list-inline pb-3">
-                                            <li class="list-inline-item">Size :
-                                                <input type="hidden" id="product-size" value="S">
-                                            </li>
-                                            <li class="list-inline-item"><span class="btn btn-success btn-size">S</span></li>
-                                            <li class="list-inline-item"><span class="btn btn-success btn-size">M</span></li>
-                                            <li class="list-inline-item"><span class="btn btn-success btn-size">L</span></li>
-                                            <li class="list-inline-item"><span class="btn btn-success btn-size">XL</span></li>
-                                        </ul>
+                                    <div class="col-4">
+                                        <a href="#">
+                                            <img class="card-img img-fluid" src="/uploads/re-image/<%= product.productImage[1] %>" alt="Product Image 2">
+                                        </a>
                                     </div>
-                                    <div class="col-auto">
-                                        <ul class="list-inline pb-3">
-                                            <li class="list-inline-item text-right">
-                                                Quantity
-                                                <input type="hidden" id="product-quantity" value="1">
-                                            </li>
-                                            <li class="list-inline-item"><span class="btn btn-success" id="btn-minus">-</span></li>
-                                            <li class="list-inline-item"><span class="badge bg-secondary" id="var-value">1</span></li>
-                                            <li class="list-inline-item"><span class="btn btn-success" id="btn-plus">+</span></li>
-                                        </ul>
+                                    <div class="col-4">
+                                        <a href="#">
+                                            <img class="card-img img-fluid" src="/uploads/re-image/<%= product.productImage[2] %>" alt="Product Image 3">
+                                        </a>
                                     </div>
-                                </div>
-                                <div class="row pb-3">
-                                    <div class="col d-grid">
-                                        <button type="button" class="btn btn-success btn-lg" id="buyButton">Buy</button>
-                                    </div>
-                                    <div class="col d-grid">
-                                        <button type="button" class="btn btn-success btn-lg" id="addToCartButton">Add To Cart</button>
+                                    <div class="col-4">
+                                        <a href="#">
+                                            <img class="card-img img-fluid" src="/uploads/re-image/<%= product.productImage[3] %>" alt="Product Image 4">
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            
+                            <!--/.First slide-->
 
+                            <!-- Second slide -->
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <a href="#">
+                                            <img class="card-img img-fluid" src="/uploads/re-image/<%= product.productImage[3] %>" alt="Product Image 5">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--/.Second slide-->
+
+                        </div>
+                        <!-- End Slides -->
+                    </div>
+                    <!-- End Carousel Wrapper -->
+
+                    <!-- Start Controls -->
+                    <div class="col-1 align-self-center">
+                        <a href="#multi-item-example" role="button" data-bs-slide="next">
+                            <i class="text-dark fas fa-chevron-right"></i>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                    <!-- End Controls -->
+                </div>
+            </div>
+            <!-- col end -->
+
+            <div class="col-lg-7 mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="h2"><%= product.productName %></h1>
+                        <p class="h3 py-2">&#8377;<%= product.salePrice.toLocaleString('en-IN') %> 
+                            <span class="text-muted"><s>&#8377;<%= product.regularPrice.toLocaleString('en-IN') %> </s></span>
+                        </p>
+                        <p class="py-2">
+                            <i class="fa fa-star text-warning"></i>
+                            <i class="fa fa-star text-warning"></i>
+                            <i class="fa fa-star text-warning"></i>
+                            <i class="fa fa-star text-warning"></i>
+                            <i class="fa fa-star text-secondary"></i>
+                            <span class="list-inline-item text-dark">Rating 4.8 | 36 Comments</span>
+                        </p>
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <h6>Brand:</h6>
+                            </li>
+                            <li class="list-inline-item">
+                                <p class="text-muted"><strong><%= product.brand %></strong></p>
+                            </li>
+                        </ul>
+
+                        <h6>Description:</h6>
+                        <p><%= product.description %></p>
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <h6>Available Color :</h6>
+                            </li>
+                            <li class="list-inline-item">
+                                <p class="text-muted"><strong><%= product.color %></strong></p>
+                            </li>
+                        </ul>
+
+                        <div class="add-to-cart-section">
+                            <input type="hidden" id="productId" value="<%= product._id %>">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <ul class="list-inline pb-3">
+                                        <li class="list-inline-item">Size :
+                                            <input type="hidden" id="product-size" value="S">
+                                        </li>
+                                        <li class="list-inline-item"><span class="btn btn-success btn-size">S</span></li>
+                                        <li class="list-inline-item"><span class="btn btn-success btn-size">M</span></li>
+                                        <li class="list-inline-item"><span class="btn btn-success btn-size">L</span></li>
+                                        <li class="list-inline-item"><span class="btn btn-success btn-size">XL</span></li>
+                                    </ul>
+                                </div>
+                                <div class="col-auto">
+                                    <ul class="list-inline pb-3">
+                                        <li class="list-inline-item text-right">
+                                            Quantity
+                                            <input type="hidden" id="product-quantity" value="1">
+                                        </li>
+                                        <li class="list-inline-item"><span class="btn btn-success" id="btn-minus">-</span></li>
+                                        <li class="list-inline-item"><span class="badge bg-secondary" id="var-value">1</span></li>
+                                        <li class="list-inline-item"><span class="btn btn-success" id="btn-plus">+</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="col d-grid">
+                                    <button type="button" class="btn btn-success btn-lg" id="buyButton">Buy</button>
+                                </div>
+                                <div class="col d-grid">
+                                    <button type="button" class="btn btn-success btn-lg" id="addToCartButton">Add To Cart</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- col end -->
         </div>
-    </section>
-    <!-- Close Content -->
+    </div>
+</section>
+<!-- Close Content -->
+
 
 
     <!-- Start Article -->
@@ -278,15 +288,59 @@
         </div>
     </section>
     <!-- End Article -->
+ 
+<script src="https://cdn.rawgit.com/elevatezoom/3.0.8/jquery.elevatezoom.js"></script>
+
     <script>
   document.addEventListener("DOMContentLoaded", function () {
     const addToCartButton = document.getElementById("addToCartButton");
+    const productDetail = document.getElementById('product-detail');
+    const zoomContainer = document.querySelector('.zoom-container');
+    const zoomedImage = document.getElementById('zoomedImage');
 
+    // Initialize elevateZoom
+    if (typeof $.fn.elevateZoom !== 'undefined') {
+        $('#product-detail').elevateZoom({
+            zoomType: "inner",
+            cursor: "crosshair",
+            scrollZoom: true,
+            zoomWindowWidth: 400,
+            zoomWindowHeight: 400,
+            borderSize: 0,
+            lensBorderSize: 0
+        });
+    }
+
+    // Custom zoom functionality as backup
+    if (productDetail && zoomContainer && zoomedImage) {
+        productDetail.addEventListener('mousemove', function(e) {
+            const bounds = zoomContainer.getBoundingClientRect();
+            const x = e.clientX - bounds.left;
+            const y = e.clientY - bounds.top;
+            
+            const xPercent = Math.round((x / bounds.width) * 100);
+            const yPercent = Math.round((y / bounds.height) * 100);
+            
+            zoomedImage.style.backgroundImage = `url(${productDetail.src})`;
+            zoomedImage.style.backgroundSize = '200%';
+            zoomedImage.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+        });
+
+        productDetail.addEventListener('mouseenter', function() {
+            zoomedImage.style.visibility = 'visible';
+        });
+
+        productDetail.addEventListener('mouseleave', function() {
+            zoomedImage.style.visibility = 'hidden';
+        });
+    }
+
+    // Add to Cart functionality
     addToCartButton.addEventListener("click", async function () {
         const productId = document.getElementById("productId").value;
-       // const size = document.getElementById("product-size").value;
         const quantity = document.getElementById("product-quantity").value;
-    console.log("id and quantity:",productId,quantity)
+        console.log("id and quantity:", productId, quantity);
+
         try {
             const response = await fetch("/AddToCart", {
                 method: "POST",
@@ -294,9 +348,8 @@
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                   productId: productId,
-                  //  size,
-                    quantity:quantity,
+                    productId: productId,
+                    quantity: quantity,
                 }),
             });
 
@@ -333,8 +386,44 @@
             }).showToast();
         }
     });
-});
 
+    // Size buttons functionality
+    const sizeButtons = document.querySelectorAll('.btn-size');
+    const productSizeInput = document.getElementById('product-size');
+
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            sizeButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            // Update hidden input value
+            productSizeInput.value = this.textContent;
+        });
+    });
+
+    // Quantity buttons functionality
+    const btnMinus = document.getElementById('btn-minus');
+    const btnPlus = document.getElementById('btn-plus');
+    const varValue = document.getElementById('var-value');
+    const productQuantity = document.getElementById('product-quantity');
+
+    btnMinus.addEventListener('click', function() {
+        let value = parseInt(varValue.textContent);
+        if (value > 1) {
+            value--;
+            varValue.textContent = value;
+            productQuantity.value = value;
+        }
+    });
+
+    btnPlus.addEventListener('click', function() {
+        let value = parseInt(varValue.textContent);
+        value++;
+        varValue.textContent = value;
+        productQuantity.value = value;
+    });
+});
     </script>
 
 
