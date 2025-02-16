@@ -107,39 +107,29 @@ https://templatemo.com/tm-559-zay-shop
                         <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
                     </a>
 
-                    <!-- User Icon -->
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
-                        <i class="fa fa-fw fa-user text-dark mr-3"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">+99</span>
+                    <a class="nav-icon position-relative text-decoration-none" href="/getWishlist">
+                        <i class="fa fa-fw fa-heart text-dark mr-1"></i>
+                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
                     </a>
-                    <div class="navbar align-self-center d-flex">
-                        <% if (user && user.name) { %>
-                            <div class="dropdown">
-                                <a href="#" class="sign-in-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <%= user.name %>
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+                    <!-- User Icon -->
+                        <div class="nav-icon position-relative">
+                            <a class="text-decoration-none" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-fw fa-user text-dark mr-3"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                <% if (user && user.name) { %>
+                                    <li><span class="dropdown-item-text fw-bold"><%= user.name %></span></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/userProfile">Profile</a></li>
                                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                                </ul>
-                            </div>
-                        <% } else { %>
-                            <!-- Sign Up Link -->
-                            <a class="nav-link text-dark mx-2 d-flex align-items-center" href="/signup">
-                                <i class="fa fa-user-plus me-1"></i>
-                                <span>Sign Up</span>
-                            </a>
-                            <!-- Login Link -->
-                            <a class="nav-link text-dark mx-2 d-flex align-items-center" href="/login">
-                                <i class="fa fa-sign-in-alt me-1"></i>
-                                <span>Login</span>
-                            </a>
-                        <% } %>
-                    </div>
+                                <% } else { %>
+                                    <li><a class="dropdown-item" href="/signup"><i class="fa fa-user-plus me-1"></i> Sign Up</a></li>
+                                    <li><a class="dropdown-item" href="/login"><i class="fa fa-sign-in-alt me-1"></i> Login</a></li>
+                                <% } %>
+                            </ul>
+                        </div>                    
                     
-                    
-                    
-                
                 </div>
             </div>
 

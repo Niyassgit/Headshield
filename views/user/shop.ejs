@@ -142,8 +142,12 @@
                                             <img class="card-img rounded-0 img-fluid" src="/uploads/re-image/<%= products[i].productImage[0] %>" alt="<%= products[i].productName %>">
                                             <div class="card-img-overlay rounded-0 product-overlay d-flex align-items-center justify-content-center">
                                                 <ul class="list-unstyled">
-                                                    <li><a class="btn btn-success text-white" href=""><i class="far fa-heart"></i></a></li>
+
+                                                    <li><a class="btn btn-success text-white add-to-wishlist" data-product-id="<%= products[i]._id%>"><i class="far fa-heart"></i></a></li>
+
+
                                                     <li><a class="btn btn-success text-white mt-2" href="/productDetails?id=<%= products[i]._id %>"><i class="far fa-eye"></i></a></li>
+
                                                     <li>
                                                         <button class="btn btn-success text-white mt-2 add-to-cart" data-product-id="<%= products[i]._id %>">
                                                             <i class="fas fa-cart-plus"></i>
@@ -327,12 +331,84 @@ document.getElementById('sortSelect').addEventListener('change', function() {
         const category = currentUrl.searchParams.get('category') || '';
         const searchQuery = currentUrl.searchParams.get('q') || '';
 
-        // Update hidden input fields
-        document.getElementById('categoryInput').value = category;
 
-        // Submit the form
+        document.getElementById('categoryInput').value = category;
         document.getElementById('sortForm').submit();
     });
+
+    document.querySelectorAll('.add-to-wishlist').forEach(button => {
+    button.addEventListener('click', async function () {
+        const productId = this.getAttribute('data-product-id'); 
+        
+        if (!productId) {
+            
+            console.error("Product ID is missing!");
+            return;
+        }
+        
+        
+        try {
+            
+            const response = await fetch("/addToWishlist", {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    productId: productId,
+                }),
+            });
+
+            if(response.url === "http://localhost:3000/login"){
+                window.location.href = response.url
+                return
+            }
+
+            const data = await response.json(); 
+
+            if (!data.success && data.redirectUrl) {
+            window.location.href = data.redirectUrl; 
+            return;
+            }
+
+            if (data.success) {
+                Toastify({
+                    text: data.message || "Item added to Wishlist!",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #28a745, #218838)",
+                    stopOnFocus: true,
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message || "Failed to add item!",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #dc3545, #c82333)",
+                    stopOnFocus: true,
+                }).showToast();
+            }
+
+        } catch (error) {
+            console.error('Fetch Error:', error);
+
+            Toastify({
+                text: "Something went wrong. Try again!",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #ffc107, #ffb300)",
+                stopOnFocus: true,
+            }).showToast();
+        }
+    });
+});
 document.querySelectorAll('.add-to-cart').forEach(button => {
     button.addEventListener('click', async function () {
         const productId = this.getAttribute('data-product-id'); 

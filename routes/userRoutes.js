@@ -8,6 +8,8 @@ const profileController =require("../controllers/user/profileController");
 const cartController=require("../controllers/user/cartController");
 const checkoutController=require("../controllers/user/checkoutController");
 const orderController =require("../controllers/user/orderController");
+const wishlistController=require("../controllers/user/wishlistController");
+
 router.get("/pageNotFound",userController.pageNotFound)
 
 //public Routes
@@ -67,6 +69,11 @@ router.get("/orders",userAuth,orderController.getOrders);
 router.get("/order-details/",userAuth,orderController.getOrderDetails);
 router.patch("/cancel-order/:id",userAuth,orderController.cancelOrder);
 router.patch("/return-order/:id",userAuth,orderController.returnOrder);
+//wishlist management
+router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);
+router.get("/getWishlist",userAuth,wishlistController.getWishlist);
+router.delete("/getWishlist/removeItem/:productId",userAuth,wishlistController.removeItem);
+
 
 
 

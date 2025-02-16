@@ -1,0 +1,98 @@
+<%- include("../../views/partials/user/header") %>
+
+<div class="container py-5">
+    <h2 class="mb-4 fw-bold text-center">My Wishlist</h2>
+
+    <div class="row justify-content-center" id="wishlistItems">
+        <% if (wishlist.length > 0) { %>
+            <% wishlist.forEach((product) => { %>  
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                    <div class="card shadow-sm border-0 position-relative p-2">
+                        <!-- Remove Wishlist Button -->
+                                        
+                        <button class="wishlist-remove-btn position-absolute top-0 end-0 m-2 btn btn-light btn-sm rounded-circle"
+                        data-id="<%= product._id %>">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    
+                        <!-- Product Clickable Area -->
+                        <a href="/order-details/<%= product.productId._id %>" class="text-decoration-none text-dark">
+                            <img src="/uploads/re-image/<%= product.productId.productImage[0] %>" class="card-img-top rounded" alt="<%= product.productId.productName %>">
+                            <div class="card-body text-center">
+                                <h6 class="card-title mb-1"><%= product.productId.productName %></h6>
+                                <p class="text-muted mb-1">size :<strong><%= product.productId.size %></strong></p>
+                                <p class="text-muted mb-1">₹<strong><%= product.productId.salePrice %></strong></p>
+                            </div>
+                        </a>
+
+                        <!--Add to Cart -->
+                        <div class="d-flex justify-content-center align-items-center px-2 pb-2">
+                            
+                            <button class="btn btn-sm btn-dark add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <!-- Empty Wishlist Message -->
+            <div class="alert alert-info text-center mt-4" id="emptyWishlist">
+                <i class="fas fa-heart-broken fs-4"></i>
+                <p class="mt-2">Your wishlist is empty.</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const removeButtons = document.querySelectorAll(".wishlist-remove-btn");
+
+    removeButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const productId = this.getAttribute("data-id");
+
+            fetch(`/getWishlist/removeItem/${productId}`, {
+                method: "DELETE",
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message); // Show success message
+                    
+                    const wishlistItem = this.closest(".col-lg-3");
+                    if (wishlistItem) {
+                        wishlistItem.remove(); // Remove item from UI
+                    } else {
+                        console.warn("Wishlist item container not found!");
+                    }
+
+                    // Check if wishlist is empty after removal
+                    if (document.querySelectorAll(".col-lg-3").length === 0) {
+                        document.getElementById("wishlistItems").innerHTML = `
+                            <div class="alert alert-info text-center mt-4" id="emptyWishlist">
+                                <i class="fas fa-heart-broken fs-4"></i>
+                                <p class="mt-2">Your wishlist is empty.</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    alert("Failed to remove item");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong!");
+            });
+        });
+    });
+});
+
+
+</script>
+
+
+<%- include("../../views/partials/user/footer") %>
+
