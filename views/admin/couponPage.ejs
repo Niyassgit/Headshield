@@ -1,0 +1,173 @@
+<%- include('../partials/admin/header') %>
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Coupon Management
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Coupon Management</li>
+      </ol>
+    </section>
+  
+    <!-- Main content -->
+    <section class="content">
+      <!-- Coupons Table -->
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Coupons</h3>
+          <div class="pull-right">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCouponModal">
+              <i class="fa fa-plus"></i> Add Coupon
+            </button>
+          </div>
+        </div>
+        <div class="box-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Coupon Name</th>
+                <th>Type</th>
+                <th>Created On</th>
+                <th>Expires On</th>
+                <th>Discount</th>
+                <th>Max Discount</th>
+                <th>Min. Purchase</th>
+                <th>Usage Limit</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="couponsTableBody">
+              <!-- Coupons will be added dynamically with JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <!-- Add Coupon Modal -->
+  <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Add New Coupon</h4>
+        </div>
+        <div class="modal-body">
+          <form id="addCouponForm">
+            <div class="form-group">
+              <label for="couponName">Coupon Name*</label>
+              <input type="text" class="form-control" id="couponName" name="name" required pattern="[A-Za-z0-9]+" title="Only letters and numbers allowed">
+              <small class="text-muted">Only letters and numbers allowed</small>
+            </div>
+            <div class="form-group">
+              <label for="couponType">Coupon Type*</label>
+              <select class="form-control" id="couponType" name="couponType" required>
+                <option value="flat">Flat Amount</option>
+                <option value="percentage">Percentage Discount</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="expireOn">Expiry Date*</label>
+              <input type="date" class="form-control" id="expireOn" name="expireOn" required min="2025-02-17">
+            </div>
+            <div class="form-group">
+              <label for="offerPrice" id="offerPriceLabel">Discount Amount (₹)*</label>
+              <input type="number" class="form-control" id="offerPrice" name="offerPrice" required min="1" step="0.01">
+              <small class="text-muted" id="offerPriceHelp">Enter the flat discount amount</small>
+            </div>
+            <div class="form-group" id="maxDiscountGroup" style="display: none;">
+              <label for="maximumDiscountAmount">Maximum Discount Amount (₹)*</label>
+              <input type="number" class="form-control" id="maximumDiscountAmount" name="maximumDiscountAmount" min="1" step="0.01">
+              <small class="text-muted">Maximum discount amount that can be applied</small>
+            </div>
+            <div class="form-group">
+              <label for="minimumPrice">Minimum Purchase Amount (₹)*</label>
+              <input type="number" class="form-control" id="minimumPrice" name="minimumPrice" required min="1" step="0.01">
+            </div>
+            <div class="form-group">
+              <label for="usageLimit">Usage Limit*</label>
+              <input type="number" class="form-control" id="usageLimit" name="usageLimit" required min="1" step="1">
+              <small class="text-muted">Maximum number of times this coupon can be used</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveCouponBtn">Save Coupon</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const couponType = document.getElementById('couponType');
+      const offerPriceLabel = document.getElementById('offerPriceLabel');
+      const offerPriceHelp = document.getElementById('offerPriceHelp');
+      const maxDiscountGroup = document.getElementById('maxDiscountGroup');
+      const offerPriceInput = document.getElementById('offerPrice');
+  
+      couponType.addEventListener('change', function() {
+        const type = this.value;
+  
+        if (type === 'percentage') {
+          offerPriceLabel.textContent = 'Discount Percentage (%)*';
+          offerPriceHelp.textContent = 'Enter percentage between 1-100';
+          maxDiscountGroup.style.display = 'block';
+          offerPriceInput.max = 100;
+        } else {
+          offerPriceLabel.textContent = 'Discount Amount (₹)*';
+          offerPriceHelp.textContent = 'Enter the flat discount amount';
+          maxDiscountGroup.style.display = 'none';
+          offerPriceInput.removeAttribute('max');
+        }
+      });
+  
+      document.getElementById('saveCouponBtn').addEventListener('click', function() {
+        const form = document.getElementById('addCouponForm');
+        if (form.checkValidity()) {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+  
+          // Convert string values to numbers where needed
+          data.offerPrice = parseFloat(data.offerPrice);
+          data.minimumPrice = parseFloat(data.minimumPrice);
+          data.usageLimit = parseInt(data.usageLimit);
+  
+          // Validate minimum price
+          if (data.offerPrice >= data.minimumPrice) {
+            alert('Minimum purchase amount must be greater than offer price');
+            return;
+          }
+  
+          // Submit form data
+          fetch('/admin/coupon/add', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' }
+          })
+            .then(response => response.json())
+            .then(result => {
+              if (result.success) {
+                alert('Coupon added successfully');
+                location.reload();
+              } else {
+                alert(result.message || 'Failed to add coupon');
+              }
+            })
+            .catch(error => alert('Error occurred while adding coupon: ' + error));
+        } else {
+          form.reportValidity();
+        }
+      });
+    });
+  </script>
+  <%- include('../partials/admin/footer') %>

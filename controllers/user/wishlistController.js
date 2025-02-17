@@ -1,6 +1,7 @@
 const User=require("../../models/userSchema");
 const Product=require("../../models/productSchema");
 const Wishlist=require("../../models/wishlistSchema");
+const Cart=require("../../models/cartSchema");
 const mongoose = require("mongoose"); 
 
 
@@ -19,9 +20,7 @@ const getWishlist = async (req, res) => {
                 wishlist: [] 
             });
         }
-        console.log('whishlist', wishlistData.products);
         
-
         return res.render("wishlistPage", {
             user: userData,
             wishlist: wishlistData.products  
@@ -50,6 +49,7 @@ const addToWishlist = async (req, res) => {
         if (wishlist && wishlist.products.some(p => p.productId.equals(product._id))) {
             return res.status(400).json({ success: false, message: "Product is already in the wishlist." });
         }
+    
 
         await Wishlist.findOneAndUpdate(
             { userId },
@@ -59,18 +59,18 @@ const addToWishlist = async (req, res) => {
             { upsert: true, new: true }
         );
 
-        return res.status(200).json({ success: true, message: "Product successfully added to wishlist." });
+        return res.status(200).json({ success: true, message: "Product added to wishlist." });
 
     } catch (error) {
         console.error("Error while adding product to Wishlist:", error);
         return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 const removeItem=async(req,res)=>{
 try {
     const userId=req.session.user;
     const productId= req.params.productId;
-    console.log("id",productId);
     const updatedWishlist = await Wishlist.findOneAndUpdate(
         { userId },
         { $pull: { products: { _id: productId } } },

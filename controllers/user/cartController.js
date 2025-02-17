@@ -1,7 +1,7 @@
 const User=require("../../models/userSchema");
 const Product=require("../../models/productSchema");
-const cart=require("../../models/cartSchema");
 const Cart = require("../../models/cartSchema");
+const Wishlist =require("../../models/wishlistSchema");
 const mongoose = require("mongoose");
 
 
@@ -106,6 +106,10 @@ const addToCart = async (req, res) => {
         cartData.cartTotal = cartData.items.reduce((total, item) => total + item.totalPrice, 0);
 
         await cartData.save();
+        await Wishlist.findOneAndUpdate(
+            { userId },
+            { $pull: { products: { productId:objectId } } }
+        );
 
         return res.status(200).json({ success: true, message: "Product added to cart!", cart: cartData });
 

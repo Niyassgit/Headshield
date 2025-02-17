@@ -7,6 +7,7 @@ const {userAuth,adminAuth}=require("../middlewares/auth");
 const brandController=require("../controllers/admin/brandController");
 const productController=require("../controllers/admin/productContoller");
 const orderController =require("../controllers/admin/orderController");
+const couponController=require("../controllers/admin/couponController");
 const multer=require("multer");
 const storage=require("../helpers/multer");
 const uploads=multer({storage:storage});
@@ -49,6 +50,8 @@ router.get("/getOrders",adminAuth,orderController.getOrderslist);
 router.get("/order-details",adminAuth,orderController.getOrderDetails);
 router.put("/update-order-status/:orderId",adminAuth,orderController.updateStatus);
 router.put("/cancelOrder",adminAuth,orderController.cancelOrder);
+//coupon management
+router.get("/getCoupon",adminAuth,couponController.getCouponPage);
 
 
 
