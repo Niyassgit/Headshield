@@ -54,6 +54,7 @@ router.put("/cancelOrder",adminAuth,orderController.cancelOrder);
 router.get("/getCoupon",adminAuth,couponController.getCouponPage);
 router.post("/addCoupon",adminAuth,couponController.addCoupon);
 router.put("/getCoupon/editCoupon",adminAuth,couponController.editCoupon);
+router.delete("/getCoupon/cancelCoupon/:couponId",adminAuth,couponController.removeCoupon);
 
 
 

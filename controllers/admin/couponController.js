@@ -86,6 +86,25 @@ const editCoupon=async (req,res)=>{
        return res.json({ success: false, message:"Internal Server Error"});
     }
         
+};
+const removeCoupon=async(req,res)=>{
+
+    try {
+        const couponId=req.params.couponId;
+     
+        const coupon=await Coupon.findOneAndDelete({_id:couponId});
+
+        if(!coupon){
+            return res.status(404).json({success:false,message:"Coupon not found!."});
+        }
+        res.status(200).json({success:true,message:"Coupon Removed Successfully"});
+        
+    } catch (error) {
+
+        console.error("Error removing coupon",error);
+        return res.status(500).json({success:false,message:"Internal Server Error"});
+        
+    }
 }
 
 
@@ -93,4 +112,5 @@ module.exports={
     getCouponPage,
     addCoupon,
     editCoupon,
+    removeCoupon,
 }

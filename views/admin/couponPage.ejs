@@ -40,7 +40,12 @@ You said:
                                         <%= coupon.type %>
                                     </td>
                                     <td>
-                                        <%= coupon.offerPrice %>
+                                        <%= coupon.offerPrice %> 
+                                        <% if (coupon.type === "percentage") { %>
+                                            %
+                                        <% } else if (coupon.type === "flat") { %>
+                                            ₹
+                                        <% } %>
                                     </td>
                                     <td>
                                         <%= coupon.maximumPrice %>
@@ -74,7 +79,7 @@ You said:
                                         data-bs-target="#editCouponModal">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
-                                    <a href="#" class="btn btn-danger btn-sm cancel-btn" data-order-id="">Cancel</a>
+                                    <a href="#" class="btn btn-danger btn-sm cancel-btn" data-order-id="<%=coupon._id %>">Cancel</a>
                                     </td>
                                 </tr>
 
@@ -278,21 +283,18 @@ You said:
             discountType.addEventListener("change", toggleMaxDiscountField);
             toggleMaxDiscountField();
 
-            // Function to show error messages
             function showError(fieldId, message) {
                 const errorDiv = document.getElementById(fieldId).nextElementSibling;
                 errorDiv.textContent = message;
             }
 
-            // Single Form Submit Handler
             couponForm.addEventListener("submit", function (event) {
                 event.preventDefault();
                 let isValid = true;
 
-                // Clear previous errors
                 document.querySelectorAll(".error-message").forEach(el => el.textContent = "");
 
-                // Validation checks
+
                 const validations = {
                     couponName: { condition: value => !value, message: "Coupon name is required." },
                     couponCode: { condition: value => !value, message: "Coupon code is required." },
@@ -302,7 +304,6 @@ You said:
                     usageLimit: { condition: value => !value || value <= 0, message: "Usage limit must be a positive number." }
                 };
 
-                // Check each field
                 Object.keys(validations).forEach(fieldId => {
                     const element = document.getElementById(fieldId);
                     const value = element.value;
@@ -312,7 +313,6 @@ You said:
                     }
                 });
 
-                // Additional validation for percentage discount type
                 if (discountType.value === "percentage" && isValid) {
                     const maxDiscount = maxDiscountAmount.value;
                     if (!maxDiscount || maxDiscount <= 0) {
@@ -321,7 +321,7 @@ You said:
                     }
                 }
 
-                // Check end date
+              
                 const startDate = new Date(document.getElementById("startDate").value);
                 const endDate = new Date(document.getElementById("endDate").value);
                 if (!endDate || endDate <= startDate) {
@@ -329,7 +329,7 @@ You said:
                     isValid = false;
                 }
 
-                // If form is valid, show confirmation and submit
+             
                 if (isValid) {
                     const formData = {
                         couponName: document.getElementById("couponName").value,
@@ -402,8 +402,7 @@ function clearErrors() {
 
     document.querySelectorAll(".edit-coupon").forEach(button => {
         button.addEventListener("click", function () {
-          
-            // Ensure correct field IDs match modal input fields
+         
             document.getElementById("coupon_Id").value = this.dataset.couponId || "";
             document.getElementById("coupon_Name").value = this.dataset.name || "";
             document.getElementById("coupon_Code").value = this.dataset.couponCode || "";
@@ -414,7 +413,6 @@ function clearErrors() {
             document.getElementById("max_DiscountAmount").value = this.dataset.maxDiscountAmount || "";
             document.getElementById("usage_Limit").value = this.dataset.usageLimit || "";
 
-            // Ensure the dropdown selection is set correctly
             let discountTypeSelect = document.getElementById("discountType");
             if (discountTypeSelect) {
                 discountTypeSelect.value = this.dataset.discountType || "percentage";
@@ -424,13 +422,12 @@ function clearErrors() {
         });
     });
 
-    // Add form validation and submission
 document.getElementById("editCouponForm").addEventListener("submit", function(e) {
     e.preventDefault();
     clearErrors();
     let isValid = true;
 
-    // Validate Coupon Name
+  
     const couponName = document.getElementById("coupon_Name").value.trim();
     if (!couponName) {
         showError("coupon_Name", "Coupon name is required");
@@ -440,7 +437,7 @@ document.getElementById("editCouponForm").addEventListener("submit", function(e)
         isValid = false;
     }
 
-    // Validate Coupon Code
+
     const couponCode = document.getElementById("coupon_Code").value.trim();
     if (!couponCode) {
         showError("coupon_Code", "Coupon code is required");
@@ -450,21 +447,20 @@ document.getElementById("editCouponForm").addEventListener("submit", function(e)
     //     isValid = false;
     // }
 
-    // Validate Offer Price
     const offerPrice = parseFloat(document.getElementById("offer_Price").value);
     if (!offerPrice || offerPrice <= 0) {
         showError("offer_Price", "Please enter a valid offer price");
         isValid = false;
     }
 
-    // Validate Minimum Purchase Amount
+
     const minPurchase = parseFloat(document.getElementById("min_PurchaseAmount").value);
     if (!minPurchase || minPurchase <= 0) {
         showError("min_PurchaseAmount", "Please enter a valid minimum purchase amount");
         isValid = false;
     }
 
-    // Validate Dates
+
     const startDate = new Date(document.getElementById("start_Date").value);
     const endDate = new Date(document.getElementById("end_Date").value);
     const today = new Date();
@@ -486,14 +482,14 @@ document.getElementById("editCouponForm").addEventListener("submit", function(e)
         isValid = false;
     }
 
-    // Validate Usage Limit
+
     const usageLimit = parseInt(document.getElementById("usage_Limit").value);
     if (!usageLimit || usageLimit <= 0) {
         showError("usage_Limit", "Please enter a valid usage limit");
         isValid = false;
     }
 
-    // If validation passes, submit the form
+
     if (isValid) {
         const formData = {
             couponId: document.getElementById("coupon_Id").value,
@@ -508,7 +504,7 @@ document.getElementById("editCouponForm").addEventListener("submit", function(e)
             discountType: document.getElementById("discountType").value
         };
           console.log("values",formData);
-        // Send data to backend
+
         fetch('/admin/getCoupon/editCoupon', {
             method: 'PUT',
             headers: {
@@ -546,7 +542,48 @@ document.getElementById("editCouponForm").addEventListener("submit", function(e)
         });
     }
 });
+     
+      document.querySelectorAll(".cancel-btn").forEach(button=>{
 
+        button.addEventListener("click",function(event){
+            event.preventDefault();
+
+            const couponId=this.getAttribute("data-order-id");
+
+            Swal.fire({
+                title:"Are you sure?",
+                text:"Once canceled this coupon will be removed!",
+                icon:"Warning",
+                showCancelButton:true,
+                confirmButtonColor:"#d33",
+                cancelButtonColor:"#3085d6",
+                confirmButtonText:"Yes,Cancel it!"
+
+            }).then((result)=>{
+
+                if(result.isConfirmed){
+                    fetch(`/admin/getCoupon/cancelCoupon/${couponId}`,{
+                        method:"DELETE",
+                        headers:{
+                            "Content-Type":"application/json"
+                        }
+                    })
+                    .then(response=>response.json())
+                    .then(data=>{
+                        if(data.success){
+                            Swal.fire("Canceled!","The coupon has been removed.","success")
+                            .then(()=>{location.reload()});
+                        }else{
+                         Swal.fire("Error!",data.message,"error");
+                        }
+                    })
+                    .catch(error=>{
+                        Swal.fire("Error!","Something went wrong!","error");
+                    });
+                }
+            })
+        })
+      })
 
     
 });
