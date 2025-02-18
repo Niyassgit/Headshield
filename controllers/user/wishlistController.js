@@ -88,8 +88,11 @@ try {
 }
 }
 
+
+
 module.exports={
     getWishlist,
     addToWishlist,
-    removeItem
+    removeItem,
+   
 }

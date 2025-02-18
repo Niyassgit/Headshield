@@ -63,6 +63,7 @@ router.post('/cart/updateQuantity', cartController.updateQuantity);
 router.get("/checkoutPage",userAuth,checkoutController.getcheckoutPage);
 router.post("/addNewAddress",userAuth,checkoutController.postAddAddress);
 router.post("/checkoutPage/editAddress",userAuth,checkoutController.postEditAddress);
+router.post("/applyCoupon",userAuth,checkoutController.applyCoupon);
 //place order
 router.post("/placeOrder",userAuth,orderController.placeOrder);
 router.get("/orders",userAuth,orderController.getOrders);
@@ -73,6 +74,7 @@ router.patch("/return-order/:id",userAuth,orderController.returnOrder);
 router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);
 router.get("/getWishlist",userAuth,wishlistController.getWishlist);
 router.delete("/getWishlist/removeItem/:productId",userAuth,wishlistController.removeItem);
+
 
 
 

@@ -87,6 +87,11 @@ const orderSchema = new Schema(
     returnReason:{
       type:String,
       required:false
+    },
+    couponId:{
+      type: Schema.Types.ObjectId,
+      ref:"Coupon",
+      required:false,
     }
 
   },{ timestamps: true });

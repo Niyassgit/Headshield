@@ -3,12 +3,14 @@ const User=require("../../models/userSchema");
 const Product=require("../../models/productSchema");
 const Cart =require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
+const Coupon =require("../../models/couponSchema");
+
 
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user; 
-        const { address, paymentMethod } = req.body;
-
+        const { address, paymentMethod, totalPrice, discount, finalAmount, couponCode } = req.body;
+    
         if (!address || !paymentMethod) {
             return res.status(400).json({
                 success: false,
@@ -62,27 +64,83 @@ const placeOrder = async (req, res) => {
             price: item.price
         }));
 
-        const totalPrice = cart.cartTotal;
-        let discount = 0;
-        const finalAmount = totalPrice;
-        let couponNotApplied = false;
+        let couponApplied = false;
+        let couponId = null;
+        let finalDiscount = 0;
+
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ couponCode: couponCode });
+
+            if (coupon) {
+                // Check if coupon is active and not expired
+                if (!coupon.isActive) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'This coupon is inactive.'
+                    });
+                }
+
+                if (coupon.expiredOn < Date.now()) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'This coupon has expired.'
+                    });
+                }
+
+                // Check if coupon can still be used
+                if (coupon.usedCount >= coupon.usageLimit) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'This coupon has reached its usage limit.'
+                    });
+                }
+
+                // Apply coupon discount
+                couponApplied = true;
+                couponId = coupon._id;
+
+                let discountAmount = 0;
+                if (coupon.type === 'percentage') {
+                    discountAmount = (totalPrice * coupon.offerPrice) / 100;
+                } else {
+                    discountAmount = coupon.offerPrice;
+                }
+
+                // Ensure discount doesn't exceed maximum price
+                if (coupon.maximumPrice && discountAmount > coupon.maximumPrice) {
+                    discountAmount = coupon.maximumPrice;
+                }
+
+                // Update used count for the coupon
+                await Coupon.findByIdAndUpdate(couponId, { $push: { userId: userId }, $inc: { usedCount: 1 } });
+
+                finalDiscount = discountAmount;
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid coupon code.'
+                });
+            }
+        }
 
         let status = 'Pending';
 
-        // Create order
+        // Create the order
         const order = await Order.create({
             userId,
             orderedItems,
             totalPrice,
-            discount,
-            finalAmount,
+            discount: finalDiscount,
+            finalAmount: finalAmount - finalDiscount,
             address: address,
             paymentMethod: paymentMethod,
             invoiceDate: new Date(),
             status,
-            couponApplied: couponNotApplied
+            couponApplied, 
+            couponId,
         });
 
+        // Update product stock based on order
         for (let item of cart.items) {
             await Product.updateOne(
                 { _id: item.productId._id },
@@ -90,6 +148,7 @@ const placeOrder = async (req, res) => {
             );
         }
 
+        // Delete the cart after placing the order
         await Cart.findByIdAndDelete(cart._id);
 
         return res.status(200).json({ success: true, message: "Order placed successfully!", order });
@@ -103,6 +162,7 @@ const placeOrder = async (req, res) => {
         });
     }
 };
+
 
 const getOrders= async(req,res)=>{
     try {

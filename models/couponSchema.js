@@ -21,12 +21,25 @@ const couponSchema = new Schema({
     expiredOn: {
         type: Date,
         required: true,
+        validate: {
+            validator: function(value) {
+                return value > Date.now(); 
+            },
+            message: "Expiration date must be in the future."
+        }
     },
     offerPrice: {
         type: Number,
         required: true,
         min: 0,
+        validate: {
+            validator: function(value) {
+                return this.type === "percentage" ? value <= 100 : true;
+            },
+            message: "Percentage discount must be ≤ 100."
+        }
     },
+    
     minimumPrice: {
         type: Number,
         required: true,
@@ -57,6 +70,7 @@ const couponSchema = new Schema({
     userId: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default:[]
     }],
 });
 
