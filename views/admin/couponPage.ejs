@@ -1,173 +1,558 @@
+Share
+
+
+You said:
 <%- include('../partials/admin/header') %>
 
-<!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>
-        Coupon Management
-      </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Coupon Management</li>
-      </ol>
-    </section>
-  
-    <!-- Main content -->
-    <section class="content">
-      <!-- Coupons Table -->
-      <div class="box">
-        <div class="box-header">
-          <h3 class="box-title">Coupons</h3>
-          <div class="pull-right">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCouponModal">
-              <i class="fa fa-plus"></i> Add Coupon
+    <div class="container mt-4">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Coupon Management</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+                Add New Coupon
             </button>
-          </div>
         </div>
-        <div class="box-body">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Coupon Name</th>
-                <th>Type</th>
-                <th>Created On</th>
-                <th>Expires On</th>
-                <th>Discount</th>
-                <th>Max Discount</th>
-                <th>Min. Purchase</th>
-                <th>Usage Limit</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="couponsTableBody">
-              <!-- Coupons will be added dynamically with JavaScript -->
-            </tbody>
-          </table>
+
+        <!-- Coupon List Table -->
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount Type</th>
+                            <th>Value</th>
+                            <th>Max Discount</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <% if(coupons.length>0){ %>
+                        <% coupons.forEach(coupon=>{ %>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <%=coupon.couponCode %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.type %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.offerPrice %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.maximumPrice %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(coupon.createdOn).toLocaleDateString('en-GB') %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(coupon.expiredOn).toLocaleDateString('en-GB') %>
+                                    </td>
+                                    <td>
+                                        <% if(coupon.isActive) { %>
+                                            <span class="badge bg-success">Active</span>
+                                            <% } else { %>
+                                                <span class="badge bg-danger">Inactive</span>
+                                                <% } %>
+                                    </td>
+                                    <td>
+                                    <button class="btn btn-sm btn-outline-primary edit-coupon"
+                                        data-coupon-id="<%= coupon._id %>"
+                                        data-coupon-name="<%= coupon.name %>"  
+                                        data-coupon-code="<%= coupon.couponCode %>"
+                                        data-discount-type="<%= coupon.type %>"
+                                        data-offer-price="<%= coupon.offerPrice %>"
+                                        data-min-purchase-amount="<%= coupon.minimumPrice %>"
+                                        data-max-discount-amount="<%= coupon.maximumPrice %>"
+                                        data-start-date="<%= coupon.createdOn ? coupon.createdOn.toISOString().split('T')[0] : '' %>"
+                                        data-end-date="<%= coupon.expiredOn ? coupon.expiredOn.toISOString().split('T')[0] : '' %>"
+                                        data-usage-limit="<%= coupon.usageLimit %>"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editCouponModal">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <a href="#" class="btn btn-danger btn-sm cancel-btn" data-order-id="">Cancel</a>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                            <% }) %>
+                                <% } %>
+                </table>
+            </div>
         </div>
-      </div>
-    </section>
-  </div>
-  
-  <!-- Add Coupon Modal -->
-  <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title">Add New Coupon</h4>
+
+        <!-- Add Coupon Modal -->
+        <div class="modal fade" id="addCouponModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Coupon</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="POST" id="couponForm" novalidate>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="couponName" class="form-label">Coupon Name</label>
+                                <input type="text" id="couponName" name="couponName" class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="couponCode" class="form-label">Coupon Code</label>
+                                <input type="text" id="couponCode" name="couponCode" class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="discountType" class="form-label">Discount Type</label>
+                                <select id="discountType" name="discountType" class="form-select">
+                                    <option value="percentage">Percentage</option>
+                                    <option value="flat">Fixed Amount</option>
+                                </select>
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="discountValue" class="form-label">Discount Value</label>
+                                <input type="number" id="discountValue" name="discountValue" class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+                            <!-- Maximum Discount Amount (Hidden by Default) -->
+                            <div class="mb-3" id="maxDiscountContainer" style="display: none;">
+                                <label for="maxDiscountAmount" class="form-label">Max Discount Amount</label>
+                                <input type="number" id="maxDiscountAmount" name="maxDiscountAmount"
+                                    class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+                            <!-- Minimum Purchase Amount (Always Visible) -->
+                            <div class="mb-3">
+                                <label for="minPurchaseAmount" class="form-label">Minimum Purchase Amount</label>
+                                <input type="number" id="minPurchaseAmount" name="minPurchaseAmount"
+                                    class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="date" id="startDate" name="startDate" class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="date" id="endDate" name="endDate" class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+
+
+                            <!-- New Usage Limit Field -->
+                            <div class="mb-3">
+                                <label for="usageLimit" class="form-label">Usage Limit</label>
+                                <input type="number" id="usageLimit" name="usageLimit" class="form-control">
+                                <div class="error-message text-danger mt-1"></div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Coupon</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <form id="addCouponForm">
-            <div class="form-group">
-              <label for="couponName">Coupon Name*</label>
-              <input type="text" class="form-control" id="couponName" name="name" required pattern="[A-Za-z0-9]+" title="Only letters and numbers allowed">
-              <small class="text-muted">Only letters and numbers allowed</small>
-            </div>
-            <div class="form-group">
-              <label for="couponType">Coupon Type*</label>
-              <select class="form-control" id="couponType" name="couponType" required>
-                <option value="flat">Flat Amount</option>
-                <option value="percentage">Percentage Discount</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="expireOn">Expiry Date*</label>
-              <input type="date" class="form-control" id="expireOn" name="expireOn" required min="2025-02-17">
-            </div>
-            <div class="form-group">
-              <label for="offerPrice" id="offerPriceLabel">Discount Amount (₹)*</label>
-              <input type="number" class="form-control" id="offerPrice" name="offerPrice" required min="1" step="0.01">
-              <small class="text-muted" id="offerPriceHelp">Enter the flat discount amount</small>
-            </div>
-            <div class="form-group" id="maxDiscountGroup" style="display: none;">
-              <label for="maximumDiscountAmount">Maximum Discount Amount (₹)*</label>
-              <input type="number" class="form-control" id="maximumDiscountAmount" name="maximumDiscountAmount" min="1" step="0.01">
-              <small class="text-muted">Maximum discount amount that can be applied</small>
-            </div>
-            <div class="form-group">
-              <label for="minimumPrice">Minimum Purchase Amount (₹)*</label>
-              <input type="number" class="form-control" id="minimumPrice" name="minimumPrice" required min="1" step="0.01">
-            </div>
-            <div class="form-group">
-              <label for="usageLimit">Usage Limit*</label>
-              <input type="number" class="form-control" id="usageLimit" name="usageLimit" required min="1" step="1">
-              <small class="text-muted">Maximum number of times this coupon can be used</small>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="saveCouponBtn">Save Coupon</button>
-        </div>
-      </div>
     </div>
-  </div>
-  
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const couponType = document.getElementById('couponType');
-      const offerPriceLabel = document.getElementById('offerPriceLabel');
-      const offerPriceHelp = document.getElementById('offerPriceHelp');
-      const maxDiscountGroup = document.getElementById('maxDiscountGroup');
-      const offerPriceInput = document.getElementById('offerPrice');
-  
-      couponType.addEventListener('change', function() {
-        const type = this.value;
-  
-        if (type === 'percentage') {
-          offerPriceLabel.textContent = 'Discount Percentage (%)*';
-          offerPriceHelp.textContent = 'Enter percentage between 1-100';
-          maxDiscountGroup.style.display = 'block';
-          offerPriceInput.max = 100;
-        } else {
-          offerPriceLabel.textContent = 'Discount Amount (₹)*';
-          offerPriceHelp.textContent = 'Enter the flat discount amount';
-          maxDiscountGroup.style.display = 'none';
-          offerPriceInput.removeAttribute('max');
-        }
-      });
-  
-      document.getElementById('saveCouponBtn').addEventListener('click', function() {
-        const form = document.getElementById('addCouponForm');
-        if (form.checkValidity()) {
-          const formData = new FormData(form);
-          const data = Object.fromEntries(formData.entries());
-  
-          // Convert string values to numbers where needed
-          data.offerPrice = parseFloat(data.offerPrice);
-          data.minimumPrice = parseFloat(data.minimumPrice);
-          data.usageLimit = parseInt(data.usageLimit);
-  
-          // Validate minimum price
-          if (data.offerPrice >= data.minimumPrice) {
-            alert('Minimum purchase amount must be greater than offer price');
-            return;
-          }
-  
-          // Submit form data
-          fetch('/admin/coupon/add', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' }
-          })
-            .then(response => response.json())
-            .then(result => {
-              if (result.success) {
-                alert('Coupon added successfully');
-                location.reload();
-              } else {
-                alert(result.message || 'Failed to add coupon');
-              }
-            })
-            .catch(error => alert('Error occurred while adding coupon: ' + error));
-        } else {
-          form.reportValidity();
-        }
-      });
+
+
+   <!-- Edit Coupon Modal -->
+<div class="modal fade" id="editCouponModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Coupon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="editCouponForm" novalidate>
+                <div class="modal-body">
+                    <input type="hidden" id="coupon_Id" name="couponId">
+
+                    <div class="mb-3">
+                        <label class="form-label">Coupon Name</label>
+                        <input type="text" id="coupon_Name" name="couponName" class="form-control" >
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Coupon Code</label>
+                        <input type="text" id="coupon_Code" name="couponCode" class="form-control">
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Discount Type</label>
+                        <select id="discountType" name="discountType" class="form-select">
+                            <option value="percentage">Percentage</option>
+                            <option value="flat">Fixed Amount</option>
+                        </select>
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Discount Value</label>
+                        <input type="number" id="offer_Price" name="offerPrice" class="form-control" >
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Max Discount Amount</label>
+                        <input type="number" id="max_DiscountAmount" name="maxDiscountAmount" class="form-control">
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Minimum Purchase Amount</label>
+                        <input type="number" id="min_PurchaseAmount" name="minPurchaseAmount" class="form-control">
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" id="start_Date" name="startDate" class="form-control" >
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" id="end_Date" name="endDate" class="form-control">
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Usage Limit</label>
+                        <input type="number" id="usage_Limit" name="usageLimit" class="form-control">
+                        <div class="error-message text-danger mt-1"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Coupon</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const discountType = document.getElementById("discountType");
+            const maxDiscountContainer = document.getElementById("maxDiscountContainer");
+            const maxDiscountAmount = document.getElementById("maxDiscountAmount");
+            const couponForm = document.getElementById("couponForm");
+
+            function toggleMaxDiscountField() {
+                if (discountType.value === "percentage") {
+                    maxDiscountContainer.style.display = "block";
+                    maxDiscountAmount.setAttribute("required", "true");
+                } else {
+                    maxDiscountContainer.style.display = "none";
+                    maxDiscountAmount.removeAttribute("required");
+                    maxDiscountAmount.value = "";
+                }
+            }
+
+            discountType.addEventListener("change", toggleMaxDiscountField);
+            toggleMaxDiscountField();
+
+            // Function to show error messages
+            function showError(fieldId, message) {
+                const errorDiv = document.getElementById(fieldId).nextElementSibling;
+                errorDiv.textContent = message;
+            }
+
+            // Single Form Submit Handler
+            couponForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                let isValid = true;
+
+                // Clear previous errors
+                document.querySelectorAll(".error-message").forEach(el => el.textContent = "");
+
+                // Validation checks
+                const validations = {
+                    couponName: { condition: value => !value, message: "Coupon name is required." },
+                    couponCode: { condition: value => !value, message: "Coupon code is required." },
+                    discountValue: { condition: value => !value || value <= 0, message: "Discount value must be a positive number." },
+                    minPurchaseAmount: { condition: value => !value || value <= 0, message: "Minimum purchase amount must be a positive number." },
+                    startDate: { condition: value => !value || new Date(value) < new Date(), message: "Start date must be in the future." },
+                    usageLimit: { condition: value => !value || value <= 0, message: "Usage limit must be a positive number." }
+                };
+
+                // Check each field
+                Object.keys(validations).forEach(fieldId => {
+                    const element = document.getElementById(fieldId);
+                    const value = element.value;
+                    if (validations[fieldId].condition(value)) {
+                        showError(fieldId, validations[fieldId].message);
+                        isValid = false;
+                    }
+                });
+
+                // Additional validation for percentage discount type
+                if (discountType.value === "percentage" && isValid) {
+                    const maxDiscount = maxDiscountAmount.value;
+                    if (!maxDiscount || maxDiscount <= 0) {
+                        showError("maxDiscountAmount", "Max discount amount must be a positive number.");
+                        isValid = false;
+                    }
+                }
+
+                // Check end date
+                const startDate = new Date(document.getElementById("startDate").value);
+                const endDate = new Date(document.getElementById("endDate").value);
+                if (!endDate || endDate <= startDate) {
+                    showError("endDate", "End date must be after start date.");
+                    isValid = false;
+                }
+
+                // If form is valid, show confirmation and submit
+                if (isValid) {
+                    const formData = {
+                        couponName: document.getElementById("couponName").value,
+                        couponCode: document.getElementById("couponCode").value,
+                        discountType: document.getElementById("discountType").value,
+                        discountValue: document.getElementById("discountValue").value,
+                        minPurchaseAmount: document.getElementById("minPurchaseAmount").value,
+                        startDate: document.getElementById("startDate").value,
+                        endDate: document.getElementById("endDate").value,
+                        usageLimit: document.getElementById("usageLimit").value
+                    };
+
+                    if (discountType.value === 'percentage') {
+                        formData.maxDiscountAmount = document.getElementById("maxDiscountAmount").value;
+                    }
+
+                    Swal.fire({
+                        title: "Confirm Coupon Submission",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, Submit",
+                        cancelButtonText: "Cancel"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch("/admin/addCoupon", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(formData)
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire("Success", "Coupon added successfully!", "success")
+                                            .then(() => {
+                                                location.reload();
+                                            });
+                                    } else {
+                                        Swal.fire("Error", data.message || "Failed to add coupon", "error");
+                                    }
+                                })
+                                .catch(err => {
+                                    console.error("Error:", err);
+                                    Swal.fire("Error", "An unexpected error occurred", "error");
+                                });
+                        }
+                    });
+                }
+            });
+
+
+            function showError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = field.nextElementSibling || document.createElement('div');
+    errorDiv.className = 'error-message text-danger mt-1';
+    errorDiv.textContent = message;
+    if (!field.nextElementSibling) {
+        field.parentNode.appendChild(errorDiv);
+    }
+}
+
+function clearErrors() {
+    document.querySelectorAll('.error-message').forEach(error => {
+        error.textContent = '';
     });
-  </script>
-  <%- include('../partials/admin/footer') %>
+}
+    
+            
+
+    document.querySelectorAll(".edit-coupon").forEach(button => {
+        button.addEventListener("click", function () {
+          
+            // Ensure correct field IDs match modal input fields
+            document.getElementById("coupon_Id").value = this.dataset.couponId || "";
+            document.getElementById("coupon_Name").value = this.dataset.name || "";
+            document.getElementById("coupon_Code").value = this.dataset.couponCode || "";
+            document.getElementById("start_Date").value = this.dataset.startDate || "";
+            document.getElementById("end_Date").value = this.dataset.endDate || "";
+            document.getElementById("offer_Price").value = this.dataset.offerPrice || "";
+            document.getElementById("min_PurchaseAmount").value = this.dataset.minPurchaseAmount || "";
+            document.getElementById("max_DiscountAmount").value = this.dataset.maxDiscountAmount || "";
+            document.getElementById("usage_Limit").value = this.dataset.usageLimit || "";
+
+            // Ensure the dropdown selection is set correctly
+            let discountTypeSelect = document.getElementById("discountType");
+            if (discountTypeSelect) {
+                discountTypeSelect.value = this.dataset.discountType || "percentage";
+            }
+
+       
+        });
+    });
+
+    // Add form validation and submission
+document.getElementById("editCouponForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    clearErrors();
+    let isValid = true;
+
+    // Validate Coupon Name
+    const couponName = document.getElementById("coupon_Name").value.trim();
+    if (!couponName) {
+        showError("coupon_Name", "Coupon name is required");
+        isValid = false;
+    } else if (couponName.length < 3) {
+        showError("coupon_Name", "Coupon name must be at least 3 characters");
+        isValid = false;
+    }
+
+    // Validate Coupon Code
+    const couponCode = document.getElementById("coupon_Code").value.trim();
+    if (!couponCode) {
+        showError("coupon_Code", "Coupon code is required");
+        isValid = false;
+     } //else if (!/^[A-Z0-9]{3,}$/.test(couponCode)) {
+    //     showError("coupon_Code", "Coupon code must be uppercase letters and numbers only");
+    //     isValid = false;
+    // }
+
+    // Validate Offer Price
+    const offerPrice = parseFloat(document.getElementById("offer_Price").value);
+    if (!offerPrice || offerPrice <= 0) {
+        showError("offer_Price", "Please enter a valid offer price");
+        isValid = false;
+    }
+
+    // Validate Minimum Purchase Amount
+    const minPurchase = parseFloat(document.getElementById("min_PurchaseAmount").value);
+    if (!minPurchase || minPurchase <= 0) {
+        showError("min_PurchaseAmount", "Please enter a valid minimum purchase amount");
+        isValid = false;
+    }
+
+    // Validate Dates
+    const startDate = new Date(document.getElementById("start_Date").value);
+    const endDate = new Date(document.getElementById("end_Date").value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!document.getElementById("start_Date").value) {
+        showError("start_Date", "Start date is required");
+        isValid = false;
+    } else if (startDate < today) {
+        showError("start_Date", "Start date cannot be in the past");
+        isValid = false;
+    }
+
+    if (!document.getElementById("end_Date").value) {
+        showError("end_Date", "End date is required");
+        isValid = false;
+    } else if (endDate <= startDate) {
+        showError("end_Date", "End date must be after start date");
+        isValid = false;
+    }
+
+    // Validate Usage Limit
+    const usageLimit = parseInt(document.getElementById("usage_Limit").value);
+    if (!usageLimit || usageLimit <= 0) {
+        showError("usage_Limit", "Please enter a valid usage limit");
+        isValid = false;
+    }
+
+    // If validation passes, submit the form
+    if (isValid) {
+        const formData = {
+            couponId: document.getElementById("coupon_Id").value,
+            couponName: couponName,
+            couponCode: couponCode,
+            startDate: document.getElementById("start_Date").value,
+            endDate: document.getElementById("end_Date").value,
+            offerPrice: offerPrice,
+            minimumPrice: minPurchase,
+            maximumPrice: document.getElementById("max_DiscountAmount").value,
+            usageLimit: usageLimit,
+            discountType: document.getElementById("discountType").value
+        };
+          console.log("values",formData);
+        // Send data to backend
+        fetch('/admin/getCoupon/editCoupon', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Coupon updated successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to update coupon'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An unexpected error occurred'
+            });
+        });
+    }
+});
+
+
+    
+});
+
+
+    
+    </script>
+
+    <%- include('../partials/admin/footer') %>

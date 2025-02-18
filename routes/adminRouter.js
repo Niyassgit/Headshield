@@ -52,6 +52,8 @@ router.put("/update-order-status/:orderId",adminAuth,orderController.updateStatu
 router.put("/cancelOrder",adminAuth,orderController.cancelOrder);
 //coupon management
 router.get("/getCoupon",adminAuth,couponController.getCouponPage);
+router.post("/addCoupon",adminAuth,couponController.addCoupon);
+router.put("/getCoupon/editCoupon",adminAuth,couponController.editCoupon);
 
 
 

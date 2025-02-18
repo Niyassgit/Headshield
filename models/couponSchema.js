@@ -11,8 +11,7 @@ const couponSchema = new Schema({
         type: String,
         required: true,
         unique: true,
-        uppercase: true,
-        match: /^[A-Z0-9]+$/, 
+        uppercase: true, 
     },
     createdOn: {
         type: Date,
@@ -37,6 +36,10 @@ const couponSchema = new Schema({
         type: String,
         enum: ["flat", "percentage"], 
         required: true,
+    },
+    maximumPrice:{
+     type:Number,
+     required:false,
     },
     usageLimit: {
         type: Number,
