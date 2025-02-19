@@ -20,6 +20,7 @@
             <th>Category</th>
             <th>Sale Price</th>
             <th>Quantity</th>
+            <th>Offer</th>
             <th class="text-center">Actions</th>
           </tr>
         </thead>
@@ -31,6 +32,19 @@
               <td><%= data[i].category.name %></td>
               <td><%= data[i].salePrice %></td>
               <td><%= data[i].quantity %></td>
+              <td class="text-center">
+                <% if(data[i].productOffer===0){ %>
+                <button class="btn btn-success btn-sm text-white" onclick="openOfferModal('<%= data[i]._id %>', '<%= data[i].productName %>')">
+                  Add Offer
+                </button>
+                <% }else{ %>
+                  <button class="btn btn-warning btn-sm text-white" onclick="cancelOffer('<%= data[i]._id %>', '<%= data[i].productName %>')">
+                    Cancel Offer
+                  </button>
+
+                  <% } %>
+              </td>
+              
               <td class="text-center">
                 <div class="btn-group" role="group">
                   <% if (data[i].isBlocked === false) { %>
@@ -99,7 +113,39 @@
         </nav>
       </div>
   </div>
-  
+
+  <!-- Offer Modal -->
+<div class="modal fade" id="offerModal" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="offerModalLabel">Add Offer to Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="offerForm" novalidate>  
+          <input type="hidden" id="productId">
+          <div class="mb-3">
+            <label for="productName" class="form-label">Product Name</label>
+            <input type="text" id="productName" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="offerPercentage" class="form-label">Offer Percentage (%)</label>
+            <input type="number" id="offerPercentage" class="form-control" min="1" max="100" >
+          </div>
+          <div class="mb-3">
+            <label for="expiryDate" class="form-label">Expiry Date</label>
+            <input type="date" id="expiryDate" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script>
     // Search functionality
     const searchInput = document.getElementById('search');
@@ -127,6 +173,78 @@
         alert(`Delete product with ID: ${productId}`);
       }
     }
+
+    
+function openOfferModal(productId, productName) {
+  document.getElementById("productId").value = productId;
+  document.getElementById("productName").value = productName;
+  var offerModal = new bootstrap.Modal(document.getElementById("offerModal"));
+  offerModal.show();
+}
+
+document.getElementById("offerForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  
+  const productId = document.getElementById("productId").value;
+  const offerPercentage = document.getElementById("offerPercentage").value;
+  const expiryDate = document.getElementById("expiryDate").value;
+
+  fetch("/admin/addProductOffer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ productId, offerPercentage, expiryDate })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire("Success!", "Offer added successfully.", "success").then(() => {
+        location.reload();
+      });
+    } else {
+      Swal.fire("Error!", data.message || "Failed to add offer.", "error");
+    }
+  })
+  .catch(error => {
+    Swal.fire("Error!", "Something went wrong.", "error");
+    console.error(error);
+  });
+});
+
+function cancelOffer(productId){
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This will remove the offer from the Product!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, cancel it!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch("/admin/cancelProductOffer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire("Cancelled!", "The offer has been removed.", "success")
+          .then(() => {
+            location.reload(); 
+          });
+        } else {
+          Swal.fire("Error!", data.message || "Failed to cancel offer", "error");
+        }
+      })
+      .catch(error => {
+        Swal.fire("Error!", "Something went wrong", "error");
+        console.error(error);
+      });
+    }
+  });
+}
+
   </script>
   
 

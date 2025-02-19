@@ -237,6 +237,51 @@ const deleteSingleImage = async (req, res) => {
   }
 };
 
+const addOffer= async(req,res)=>{
+
+  try {
+    const {productId,offerPercentage,expiryDate}=req.body;
+ 
+    const product = await Product.findByIdAndUpdate(productId,
+      {
+        productOffer:offerPercentage,
+        offerExpiry:expiryDate,
+      },{new:true},
+    ) ;
+    if(!product){
+      return res.status(404).json({succcess:false,success:"Product not found!"});
+    }
+    return res.status(200).json({success:true,message:"Offer Aadded Successfully."});
+   
+  } catch (error) {
+    console.error("Error while adding the product offer",error);
+    return res.status(500).json({success:false,message:"Internal Server Error"});
+  }
+};
+
+const removeOffer=async(req,res)=>{
+
+  try {
+    const {productId}=req.body;
+
+    const product=await Product.findByIdAndUpdate(productId,
+      {$unset:{
+        productOffer:1,
+        offerExpiry:1
+      }}
+    );
+
+    if(!product){
+      return res.status(404).json({success:false,message:"Product not found!"});
+    }
+
+    return res.status(200).json({success:true,message:"Offer Removed Successfully."});
+    
+  } catch (error) {
+    console.error("Error while removing the Offer",error);
+    return res.status(500).json({success:false,message:"Internal Server Error"});
+  }
+}
 
 
 
@@ -250,5 +295,7 @@ module.exports={
     unBlockProduct,
     getEditProduct,
     editProduct,
-    deleteSingleImage
+    deleteSingleImage,
+    addOffer,
+    removeOffer
 }

@@ -132,6 +132,45 @@ const editCategory=async(req,res)=>{
         res.status(500).json({error:"Internl Server error"});
     }
 };
+const addCategoryOffer=async(req,res)=>{
+
+    try {
+        const { categoryId, offerPercentage, expiryDate }=req.body;
+     
+        const category=await Category.findByIdAndUpdate(categoryId,{
+            categoryOffer:offerPercentage,
+            expiredOn:expiryDate,
+        },{new:true});
+        if(!category){
+            return res.status(404).json({success:false,message:"Category not found!"});
+        }
+        return res.status(200).json({success:true,message:"Offer added Successfully."});
+        
+    } catch (error) {
+        console.error("Error While adding offer",error);
+        return res.status(500).json({success:false,message:"Internal Server Error"});
+        
+    }
+};
+
+const cancelCategoryOffer=async(req,res)=>{
+    try {
+
+        const {categoryId}=req.body;
+
+        const category=await Category.findByIdAndUpdate(categoryId,
+            {$unset:{categoryOffer:1,expiredOn:1}},{new:true});
+
+        if(!category){
+            return res.status(404).json({success:false,message:"Category not found!"});
+        }
+        return res.status(200).json({success:true,message:"Offer cancelled successfully"});
+        
+    } catch (error) {
+        console.error("Erro while cancelling the Offer",error);
+        return res.status(500).json({success:false,message:"Internal Server Error"});
+    }
+};
 
 module.exports = {
 
@@ -140,5 +179,7 @@ module.exports = {
     getListCategory,
     getUnlistCategory,
     getEditCategory,
-    editCategory
+    editCategory,
+    addCategoryOffer,
+    cancelCategoryOffer
 }

@@ -277,11 +277,11 @@
                                         </div>
                                         <div class="summary-item">
                                             <span>Discount</span>
-                                            <span id="discountAmount" class="text-success">-₹0</span> <!-- Added ID here -->
+                                            <span id="discountAmount" class="text-success">-₹0</span>
                                         </div>
                                         <div class="summary-item">
                                             <strong>Total</strong>
-                                            <strong id="totalAmount">₹<%= cartTotal %></strong> <!-- Add ID here -->
+                                            <strong id="totalAmount">₹<%= cartTotal %></strong> 
                                         </div>
                                         
                     </div>
@@ -310,7 +310,7 @@
                                             <div>
                                                 <strong><%= coupon.couponName %></strong> -
                                                 <span class="text-success"><%= coupon.couponCode %></span>
-                                                (<%= coupon.discountType === 'percentage' ? coupon.offerPrice + '%' : '₹' + coupon.offerPrice %> off)
+                                                (<%= coupon.type === 'percentage' ? coupon.offerPrice + '%' : '₹' + coupon.offerPrice %> off)
                                             </div>
                                             <button class="btn btn-sm btn-dark select-coupon" data-code="<%= coupon.couponCode %>">Use</button>
                                         </div>
@@ -828,7 +828,7 @@
     const couponCode = document.getElementById("couponCodeInput").value;
     const discountMessage = document.getElementById("discountMessage");
 
-    // Get total amount from the page
+   
     const totalAmountElement = document.getElementById("totalAmount");
     const totalAmount = parseFloat(totalAmountElement.innerText.replace("₹", "").trim());
     const discountElement = document.getElementById("discountAmount");
@@ -850,7 +850,6 @@
             discountMessage.innerHTML = `<p class="text-success">Coupon applied! Discount: ₹${result.discount}</p>`;
 
             discountElement.innerText = `-₹${result.discount}`;
-            // Update total amount after discount
             totalAmountElement.innerText = `₹${result.cartTotal}`;
         } else {
             discountMessage.innerHTML = `<p class="text-danger">${result.message}</p>`;

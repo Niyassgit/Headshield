@@ -33,6 +33,16 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
+    offerExpiry: {
+      type: Date,
+      required: false,
+      validate: {
+          validator: function(value) {
+              return value > Date.now(); 
+          },
+          message: "Expiration date must be in the future."
+      }
+  },
     quantity: {
       type: Number,
       default: 0, 
@@ -58,6 +68,10 @@ const productSchema = new Schema(
       enum: ["Available", "Out of Stock", "Discontinued"], 
       required: true,
       default: "Available",
+    },
+    finalOffer: {
+      type: Number,
+      default: 0, 
     },
   },
   { timestamps: true }

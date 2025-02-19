@@ -22,6 +22,16 @@ const categorySchema=new Schema({
         type:Number,
         default:0,
     },
+    expiredOn: {
+        type: Date,
+        required: false,
+        validate: {
+            validator: function(value) {
+                return value > Date.now(); 
+            },
+            message: "Expiration date must be in the future."
+        }
+    },
     createdAt:{
      type:Date,
      default:Date.now,    

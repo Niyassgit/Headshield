@@ -17,14 +17,12 @@ const getcheckoutPage = async (req, res) => {
             return res.status(400).json({ success: false, message: "User not found" });
         }
 
-        // Fetch the user's addresses
         const addressDocs = await Address.find({ userId: userData._id });
         let addressList = [];
         addressDocs.forEach((doc) => {
             addressList = addressList.concat(doc.address);
         });
 
-        // Fetch the cart data
         const cartData = await Cart.findOne({ userId: userData._id }).populate("items.productId");
 
         let cartList = [];
@@ -32,29 +30,31 @@ const getcheckoutPage = async (req, res) => {
 
         if (cartData) {
             cartList = cartData.items;  
-            cartTotal = cartData.cartTotal; // Assuming cartTotal is the total price of the cart
+            cartTotal = cartData.cartTotal; 
         }
-console.log(cartTotal);
-        // Get the current date for checking coupon expiration
+   
         const currentDate = new Date();
 
-        const availableCoupons = await Coupon.find({
-            isActive: true, // Coupon must be active
-            expiredOn: { $gt: currentDate }, // Expiration date must be in the future
-            minimumPrice: { $lte: cartTotal }, // Coupon must be applicable based on cart total
-            // $or: [
-            //     { userId: { $exists: false } }, // Coupon can be used by anyone
-            //     { userId: { $nin: [userId] } } // Exclude coupons already used by the current user
-            // ]
+       
+        let coupons = await Coupon.find({
+            isActive: true, 
+            expiredOn: { $gt: currentDate }, 
+            minimumPrice: { $lte: cartTotal }
         }).sort({ createdOn: -1 });
 
-        // Render checkout page with data
+       
+        let availableCoupons = coupons.filter((coupon) => {
+            let userUsageCount = coupon.userId.filter(id => id.toString() === userData._id.toString()).length;
+            return userUsageCount < coupon.usageLimit;
+        });
+
+
         res.render("checkoutPage", {
             user: userData,
             address: addressList,
             cart: cartList,
-            cartTotal: cartTotal, // Pass the cart total
-            coupons: availableCoupons || [], // Pass available coupons to the frontend
+            cartTotal: cartTotal,
+            coupons: availableCoupons || [], 
         });
 
     } catch (error) {

@@ -3,6 +3,7 @@ const Category=require("../../models/categorySchema");
 const Product=require("../../models/productSchema");
 const Brand=require("../../models/brandSchema");
 const nodemailer=require("nodemailer");
+const { applyBestOffer }=require("../../helpers/offerHelper");
 const env=require("dotenv").config();
 const bcrypt=require("bcrypt");
 
@@ -22,6 +23,7 @@ const loadHomepage = async (req, res) => {
     try {
         const user = req.session.user;
         const categories = await Category.find({ isListed: true });
+        await applyBestOffer();
         let productData = await Product.find({
             isBlocked: false,
             category: { $in: categories.map(category => category._id) },
@@ -286,7 +288,6 @@ const loadShoppingPage = async (req, res) => {
             quantity: { $gt: 0 }
         };
 
-        // 🔥 Fix category filtering logic
         if (selectedCategory && categoryIds.includes(selectedCategory)) {
             filter.category = selectedCategory;
         } else if (!selectedCategory) {
@@ -304,15 +305,19 @@ const loadShoppingPage = async (req, res) => {
         else if (sortOption === "name_desc") sortQuery = { productName: -1 };
         else if (sortOption === "latest") sortQuery = { createdAt: -1 };
 
+        await applyBestOffer(); 
+
         const products = await Product.find(filter)
             .sort(sortQuery)
             .skip(skip)
-            .limit(limit);
-
+            .limit(limit)
+            .lean();  
         const totalProducts = await Product.countDocuments(filter);
         const totalPages = Math.ceil(totalProducts / limit);
 
         const brands = await Brand.find({ isBlocked: false });
+        
+        
 
         return res.render("shop", {
             user: userData,

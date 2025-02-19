@@ -72,7 +72,7 @@ const placeOrder = async (req, res) => {
             const coupon = await Coupon.findOne({ couponCode: couponCode });
 
             if (coupon) {
-                // Check if coupon is active and not expired
+            
                 if (!coupon.isActive) {
                     return res.status(400).json({
                         success: false,
@@ -87,7 +87,6 @@ const placeOrder = async (req, res) => {
                     });
                 }
 
-                // Check if coupon can still be used
                 if (coupon.usedCount >= coupon.usageLimit) {
                     return res.status(400).json({
                         success: false,
@@ -95,7 +94,6 @@ const placeOrder = async (req, res) => {
                     });
                 }
 
-                // Apply coupon discount
                 couponApplied = true;
                 couponId = coupon._id;
 
@@ -106,12 +104,11 @@ const placeOrder = async (req, res) => {
                     discountAmount = coupon.offerPrice;
                 }
 
-                // Ensure discount doesn't exceed maximum price
+
                 if (coupon.maximumPrice && discountAmount > coupon.maximumPrice) {
                     discountAmount = coupon.maximumPrice;
                 }
 
-                // Update used count for the coupon
                 await Coupon.findByIdAndUpdate(couponId, { $push: { userId: userId }, $inc: { usedCount: 1 } });
 
                 finalDiscount = discountAmount;
@@ -125,7 +122,6 @@ const placeOrder = async (req, res) => {
 
         let status = 'Pending';
 
-        // Create the order
         const order = await Order.create({
             userId,
             orderedItems,
@@ -140,7 +136,6 @@ const placeOrder = async (req, res) => {
             couponId,
         });
 
-        // Update product stock based on order
         for (let item of cart.items) {
             await Product.updateOne(
                 { _id: item.productId._id },
@@ -148,7 +143,7 @@ const placeOrder = async (req, res) => {
             );
         }
 
-        // Delete the cart after placing the order
+        
         await Cart.findByIdAndDelete(cart._id);
 
         return res.status(200).json({ success: true, message: "Order placed successfully!", order });
