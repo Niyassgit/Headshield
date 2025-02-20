@@ -78,15 +78,15 @@ const getAllProducts = async (req, res) => {
    
       const productData = await Product.find({
         $or: [
-          { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
-          { brand: { $regex: new RegExp(".*" + search + ".*", "i") } }
+            { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
+            { brand: { $regex: new RegExp(".*" + search + ".*", "i") } }
         ]
-      })
-        .limit(limit * 1)
-        .skip((page - 1) * limit)
-        .populate('category')
+    })
+        .sort({ quantity: 1 }) 
+        .skip((page - 1) * limit) 
+        .limit(limit)
+        .populate("category")
         .exec();
-  
       
       const count = await Product.find({
         $or: [

@@ -5,12 +5,12 @@ const Cart =require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 const Coupon =require("../../models/couponSchema");
 const Wallet=require("../../models/walletSchema");
-
+const axios = require("axios");
 
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user; 
-        const { address, paymentMethod, totalPrice, discount, finalAmount, couponCode } = req.body;
+        const { address, paymentMethod, totalPrice, discount, finalAmount, couponCode,razorpay_payment_id} = req.body;
 
       
         if (!address || !paymentMethod) {
@@ -122,7 +122,7 @@ const placeOrder = async (req, res) => {
             }
         }
 
-        let status = 'Pending';
+
 
         if (paymentMethod === "wallet") {
             const wallet = await Wallet.findOne({ userId: userId });
@@ -147,6 +147,33 @@ const placeOrder = async (req, res) => {
                 { $inc: { balance: -(finalAmount - finalDiscount) } }
             );
         }
+
+
+    if (paymentMethod === "razorpay" && !razorpay_payment_id) {
+        return res.status(400).json({ success: false, message: "Payment ID is required for Razorpay payments" });
+    }
+
+    if (paymentMethod === "razorpay") {
+        try {
+            const response = await axios.get(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
+                auth: {
+                    username: process.env.RAZORPAY_KEY_ID,
+                    password: process.env.RAZORPAY_KEY_SECRET
+                }
+            });
+
+            if (response.data.status !== "captured") {
+                return res.status(400).json({ success: false, message: "Payment verification failed" });
+            }
+        } catch (error) {
+            console.error("Payment verification error:", error);
+            return res.status(400).json({ success: false, message: "Payment verification failed" });
+        }
+    }
+    let status="Pending";
+    if(paymentMethod==="razorpay"){
+        status="Processing";
+    }
         
 
         const order = await Order.create({
@@ -161,6 +188,7 @@ const placeOrder = async (req, res) => {
             status,
             couponApplied, 
             couponId,
+            transactionId:razorpay_payment_id || null
         });
 
         for (let item of cart.items) {

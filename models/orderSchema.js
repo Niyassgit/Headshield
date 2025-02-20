@@ -54,7 +54,7 @@ const orderSchema = new Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["credit_card", "wallet", "cod", "upi"],
+      enum: ["cod", "wallet", "razorpay"],
       required: true,
     },
     invoiceDate: {
@@ -92,7 +92,11 @@ const orderSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref:"Coupon",
       required:false,
-    }
+    },
+    transactionId:{
+      type:String,
+      default:null
+    },
 
   },{ timestamps: true });
 

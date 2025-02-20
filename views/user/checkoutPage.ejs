@@ -353,8 +353,8 @@
 
                         <div class="payment-option">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
-                                <label class="form-check-label" for="upi">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
+                                <label class="form-check-label" for="razorpay">
                                     <i class="fas fa-credit-card me-2"></i> RAZORPAY
                                 </label>
                             </div>
@@ -518,6 +518,7 @@
         </div>
     </div>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -783,18 +784,34 @@
         confirmButtonText: "Yes, place order!"
     }).then((result) => {
         if (result.isConfirmed) {
+            if (selectedPayment.value === "razorpay") {
+               
+                initiateRazorpayPayment(totalPrice, selectedAddress.value, couponCode);
+            } else {
+               
+                placeOrder(selectedAddress.value, selectedPayment.value, totalPrice, discountAmount, couponCode);
+                
+            }
+        }
+        
+    });
+}
+
+    function placeOrder(selectedAddress, selectedPayment, totalPrice, discountAmount, couponCode,razorpay_payment_id = null){
+
             fetch("/placeOrder", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    address: selectedAddress.value,
-                    paymentMethod: selectedPayment.value,
+                    address: selectedAddress,
+                    paymentMethod: selectedPayment,
                     totalPrice: totalPrice,
                     discount: discountAmount,
-                    finalAmount: totalPrice, // Ensure this gets updated in the backend
-                    couponCode: couponCode || null // Send coupon name
+                    finalAmount: totalPrice, 
+                    couponCode: couponCode || null ,
+                    razorpay_payment_id: razorpay_payment_id 
                 })
             })
                 .then(response => response.json())
@@ -816,8 +833,7 @@
                     Swal.fire("Error!", "An unexpected error occurred.", "error");
                 });
         }
-    });
-}
+    
 
 
         async function applyCoupon() {
@@ -855,6 +871,63 @@
         discountMessage.innerHTML = `<p class="text-danger">An error occurred while applying the coupon.</p>`;
     }
 }
+
+function initiateRazorpayPayment(amount, address, couponCode) {
+
+    if (typeof Razorpay === "undefined") {
+        Swal.fire("Error!", "Razorpay SDK is not loaded. Please check your internet connection.", "error");
+        return;
+    }
+
+    fetch("/createOrder", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ amount: amount, currency: "INR" })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                Swal.fire("Error!", "Failed to create payment order.", "error");
+                return;
+            }
+
+            const options = {
+                key: "rzp_test_ju0hCIjA1oCJcC", 
+                amount: data.order.amount,
+                currency: "INR",
+                name: "Headshield Store",
+                description: "Helmet Purchase",
+                order_id: data.order.id,
+                handler: function (response) {
+
+                if (!response.razorpay_payment_id) {
+                    Swal.fire("Error!", "Payment failed. No payment ID received.", "error");
+                    return;
+                }
+               
+                    placeOrder(address, "razorpay", amount, 0, couponCode, response.razorpay_payment_id);
+                },
+                prefill: {
+                    name: "Niyas Nazar",
+                    email: "niyas28nazar@gmail.com",
+                    contact: "7907291887"
+                },
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            Swal.fire("Error!", "An unexpected error occurred.", "error");
+        });
+}
+
 
     </script>
 
