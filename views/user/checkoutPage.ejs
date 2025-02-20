@@ -342,7 +342,11 @@
                                 <input class="form-check-input" type="radio" name="paymentMethod" id="wallet"
                                     value="wallet">
                                 <label class="form-check-label" for="wallet">
-                                    <i class="fas fa-wallet me-2"></i> Wallet Balance: ₹3,000
+                                    <% if(wallet.length==0){ %>
+                                        <i class="fas fa-wallet me-2 text-danger"></i> <span class="text-danger">Activate wallet</span>
+                                    <% } else{%>
+                                        <i class="fas fa-wallet me-2"></i> Wallet Balance: ₹<%=wallet.balance %>
+                                        <% } %>
                                 </label>
                             </div>
                         </div>
@@ -351,22 +355,15 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
                                 <label class="form-check-label" for="upi">
-                                    <i class="fas fa-mobile-alt me-2"></i> UPI Payment
+                                    <i class="fas fa-credit-card me-2"></i> RAZORPAY
                                 </label>
                             </div>
                         </div>
 
-                        <div class="payment-option">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="card"
-                                    value="card">
-                                <label class="form-check-label" for="card">
-                                    <i class="fas fa-credit-card me-2"></i> Credit/Debit Card
-                                </label>
-                            </div>
-                        </div>
+                        
 
                         <!-- Place Order Button Inside Payment Method -->
+            
                         <button type="submit" class="btn btn-success mt-4 w-100">
                             <i class="fas fa-check me-2"></i> Place Order
                         </button>
@@ -600,10 +597,9 @@
 
             const placeOrderForm = document.querySelector("form[action='/placeOrder']");
     if (placeOrderForm) {
-        // Prevent default form submission
+  
         placeOrderForm.addEventListener("submit", function(e) {
             const submitter = e.submitter;
-            // Only prevent default if it's not coming from a button with type="button"
             if (!submitter || submitter.type !== 'button') {
                 e.preventDefault();
             }
@@ -635,8 +631,8 @@
 
             document.querySelectorAll(".select-coupon").forEach(button => {
     button.addEventListener("click", function () {
-        const selectedCoupon = this.getAttribute("data-code"); // Get coupon code
-        document.getElementById("couponCodeInput").value = selectedCoupon; // Fill input field
+        const selectedCoupon = this.getAttribute("data-code"); 
+        document.getElementById("couponCodeInput").value = selectedCoupon;
     });
 });
 
@@ -765,17 +761,17 @@
     const selectedPayment = form.querySelector("input[name='paymentMethod']:checked");
     const totalAmountElement = document.getElementById("totalAmount");
     const discountElement = document.getElementById("discountAmount");
-    const couponInput = document.getElementById("couponCodeInput"); // Get coupon input field
+    const couponInput = document.getElementById("couponCodeInput"); 
 
     if (!selectedAddress || !selectedPayment) {
         Swal.fire("Error!", "Please select an address and payment method.", "error");
         return;
     }
 
-    // ✅ Get values from UI
+    
     const totalPrice = parseFloat(totalAmountElement.innerText.replace("₹", "").trim());
     const discountAmount = parseFloat(discountElement.innerText.replace("-₹", "").trim()) || 0;
-    const couponCode = couponInput ? couponInput.value.trim() : ""; // Get coupon name
+    const couponCode = couponInput ? couponInput.value.trim() : ""; 
 
     Swal.fire({
         title: "Are you sure?",

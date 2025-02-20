@@ -4,13 +4,15 @@ const Product=require("../../models/productSchema");
 const Cart =require("../../models/cartSchema");
 const Address = require("../../models/addressSchema");
 const Coupon =require("../../models/couponSchema");
+const Wallet=require("../../models/walletSchema");
 
 
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user; 
         const { address, paymentMethod, totalPrice, discount, finalAmount, couponCode } = req.body;
-    
+
+      
         if (!address || !paymentMethod) {
             return res.status(400).json({
                 success: false,
@@ -121,6 +123,31 @@ const placeOrder = async (req, res) => {
         }
 
         let status = 'Pending';
+
+        if (paymentMethod === "wallet") {
+            const wallet = await Wallet.findOne({ userId: userId });
+
+            if(!wallet){
+                return res.status(400).json({
+                    success: false,
+                    message: "Wallet not found!",
+                });
+
+            }
+        
+            if (wallet.balance < finalAmount - finalDiscount) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Payment amount exceeded the wallet balance!",
+                });
+            }
+        
+            await Wallet.findOneAndUpdate(
+                { userId: userId }, 
+                { $inc: { balance: -(finalAmount - finalDiscount) } }
+            );
+        }
+        
 
         const order = await Order.create({
             userId,

@@ -1,0 +1,174 @@
+<%- include("../../views/partials/user/header") %>
+    <%- include("../../views/partials/user/sidebar") %>
+
+        <!-- Required CSS -->
+        <style>
+            .wallet-card {
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 20px;
+                background: #f8f9fa;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                max-width: 600px;
+                margin: 40px auto;
+            }
+
+            .balance {
+                font-size: 32px;
+                color: #2c3e50;
+                margin: 20px 0;
+            }
+
+            .currency {
+                color: #7f8c8d;
+                font-size: 18px;
+            }
+
+            .input-group {
+                margin: 20px 0;
+            }
+
+            input {
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-right: 10px;
+                width: 150px;
+            }
+
+            button {
+                padding: 8px 16px;
+                background: #2ecc71;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background: #27ae60;
+            }
+
+            .transaction {
+                margin: 10px 0;
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+            }
+        </style>
+
+
+        <!-- Wallet Container -->
+        <div class="wallet-card">
+            <h2>My Wallet</h2>
+            <div class="balance">
+                <span class="currency fw-bold">₹</span>
+                <span id="balance" class="fw-bold"><%= balance.toLocaleString('en-IN') %></span>
+            </div>
+
+            <div class="input-group">
+                <input type="number" id="amount" placeholder="Enter amount" >
+                <button onclick="addMoney()">Add Money</button>
+            </div>
+
+            <div id="transactions">
+                <h3>Recent Transactions</h3>
+             
+            </div>
+        </div>
+
+               
+        
+        <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.css" rel="stylesheet">
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.js"></script>
+
+        <script>
+            async function addMoney() {
+                const amountInput = document.getElementById("amount");
+                const amount = parseFloat(amountInput.value);
+        
+                if (isNaN(amount) || amount <= 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Invalid Amount",
+                        text: "Please enter a valid amount to add to your wallet.",
+                    });
+                    return;
+                }
+        
+            
+                const result = await Swal.fire({
+                    title: "Are you sure?",
+                    text: `You are about to add ₹${amount.toFixed(2)} to your wallet.`,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Add Money",
+                    cancelButtonText: "Cancel",
+                });
+        
+                if (result.isConfirmed) {
+                    try {
+
+                        const addButton = document.querySelector("button[onclick='addMoney()']");
+                        addButton.disabled = true;
+                        addButton.textContent = "Processing...";
+        
+                        const response = await fetch("/addMoney", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ amount }),
+                        });
+        
+                        const data = await response.json();
+                        console.log("API Response:", data);
+        
+                        if (response.ok) {
+                            if (data.wallet && typeof data.wallet.balance === "number") {
+                                document.getElementById("balance").textContent = data.wallet.balance.toFixed(2);
+                            }
+        
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success!",
+                                text: "Money added successfully to your wallet.",
+                            });
+        
+                          
+                            amountInput.value = "";
+
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Transaction Failed",
+                                text: data.message || "Something went wrong.",
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "An unexpected error occurred. Please try again later.",
+                        });
+                    } finally {
+                  
+                        const addButton = document.querySelector("button[onclick='addMoney()']");
+                        addButton.disabled = false;
+                        addButton.textContent = "Add Money";
+                    }
+                }
+            }
+        </script>
+        
+        <!--sidebar Footer section-->
+        </section>
+        </div>
+        </div>
+        </div>
+        </main>
+
+
+
+
+
+        <%- include("../../views/partials/user/footer") %>

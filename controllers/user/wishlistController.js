@@ -12,7 +12,7 @@ const getWishlist = async (req, res) => {
         
         const userData = await User.findById(userId);
         const wishlistData = await Wishlist.findOne({ userId })
-            .populate("products.productId", "productImage productName salePrice size");
+            .populate("products.productId", "productImage productName salePrice size finalOffer");
 
         if (!wishlistData || wishlistData.products.length === 0) {
             return res.render("wishlistPage", {

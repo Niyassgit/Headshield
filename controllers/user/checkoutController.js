@@ -2,6 +2,7 @@ const User=require("../../models/userSchema");
 const Address=require("../../models/addressSchema");
 const Cart=require("../../models/cartSchema");
 const Coupon=require("../../models/couponSchema");
+const Wallet=require("../../models/walletSchema");
 const mongoose=require("mongoose");
 const { ConnectionClosedEvent } = require("mongodb");
 
@@ -47,7 +48,7 @@ const getcheckoutPage = async (req, res) => {
             let userUsageCount = coupon.userId.filter(id => id.toString() === userData._id.toString()).length;
             return userUsageCount < coupon.usageLimit;
         });
-
+        const wallet=await Wallet.findOne({userId:userId});
 
         res.render("checkoutPage", {
             user: userData,
@@ -55,6 +56,7 @@ const getcheckoutPage = async (req, res) => {
             cart: cartList,
             cartTotal: cartTotal,
             coupons: availableCoupons || [], 
+            wallet:wallet?wallet:[],
         });
 
     } catch (error) {

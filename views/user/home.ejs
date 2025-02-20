@@ -187,14 +187,20 @@
                             <img src="/uploads/re-image/<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
                         </a>
                         <div class="card-body">
-                            <ul class="list-unstyled d-flex justify-content-between">
-                                <li class="text-muted text-right">&#8377;<%= products[i].salePrice %></li>
+                            <ul class="list-unstyled d-flex align-items-center gap-2">
+                                <% if(products[i].finalOffer) {%>
+                                <li class="text-muted"><s>&#8377;<%= products[i].regularPrice %></s></li>
+                                <li class="text-muted ">&#8377;<%= products[i].salePrice %></li>
+                                <% }else{ %>
+                                    <li class="text-muted">&#8377;<%= products[i].regularPrice %></li>
+                                    <% } %>
                             </ul>
                             <a href="/productDetails?id=<%= products[i]._id %>" class="h2 text-decoration-none text-dark">
                                 <%= products[i].productName %>
                             </a>
                             <p class="text-muted">Reviews (24)</p>
                         </div>
+                        
                     </div>
                 </div>
             <% } %>

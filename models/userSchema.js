@@ -50,10 +50,6 @@ const userSchema=new Schema({
             type:Schema.Types.ObjectId,
             ref:"Cart",
         }],
-        wallet:[{
-            type:Schema.Types.ObjectId,
-            ref:"Wishlist"
-        }],
         orderHistory:[{
 
             type:Schema.Types.ObjectId,
@@ -75,6 +71,7 @@ const userSchema=new Schema({
             type:Schema.Types.ObjectId,
             ref:"User"
         }],
+        
         searchHistory:[{
          category:{
             type:Schema.Types.ObjectId,

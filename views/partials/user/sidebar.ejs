@@ -1,34 +1,32 @@
 <style>
-/* Main container style */
+
 .main {
   padding: 30px 0;
   display: flex;
   flex-wrap: wrap;
 }
 
-/* Sidebar container that fills the entire height */
+
 .sidebar-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Make sure the sidebar takes up full height */
+  height: 100%; 
 }
 
-/* Sidebar styling */
+
 .sidebar {
   background-color: #59ab6e;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  flex-grow: 1; /* Sidebar will stretch to fill the available height */
-  min-height: 100%; /* Makes the sidebar extend to full height, but can grow with content */
+  flex-grow: 1; 
+  min-height: 100%; 
 }
 
-/* Flex behavior for the sidebar to stretch */
 .sidebar .nav {
-  flex-grow: 1; /* Allows the nav to take up remaining space */
+  flex-grow: 1; 
 }
 
-/* Sidebar links styling */
 .sidebar .nav-link {
   font-weight: bold;
   color: #fff;
@@ -38,13 +36,10 @@
   transition: background 0.3s;
 }
 
-/* Active and hover states for nav links */
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
   background: #4a965d;
 }
-
-/* Button styling */
 .btn-success {
   background-color: #577194;
   border-color: #6bb87d;
@@ -54,7 +49,6 @@
   background-color: #506955;
 }
 
-/* Responsive design for small screens */
 @media (max-width: 768px) {
   .sidebar {
     padding: 15px;
@@ -81,7 +75,7 @@
               <a class="nav-link" href="/orders">Orders</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/walletStatus">Wallet Status</a>
+              <a class="nav-link" href="/getWallet">Wallet Status</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#wallet-history">Wallet History</a>

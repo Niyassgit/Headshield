@@ -9,6 +9,8 @@ const cartController=require("../controllers/user/cartController");
 const checkoutController=require("../controllers/user/checkoutController");
 const orderController =require("../controllers/user/orderController");
 const wishlistController=require("../controllers/user/wishlistController");
+const walletController=require("../controllers/user/walletController");
+const razorPayController=require("../controllers/user/razorPayController");
 
 router.get("/pageNotFound",userController.pageNotFound)
 
@@ -74,6 +76,11 @@ router.patch("/return-order/:id",userAuth,orderController.returnOrder);
 router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);
 router.get("/getWishlist",userAuth,wishlistController.getWishlist);
 router.delete("/getWishlist/removeItem/:productId",userAuth,wishlistController.removeItem);
+//wallet management
+router.get("/getWallet",userAuth,walletController.getWalletAdd);
+router.post("/addMoney",userAuth,walletController.addMoney);
+//razor Pay management
+router.post("/createOrder",userAuth,razorPayController.createOrder);
 
 
 
