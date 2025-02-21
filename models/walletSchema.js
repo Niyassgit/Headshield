@@ -28,13 +28,17 @@ const walletSchema = new Schema({
            },
            status: {
               type: String,
-              enum: ['pending', 'completed', 'failed'],
-              default: 'completed'
+              enum: ['Pending', 'Completed', 'Failed'],
+              default: 'Completed'
            },
            createdAt: {
               type: Date,
               default: Date.now
-           }
+           },
+           orderId:{
+            type:String,
+            required:false,
+           }   
        }
    ]
 }, { timestamps: true });

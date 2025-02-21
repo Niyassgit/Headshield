@@ -35,19 +35,17 @@ const getcheckoutPage = async (req, res) => {
         }
    
         const currentDate = new Date();
-
+  
+    
        
         let coupons = await Coupon.find({
             isActive: true, 
             expiredOn: { $gt: currentDate }, 
-            minimumPrice: { $lte: cartTotal }
+            minimumPrice: { $lte: cartTotal },
+            userId: { $ne: userData._id },
         }).sort({ createdOn: -1 });
 
-       
-        let availableCoupons = coupons.filter((coupon) => {
-            let userUsageCount = coupon.userId.filter(id => id.toString() === userData._id.toString()).length;
-            return userUsageCount < coupon.usageLimit;
-        });
+     
         const wallet=await Wallet.findOne({userId:userId});
 
         res.render("checkoutPage", {
@@ -55,7 +53,7 @@ const getcheckoutPage = async (req, res) => {
             address: addressList,
             cart: cartList,
             cartTotal: cartTotal,
-            coupons: availableCoupons || [], 
+            coupons: coupons || [], 
             wallet:wallet?wallet:[],
         });
 

@@ -177,7 +177,7 @@
 
                         <div class="order-details">
                             <p><strong>Total Items:</strong> <%= orderItem.orderedItems.reduce((sum, item) => sum + item.quantity, 0) %></p>
-                            <p><strong>Total Price:</strong> ₹<%= orderItem.totalPrice %></p>
+                            <p><strong>Total Price:</strong> ₹<%= orderItem.finalAmount %></p>
                         </div>
 
                         <!-- ✅ View Order Button positioned to the right -->

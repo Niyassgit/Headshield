@@ -534,14 +534,12 @@
     }
 
 
-            // Handle edit address button clicks
             document.querySelectorAll(".edit-address").forEach(button => {
                 button.addEventListener("click", function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     const modal = document.getElementById("editAddressModal");
 
-                    // Populate modal fields with existing address data
                     modal.querySelector("#editAddressId").value = this.dataset.addressId;
                     modal.querySelector("#editAddressType").value = this.dataset.addressType;
                     modal.querySelector("#editName").value = this.dataset.name;
@@ -572,6 +570,7 @@
                     handleAddAddressValidation(this);
                 });
             }
+            
 
             // Handle address card selection
             document.querySelectorAll('.address-card').forEach(card => {
@@ -717,41 +716,42 @@
     };
 
 
-     if (addressType === "") errors.push("Please select an Address Type.");
-            if (name === "") {
-                errors.push("Full Name is required.");
-            } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-                errors.push("Full Name must contain only letters and spaces.");
-            }
-            if (landmark === "") errors.push("Landmark is required.");
-            if (city === "") {
-                errors.push("City is required.");
-            } else if (!/^[a-zA-Z\s]+$/.test(city)) {
-                errors.push("City must contain only letters.");
-            }
-            if (state === "") {
-                errors.push("State is required.");
-            } else if (!/^[a-zA-Z\s]+$/.test(state)) {
-                errors.push("State must contain only letters.");
-            }
-            if (country === "") {
-                errors.push("Country is required.");
-            } else if (!/^[a-zA-Z\s]+$/.test(country)) {
-                errors.push("Country must contain only letters.");
-            }
-            if (pincode === "") {
-                errors.push("Pincode is required.");
-            } else if (!/^\d{6}$/.test(pincode)) {
-                errors.push("Pincode must be a 6-digit number.");
-            }
-            if (phone === "") {
-                errors.push("Phone Number is required.");
-            } else if (!/^\d{10}$/.test(phone)) {
-                errors.push("Phone Number must be a 10-digit number.");
-            }
-            if (altPhone !== "" && !/^\d{10}$/.test(altPhone)) {
-                errors.push("Alternate Phone Number must be a 10-digit number.");
-            }
+    if (fields.addressType === "") errors.push("Please select an Address Type.");
+if (fields.name === "") {
+    errors.push("Full Name is required.");
+} else if (!/^[a-zA-Z\s]+$/.test(fields.name)) {
+    errors.push("Full Name must contain only letters and spaces.");
+}
+if (fields.landmark === "") errors.push("Landmark is required.");
+if (fields.city === "") {
+    errors.push("City is required.");
+} else if (!/^[a-zA-Z\s]+$/.test(fields.city)) {
+    errors.push("City must contain only letters.");
+}
+if (fields.state === "") {
+    errors.push("State is required.");
+} else if (!/^[a-zA-Z\s]+$/.test(fields.state)) {
+    errors.push("State must contain only letters.");
+}
+if (fields.country === "") {
+    errors.push("Country is required.");
+} else if (!/^[a-zA-Z\s]+$/.test(fields.country)) {
+    errors.push("Country must contain only letters.");
+}
+if (fields.pincode === "") {
+    errors.push("Pincode is required.");
+} else if (!/^\d{6}$/.test(fields.pincode)) {
+    errors.push("Pincode must be a 6-digit number.");
+}
+if (fields.phone === "") {
+    errors.push("Phone Number is required.");
+} else if (!/^\d{10}$/.test(fields.phone)) {
+    errors.push("Phone Number must be a 10-digit number.");
+}
+if (fields.altPhone !== "" && !/^\d{10}$/.test(fields.altPhone)) {
+    errors.push("Alternate Phone Number must be a 10-digit number.");
+}
+
 
     return errors;
 

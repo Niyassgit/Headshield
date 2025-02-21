@@ -171,7 +171,7 @@ const placeOrder = async (req, res) => {
         }
     }
     let status="Pending";
-    if(paymentMethod==="razorpay"){
+    if(paymentMethod==="razorpay" || paymentMethod=== "wallet"){
         status="Processing";
     }
         
@@ -274,41 +274,109 @@ const getOrderDetails=async(req,res)=>{
         
     }
 };
-
-const cancelOrder =async(req,res)=>{
-        const {id}=req.params;
-        const {reason}=req.body;
+const cancelOrder = async (req, res) => {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const userId = req.session.user;
+  
     try {
-       const order = await Order.findByIdAndUpdate(id,
 
-        {status:"Cancelled",cancelReason:reason},
-        {new:true}
-       );
+      const order = await Order.findById(id);
+      if (!order) {
+        return res.status(404).json({ success: false, message: "Order not found!" });
+      }
 
-       for (let item of order.orderedItems) {
-        await Product.updateOne(
-            { _id: item.productId },
-            { $inc: { quantity: item.quantity } } 
+      const productPrice = order.finalAmount;
+      const orderId=order.orderId;
+  
+      if (order.paymentMethod === "razorpay") {
+
+        await Order.updateOne(
+          { _id: id },
+          {
+            status: "Cancelled",
+            cancelReason: reason,
+          },
+          { new: true }
         );
-    }
-       if(!order){
+  
+        for (let item of order.orderedItems) {
+          await Product.updateOne(
+            { _id: item.productId },
+            { $inc: { quantity: item.quantity } }
+          );
+        }
+  
+        const wallet = await Wallet.findOneAndUpdate(
+          { userId: userId },
+          {
+            $inc: { balance: productPrice },
+            $push: {
+              transactions: {
+                transactionType: "credit",
+                amount: productPrice,
+                description: `Refund for Order #${order._id}`,
+                createdAt: new Date(),
+                status: "Completed",
+                orderId:orderId,
+              },
+            },
+          },
+          { new: true }
+        );
+  
 
-        return res.status(404).json({success:false,message:"Failed to find the order"})
-       }
-
-       return res.status(200).json({success:true,message:"Order Cancelled Successfully"});
-       
-              
+        if (!wallet) {
+          await Wallet.create({
+            userId: userId,
+            balance: productPrice,
+            transactions: [
+              {
+                transactionType: "credit",
+                amount: productPrice,
+                description: `Refund for Order #${order._id}`,
+                createdAt: new Date(),
+                status: "completed",
+              },
+            ],
+          });
+        }
+      } else {
+        await Order.updateOne(
+          { _id: id },
+          {
+            status: "Cancelled",
+            cancelReason: reason,
+          },
+          { new: true }
+        );
+  
+        for (let item of order.orderedItems) {
+          await Product.updateOne(
+            { _id: item.productId },
+            { $inc: { quantity: item.quantity } }
+          );
+        }
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: "Order cancelled and refund processed successfully.",
+      });
     } catch (error) {
-        console.error("Errror canceling order",error);
-        return res.status(500).json({success:false,message:"Internal Server Error"});
+      console.error("Error canceling order", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
     }
-};
+  };
+  
 
 const returnOrder=async(req,res)=>{
         const {id}=req.params;
         const {reason}=req.body;
     try {
+        
         const order=await Order.findByIdAndUpdate(id,
             {status:"Return Request",returnReason:reason},{new:true}
         );

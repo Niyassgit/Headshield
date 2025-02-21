@@ -79,6 +79,7 @@ router.delete("/getWishlist/removeItem/:productId",userAuth,wishlistController.r
 //wallet management
 router.get("/getWallet",userAuth,walletController.getWalletAdd);
 router.post("/addMoney",userAuth,walletController.addMoney);
+router.get("/getWalletHistory",userAuth,walletController.getWalletHistory);
 //razor Pay management
 router.post("/createOrder",userAuth,razorPayController.createOrder);
 

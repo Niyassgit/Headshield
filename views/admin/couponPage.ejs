@@ -22,6 +22,7 @@
                             <th>Max Discount</th>
                             <th>Start Date</th>
                             <th>End Date</th>
+                            <th>Offer Limit</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -52,6 +53,9 @@
                                     </td>
                                     <td>
                                         <%= new Date(coupon.expiredOn).toLocaleDateString('en-GB') %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.usedCount %>/<%= coupon.usageLimit %>
                                     </td>
                                     <td>
                                         <% if(coupon.isActive) { %>

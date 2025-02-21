@@ -164,7 +164,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
- // Search functionality
+
 const searchForm = document.getElementById('searchForm');
 const searchInput = document.getElementById('searchInput');
 
@@ -173,15 +173,15 @@ if (searchForm && searchInput) {
         e.preventDefault();
         const searchValue = searchInput.value;
         
-        // Update URL with search parameter
+       
         let url = new URL(window.location.href);
         url.searchParams.set('search', searchValue);
-        url.searchParams.set('page', '1'); // Reset to first page on new search
+        url.searchParams.set('page', '1'); 
         window.location.href = url.toString();
     });
 }
 
-// Filter by status
+
 const filterStatus = document.getElementById("filterStatus");
 if (filterStatus) {
     filterStatus.addEventListener("change", function() {
@@ -217,13 +217,13 @@ document.addEventListener("DOMContentLoaded", function () {
             fetch("/admin/cancelOrder", {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ orderId }) // Send orderId in request body
+              body: JSON.stringify({ orderId }) 
             })
             .then(response => response.json())
             .then(data => {
               if (data.success) {
                 Swal.fire("Cancelled!", "The order has been cancelled.", "success").then(() => {
-                  location.reload(); // Reload the page to reflect changes
+                  location.reload();
                 });
               } else {
                 Swal.fire("Error!", data.message, "error");

@@ -1,7 +1,8 @@
 const Order=require("../../models/orderSchema");
 const User=require("../../models/userSchema");
 const Address=require("../../models/addressSchema");
-const Product=require("../../models/productSchema");    
+const Product=require("../../models/productSchema"); 
+const Wallet =require("../../models/walletSchema");   
 
 
 const getOrderslist = async (req, res) => {
@@ -97,34 +98,71 @@ const getOrderDetails=async(req,res)=>{
         
     }
 };
-
-const updateStatus= async(req,res)=>{
+const updateStatus = async (req, res) => {
     try {
-        const {orderId}=req.params;
-        const {status } = req.body;
+      const { orderId } = req.params;
+      const { status } = req.body;
+  
+      const order = await Order.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ success: false, message: "Order not found" });
+      }
+  
+      if (order.status === "Returned" && status === "Returned") {
+        return res.status(400).json({ success: false, message: "Order has already been returned" });
+      }
+  
 
-        const order = await Order.findByIdAndUpdate(orderId, { status: status }, { new: true });
-
-        if(!order){
-            return res.status(404).json({success:false,message:"Order not found"});
+      const updatedOrder = await Order.findByIdAndUpdate(
+        orderId,
+        { status: status },
+        { new: true }
+      );
+  
+    
+      if (status === "Returned") {
+        for (let item of order.orderedItems) {
+          await Product.updateOne(
+            { _id: item.productId },
+            { $inc: { quantity: item.quantity } }
+          );
         }
 
-        if(status=="Returned"){
-
-            for (let item of order.orderedItems) {
-                await Product.updateOne(
-                    { _id: item.productId },
-                    { $inc: { quantity: item.quantity } } 
-                );
-            }
+        if (order.paymentMethod === "razorpay") {
+          const productPrice = order.finalAmount;
+          const orderId=order.orderId
+  
+          const wallet = await Wallet.findOneAndUpdate(
+            { userId: order.userId },
+            {
+              $inc: { balance: productPrice },
+              $push: {
+                transactions: {
+                  transactionType: "credit",
+                  amount: productPrice,
+                  description: `Refund for Order #${order._id}`,
+                  createdAt: new Date(),
+                  status: "Completed",
+                  orderId:orderId
+                },
+              },
+            },
+            { new: true, upsert: true } 
+          );
         }
-        return res.json({success:true,message:"Order status updated successfully",order});
+      }
+  
+      return res.json({
+        success: true,
+        message: "Order status updated successfully",
+        order: updatedOrder,
+      });
     } catch (error) {
-        console.error("Error updating order status:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+      console.error("Error updating order status:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
     }
-};
-
+  };
+  
 const cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.body;

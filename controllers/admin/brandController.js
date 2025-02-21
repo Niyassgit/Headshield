@@ -26,27 +26,31 @@ const getBrandPage=async (req,res)=>{
     }
 }
 
-const addBrand=async(req,res)=>{
-
+const addBrand = async (req, res) => {
     try {
-        const brand = req.body.brandName;
-        const findBrand = await Brand.findOne({brand});
-        if(!findBrand){
-            const image = req.file.filename;
-            const newBrand=new Brand({
-                brandName:brand,
-                brandImage:image,
-            })
-            await newBrand.save();
-            res.redirect("/admin/brands");
-        }
+      const brand = req.body.brandName;
+      const findBrand = await Brand.findOne({ brandName: new RegExp(`^${brand}$`, 'i') });
+  
+      if (!findBrand) {
+        const image = req.file.filename;
+        await Brand.create({
+          brandName: brand,
+          brandImage: image,
+        });
         
+        return res.redirect("/admin/brands");
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Oops! You are trying to add an existing brand!",
+        });
+      }
     } catch (error) {
-        console.error('upload error:',error);
-        res.redirect("/admin-error");
+      console.error("Upload error:", error);
+      res.redirect("/admin-error");
     }
-};
-
+  };
+  
 const blockBrand=async(req,res)=>{
 
     try {
