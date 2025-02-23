@@ -39,9 +39,13 @@ const orderSchema = new Schema(
       type: Number,
       required: true,
     },
-    discount: {
+    couponDiscount: {
       type: Number,
       default: 0,
+    },
+    productDiscount:{
+     type:Number,
+     default:0,
     },
     finalAmount: {
       type: Number,
@@ -72,6 +76,7 @@ const orderSchema = new Schema(
         "Out for Delivery",
         "Cancelled",
         "Return Request",
+        "Return Rejected",
         "Returned",
       ],
       default: "Pending",

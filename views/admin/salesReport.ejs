@@ -1,0 +1,234 @@
+<%- include("../partials/admin/header") %>
+
+<style>
+    .container {
+    width: 80%;
+    margin: 110px auto; /* Centered with top margin */
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .top-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .pdf-btn {
+        background: linear-gradient(to right, #FFD700, #FF8C00);
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .pdf-btn:hover {
+        background: linear-gradient(to right, #FF8C00, #FFD700);
+    }
+
+    .filters {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9f9f9;
+        padding: 10px;
+        margin: 20px 0;
+        border-radius: 5px;
+        gap: 10px;
+    }
+
+    .filters input,
+    .filters select {
+        padding: 8px;
+        width: 100%;
+    }
+
+    .generate-btn {
+        background: linear-gradient(to right, #77ff00, #00ff11);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .generate-btn:hover {
+        background: linear-gradient(to right, #00ff11, #77ff00);
+    }
+
+    .summary {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+
+    .box {
+        width: 32%;
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background: #333;
+        color: white;
+    }
+
+    .status {
+        padding: 5px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .delivered { background-color: #28a745; color: white; }
+    .return-rejected { background-color: #dc3545; color: yellow; }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .pagination a {
+        color: white;
+        background-color: black;
+        padding: 8px 12px;
+        margin: 0 2px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .pagination a.active {
+        background-color: #444;
+    }
+
+    .pagination a:hover {
+        background-color: #666;
+    }
+</style>
+
+<div class="container">
+    <h2>Sales Report</h2>
+
+    <div class="top-buttons">
+        <a id="downloadPDF" href="#" class="pdf-btn">Download PDF</a>
+    </div>
+
+    <form id="filterForm" method="GET" action="/admin/sales-report" class="filters">
+        <div>
+            <label>Filter By:</label>
+            <select name="filterBy" id="filterBy">
+                <option value="all" <%= filterBy === "all" ? "selected" : "" %>>All</option>
+                <option value="daily" <%= filterBy === "daily" ? "selected" : "" %>>Daily</option>
+                <option value="weekly" <%= filterBy === "weekly" ? "selected" : "" %>>Weekly</option>
+                <option value="monthly" <%= filterBy === "monthly" ? "selected" : "" %>>Monthly</option>
+            </select>
+        </div>
+
+        <div>
+            <label>From:</label>
+            <input type="date" name="fromDate" id="fromDate" value="<%= fromDate %>">
+        </div>
+
+        <div>
+            <label>To:</label>
+            <input type="date" name="toDate" id="toDate" value="<%= toDate %>">
+        </div>
+
+        <button type="submit" class="generate-btn">Generate Report</button>
+    </form>
+
+    <div class="summary">
+        <div class="box">
+            <h4>Total Orders</h4>
+            <p><%- totalOrders %></p>
+        </div>
+        <div class="box">
+            <h4>Total Revenue</h4>
+            <p>₹<%- totalRevenue %>.00</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer Name</th>
+                <th>Order Status</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% orders.forEach(order => { %>
+                <tr>
+                    <td><%- order.orderId %></td>
+                    <td><%= new Date(order.invoiceDate).toLocaleDateString() %></td>
+                    <td><%= order.userId.name %></td>
+                    <td class="status <%= order.status.replace(/\s+/g, '-').toLowerCase() %>">
+                        <%= order.status %>
+                    </td>
+                    <td>₹<%= order.finalAmount %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+   <!-- Pagination -->
+<nav>
+    <ul class="pagination">
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function updateDownloadLink() {
+            const filterBy = document.getElementById('filterBy').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            let query = [];
+            if (filterBy) query.push(`filterBy=${filterBy}`);
+            if (fromDate) query.push(`fromDate=${fromDate}`);
+            if (toDate) query.push(`toDate=${toDate}`);
+
+            const queryString = query.length ? `?${query.join('&')}` : '';
+            document.getElementById('downloadPDF').href = `/admin/salesReportPDF/pdf${queryString}`;
+        }
+
+        updateDownloadLink();
+
+        document.getElementById('filterBy').addEventListener('change', updateDownloadLink);
+        document.getElementById('fromDate').addEventListener('input', updateDownloadLink);
+        document.getElementById('toDate').addEventListener('input', updateDownloadLink);
+    });
+</script>
+
+<%- include("../partials/admin/footer") %>

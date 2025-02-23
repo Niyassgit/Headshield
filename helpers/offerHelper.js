@@ -26,13 +26,15 @@ const applyBestOffer = async () => {
             const bestOffer = Math.max(categoryOffer, offerExpiry);
             const discountAmount = (product.regularPrice * bestOffer) / 100;
             const discountedPrice = Math.round(product.regularPrice - discountAmount);
+            const discountDifference = product.regularPrice - discountedPrice;
 
             return {
                 updateOne: {
                     filter: { _id: product._id },
                     update: { 
                         finalOffer: bestOffer,
-                        salePrice: discountedPrice 
+                        salePrice: discountedPrice,
+                        savedAmount:discountDifference, 
                     }
                 }
             };

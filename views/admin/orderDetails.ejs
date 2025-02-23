@@ -184,8 +184,9 @@
                 case "Shipped": return "bg-info text-dark"; 
                 case "Delivered": return "bg-success"; 
                 case "Cancelled": return "bg-danger"; 
-                case "Return Request": return "bg-secondary"; 
-                case "Returned": return "bg-dark"; 
+                case "Return Request": return "bg-secondary";
+                case "Return Rejected": return "bg-danger text-warning"; 
+                case "Returned": return "bg-dark text-white"; 
                 default: return "bg-light text-dark"; 
             }
         } %>
@@ -249,7 +250,7 @@
         <option value="Shipped" <%= orders.status === "Shipped" ? "selected" : "" %>>Shipped</option>
         <option value="Delivered" <%= orders.status === "Delivered" ? "selected" : "" %>>Delivered</option>
         <option value="Cancelled" <%= orders.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
-        <option value="Return Request" <%= orders.status === "Return Request" ? "selected" : "" %>>Return Request</option>
+        <option value="Return Rejected" <%= orders.status === "Return Rejected" ? "selected" : "" %>>Return Rejected</option>
         <option value="Returned" <%= orders.status === "Returned" ? "selected" : "" %>>Returned</option>
     </select>
     <button id="updateStatusBtn">Update Status</button>

@@ -8,6 +8,7 @@ const brandController=require("../controllers/admin/brandController");
 const productController=require("../controllers/admin/productContoller");
 const orderController =require("../controllers/admin/orderController");
 const couponController=require("../controllers/admin/couponController");
+const salesReportController=require("../controllers/admin/salesReportController")
 const multer=require("multer");
 const storage=require("../helpers/multer");
 const uploads=multer({storage:storage});
@@ -60,7 +61,9 @@ router.get("/getCoupon",adminAuth,couponController.getCouponPage);
 router.post("/addCoupon",adminAuth,couponController.addCoupon);
 router.put("/getCoupon/editCoupon",adminAuth,couponController.editCoupon);
 router.delete("/getCoupon/cancelCoupon/:couponId",adminAuth,couponController.removeCoupon);
-
+//sales report management
+router.get('/sales-report',adminAuth,salesReportController.getSalesReport);
+router.get('/salesReportPDF/pdf', adminAuth, salesReportController.getSalesReportPDF);  
 
 
 

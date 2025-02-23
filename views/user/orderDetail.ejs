@@ -237,7 +237,7 @@
             <% function getStatusBadgeClass(status) { switch (status) { case "Pending" : return "bg-warning text-dark" ;
                 case "Processing" : return "bg-primary" ; case "Shipped" : return "bg-info text-dark" ;
                 case "Out for Delivery" : return "bg-orange text-dark" ; case "Delivered" : return "bg-success" ;
-                case "Cancelled" : return "bg-danger" ; case "Return Request" : return "bg-secondary" ; case "Returned"
+                case "Cancelled" : return "bg-danger" ; case "Return Request" : return "bg-secondary" ;  case "Return Rejected": return "bg-danger text-warning";  case "Returned"
                 : return "bg-dark" ; default: return "bg-light text-dark" ; } } %>
                 <div class="order-container">
                     <!-- Order Header -->

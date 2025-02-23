@@ -23,7 +23,7 @@ const placeOrder = async (req, res) => {
         const cart = await Cart.findOne({ userId })
             .populate({
                 path: 'items.productId',
-                select: 'productName quantity isBlocked' 
+                select: 'productName quantity isBlocked savedAmount' 
             });
 
         if (!cart || !cart.items.length) {
@@ -174,13 +174,19 @@ const placeOrder = async (req, res) => {
     if(paymentMethod==="razorpay" || paymentMethod=== "wallet"){
         status="Processing";
     }
-        
+
+    let savedAmount = 0;
+    cart.items.forEach(item => {
+        savedAmount += (item.productId.savedAmount || 0) * item.quantity; 
+    });
+   
 
         const order = await Order.create({
             userId,
             orderedItems,
             totalPrice,
-            discount: finalDiscount,
+            couponDiscount: finalDiscount,
+            productDiscount:savedAmount,
             finalAmount: finalAmount - finalDiscount,
             address: address,
             paymentMethod: paymentMethod,

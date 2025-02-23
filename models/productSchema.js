@@ -33,6 +33,10 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
+    savedAmount:{
+      type:Number,
+      default:0,
+    },
     offerExpiry: {
       type: Date,
       required: false,

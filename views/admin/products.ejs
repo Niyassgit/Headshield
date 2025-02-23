@@ -69,51 +69,51 @@
       </table>
     </div>
     
-     <!-- Pagination -->
-     <div class="pagination-area mt-30 mb-50">
-        <nav aria-label="Page navigation example">
-          <ul class="pagination justify-content-center">
-      
-            <!-- Previous Page Link -->
-            <% if (currentPage > 1) { %>
-              <li class="page-item">
-                <a class="page-link" href="/admin/products?page=<%= currentPage - 1 %>">
-                  <i class="material-icons md-chevron_left"></i>
-                </a>
-              </li>
-            <% } else { %>
-              <li class="page-item disabled">
-                <span class="page-link"><i class="material-icons md-chevron_left"></i></span>
-              </li>
-            <% } %>
-      
-            <!-- Page Number Links -->
-            <% for (let i = 1; i <= totalPage; i++) { %>
-              <% if (i === currentPage) { %>
-                <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
-              <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
-                <li class="page-item"><a class="page-link" href="/admin/products?page=<%= i %>">0<%= i %></a></li>
-              <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
-                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+      <!-- Pagination -->
+      <div class="pagination-area mt-30 mb-50">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+        
+              <!-- Previous Page Link -->
+              <% if (currentPage > 1) { %>
+                <li class="page-item">
+                  <a class="page-link" href="/admin/products?page=<%= currentPage - 1 %>">
+                    <i class="material-icons md-chevron_left"></i>
+                  </a>
+                </li>
+              <% } else { %>
+                <li class="page-item disabled">
+                  <span class="page-link"><i class="material-icons md-chevron_left"></i></span>
+                </li>
               <% } %>
-            <% } %>
-      
-            <!-- Next Page Link -->
-            <% if (currentPage < totalPage) { %>
-              <li class="page-item">
-                <a class="page-link" href="/admin/products?page=<%= currentPage + 1 %>">
-                  <i class="material-icons md-chevron_right"></i>
-                </a>
-              </li>
-            <% } else { %>
-              <li class="page-item disabled">
-                <span class="page-link"><i class="material-icons md-chevron_right"></i></span>
-              </li>
-            <% } %>
-      
-          </ul>
-        </nav>
-      </div>
+        
+              <!-- Page Number Links -->
+              <% for (let i = 1; i <= totalPage; i++) { %>
+                <% if (i === currentPage) { %>
+                  <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
+                <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
+                  <li class="page-item"><a class="page-link" href="/admin/products?page=<%= i %>">0<%= i %></a></li>
+                <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
+                  <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <% } %>
+              <% } %>
+        
+              <!-- Next Page Link -->
+              <% if (currentPage < totalPage) { %>
+                <li class="page-item">
+                  <a class="page-link" href="/admin/products?page=<%= currentPage + 1 %>">
+                    <i class="material-icons md-chevron_right"></i>
+                  </a>
+                </li>
+              <% } else { %>
+                <li class="page-item disabled">
+                  <span class="page-link"><i class="material-icons md-chevron_right"></i></span>
+                </li>
+              <% } %>
+        
+            </ul>
+          </nav>
+        </div>
   </div>
 
   <!-- Offer Modal -->

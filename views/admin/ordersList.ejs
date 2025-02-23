@@ -52,6 +52,7 @@
       <option value="Delivered">Delivered</option>
       <option value="Cancelled">Cancelled</option>
       <option value="Return Request">Return Request</option>
+      <option value="Return Request">Return Rejected</option>
       <option value="Returned">Returned</option>
   </select>
 </div>
@@ -78,6 +79,7 @@
                                 case "Delivered": return "bg-success"; 
                                 case "Cancelled": return "bg-danger"; 
                                 case "Return Request": return "bg-secondary"; 
+                                case "Return Rejected": return "bg-danger text-warning"; 
                                 case "Returned": return "bg-dark"; 
                                 default: return "bg-light text-dark"; 
                             }
