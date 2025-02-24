@@ -118,6 +118,7 @@ const addToCart = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 const deleteItem = async (req, res) => {
     try {
         const { productId } = req.body; 

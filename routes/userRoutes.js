@@ -18,6 +18,7 @@ router.get("/pageNotFound",userController.pageNotFound)
 router.get("/",isBlocked,userController.loadHomepage);
 router.get("/shop",userController.loadShoppingPage);
 router.get("/productDetails",isBlocked,productController.productDetails);
+router.get("/get-counts",userAuth,userController.getCount);
 
 //Authentication Routes
 router.get("/signup",userController.loadSignup);

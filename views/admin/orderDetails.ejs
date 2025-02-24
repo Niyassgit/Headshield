@@ -264,36 +264,55 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 <script>
-    document.getElementById("updateStatusBtn").addEventListener("click",async function(){
-        const selectElement=document.getElementById("orderStatus");
-        const orderId=selectElement.getAttribute("data-order-id");
-        const newStatus=selectElement.value;
- 
-        console.log("orderid and new status:",orderId,newStatus)
+    document.getElementById("updateStatusBtn").addEventListener("click", async function () {
+        const selectElement = document.getElementById("orderStatus");
+        const orderId = selectElement.getAttribute("data-order-id");
+        const newStatus = selectElement.value;
+
+        console.log("orderid and new status:", orderId, newStatus);
+
         try {
-            const response = await fetch(`/admin/update-order-status/${orderId}`,{
-                method:"PUT",
+            const response = await fetch(`/admin/update-order-status/${orderId}`, {
+                method: "PUT",
                 headers: {
-                "Content-Type": "application/json" ,
+                    "Content-Type": "application/json",
                 },
-                body:JSON.stringify({status:newStatus})
+                body: JSON.stringify({ status: newStatus }),
             });
             const result = await response.json();
 
-            if(result.success){
-                alert("order status updated successfully!");
-                window.location.reload();
-            }else{
-                alert("Failed to update order status.");
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Order status updated successfully!',
+                    confirmButtonColor: '#4f46e5',
+                }).then(() => {
+                    window.location.reload(); // Reload after confirmation
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: 'Failed to update order status. Please try again.',
+                    confirmButtonColor: '#d33',
+                });
             }
         } catch (error) {
             console.error("Error updating order status:", error);
-            alert("An error occurred. Please try again.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: 'An error occurred. Please try again.',
+                confirmButtonColor: '#d33',
+            });
         }
     });
 </script>
-
 
 
 <%- include("../partials/admin/footer") %>

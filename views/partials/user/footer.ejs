@@ -132,6 +132,22 @@
             }
         ]
     });
+
+    async function fetchCounts() {
+    try {
+      const response = await fetch("/get-counts");
+      if (response.ok) {
+        const data = await response.json();
+        document.getElementById("cart-count").textContent = data.cartCount > 0 ? data.cartCount : '';
+        document.getElementById("wishlist-count").textContent = data.wishlistCount > 0 ? data.wishlistCount : '';
+      }
+    } catch (error) {
+      console.error("Error fetching cart/wishlist counts:", error);
+    }
+  }
+
+  // Call function on page load
+  window.addEventListener("DOMContentLoaded", fetchCounts);
 </script>
 <!-- End Slider Script -->
   

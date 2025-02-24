@@ -2,12 +2,12 @@
 
 <style>
     .container {
-    width: 80%;
-    margin: 110px auto; /* Centered with top margin */
-    background: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+        width: 80%;
+        margin: 110px auto;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
     h2 {
         text-align: center;
@@ -71,7 +71,7 @@
     }
 
     .box {
-        width: 32%;
+        width: 24%;
         background: #f0f0f0;
         padding: 15px;
         border-radius: 5px;
@@ -169,6 +169,14 @@
             <h4>Total Revenue</h4>
             <p>₹<%- totalRevenue %>.00</p>
         </div>
+        <div class="box">
+            <h4>Total Discounts</h4>
+            <p>₹<%- totalProductDiscount %>.00</p>
+        </div>
+        <div class="box">
+            <h4>Total Coupon Deductions</h4>
+            <p>₹<%- totalCouponDiscount %>.00</p>
+        </div>
     </div>
 
     <table>
@@ -179,6 +187,8 @@
                 <th>Customer Name</th>
                 <th>Order Status</th>
                 <th>Amount</th>
+                <th>Product Discount</th>
+                <th>Coupon Discount</th>
             </tr>
         </thead>
         <tbody>
@@ -191,21 +201,22 @@
                         <%= order.status %>
                     </td>
                     <td>₹<%= order.finalAmount %></td>
+                    <td>₹<%= order.productDiscount || 0 %></td>
+                    <td>₹<%= order.couponDiscount || 0 %></td>
                 </tr>
             <% }) %>
         </tbody>
     </table>
 
-   <!-- Pagination -->
-<nav>
-    <ul class="pagination">
-      <% for(let i = 1; i <= totalPages; i++) { %>
-        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-        </li>
-      <% } %>
-    </ul>
-  </nav>
+    <nav>
+        <ul class="pagination">
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

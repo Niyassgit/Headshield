@@ -4,6 +4,7 @@ const Product=require("../../models/productSchema");
 const Brand=require("../../models/brandSchema");
 const nodemailer=require("nodemailer");
 const { applyBestOffer }=require("../../helpers/offerHelper");
+const { getUserCartAndWishlistCount } = require("../../helpers/userHelper");
 const env=require("dotenv").config();
 const bcrypt=require("bcrypt");
 
@@ -33,7 +34,7 @@ const loadHomepage = async (req, res) => {
         .limit(3); 
 
         if (user) {
-            const userData = await User.findOne({ _id: user });
+            const userData = await User.findOne({ _id: user }).populate("cart wishlist");
             return res.render("home", { user: userData, products: productData });
         } else {
             return res.render("home", { user: null, products: productData });
@@ -338,6 +339,17 @@ const loadShoppingPage = async (req, res) => {
         res.redirect("/pageNotFound");
     }   
 };
+const getCount=async(req,res)=>{
+
+        try {
+            const { cartCount, wishlistCount } = await getUserCartAndWishlistCount(req.session.user);
+            res.json({ cartCount, wishlistCount });
+          } catch (error) {
+            console.error("Error fetching counts:", error);
+            res.status(500).json({ cartCount: 0, wishlistCount: 0 });
+          }
+      
+};
 
 
 
@@ -352,4 +364,5 @@ module.exports={
     login,
     logout,
     loadShoppingPage,
+    getCount,
 }

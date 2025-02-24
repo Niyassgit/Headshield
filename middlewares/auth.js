@@ -1,6 +1,7 @@
 
 const User=require("../models/userSchema");
 
+
 const userAuth = (req, res, next) => {
 
   if (req.session && req.session.user) {

@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
+const {applyBestOffer}=require("../../helpers/offerHelper");
 
 
 const productDetails = async (req, res) => {
@@ -14,7 +15,9 @@ const productDetails = async (req, res) => {
             return res.redirect("/pageNotFound"); 
         }
 
+        await applyBestOffer(); 
         const product = await Product.findById(productId).populate("category");
+        
         if (!product) {
             console.error("Product not found:", productId);
             return res.redirect("/pageNotFound"); 
