@@ -20,6 +20,28 @@ const placeOrder = async (req, res) => {
             });
         }
 
+           const userAddress = await Address.findOne(
+            { userId, "address._id": address },
+            { "address.$": 1 }
+        );
+
+        if (!userAddress) {
+            return res.status(400).json({
+                success: false,
+                message: "Address not found"
+            });
+        }
+
+        
+        const selectedAddress = userAddress.address[0];
+       
+        if (!selectedAddress) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid address selection"
+            });
+        }
+
         const cart = await Cart.findOne({ userId })
             .populate({
                 path: 'items.productId',
@@ -190,7 +212,7 @@ const placeOrder = async (req, res) => {
             couponDiscount: finalDiscount,
             productDiscount:savedAmount,
             finalAmount: finalAmount - finalDiscount,
-            address: address,
+            address: selectedAddress,
             paymentMethod: paymentMethod,
             invoiceDate: new Date(),
             status,
@@ -209,7 +231,7 @@ const placeOrder = async (req, res) => {
         
         await Cart.findByIdAndDelete(cart._id);
 
-        return res.status(200).json({ success: true, message: "Order placed successfully!", order });
+        return res.status(200).json({ success: true, message: "Order placed successfully!", orderId:order.orderId });
 
     } catch (error) {
         console.error('Place order error:', error);
@@ -227,7 +249,8 @@ const getOrders= async(req,res)=>{
         const userId=req.session.user;
         const userData=await User.findById(userId);
         const orderData = await Order.find({ userId: userId })
-         .populate("orderedItems.productId", "productName productImage size color"); 
+         .populate("orderedItems.productId", "productName productImage size color")
+         .sort({createdAt:-1}); 
         if(!orderData){
             console.error("Error while fetching order list:",error);
             return res.status(404).json({success:false,message:"failed to find Orders"});
@@ -279,7 +302,7 @@ const getOrderDetails=async(req,res)=>{
         
     } catch (error) {
         console.error("Error while rendering order details:",error);
-        return res.status(500).json({success:false,message:"Internal; server issue",error });
+        return res.status(500).json({success:false,message:"Internal; server issue"});
         
     }
 };

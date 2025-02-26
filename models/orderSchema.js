@@ -9,7 +9,7 @@ const orderSchema = new Schema(
       default: () => uuidv4(),
       unique: true,
     },
-    userId: { 
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -33,9 +33,9 @@ const orderSchema = new Schema(
           type: Number,
           default: 0,
         },
-        regularPrice:{
-          type:Number,
-          default:0,
+        regularPrice: {
+          type: Number,
+          default: 0,
 
         },
       },
@@ -48,18 +48,53 @@ const orderSchema = new Schema(
       type: Number,
       default: 0,
     },
-    productDiscount:{
-     type:Number,
-     default:0,
+    productDiscount: {
+      type: Number,
+      default: 0,
     },
     finalAmount: {
       type: Number,
       required: true,
     },
     address: {
-      type: Schema.Types.ObjectId,
-      ref: "Address",
-      required: true,
+      addressType: {
+        type: String,
+        required: true
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      landMark: {
+
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+
+      },
+      state: {
+        type: String,
+        required: true,
+      },
+      country: {
+        type: String,
+        required: true
+      },
+      pincode: {
+        type: Number,
+        required: true
+      },
+      phone: {
+        type: String,
+        required: true
+      },
+      altPhone: {
+        type: String,
+        required: true
+      }
     },
     paymentMethod: {
       type: String,
@@ -90,25 +125,25 @@ const orderSchema = new Schema(
       type: Boolean,
       default: false,
     },
-     cancelReason:{
-      type:String,
-      required:false
+    cancelReason: {
+      type: String,
+      required: false
     },
-    returnReason:{
-      type:String,
-      required:false
+    returnReason: {
+      type: String,
+      required: false
     },
-    couponId:{
+    couponId: {
       type: Schema.Types.ObjectId,
-      ref:"Coupon",
-      required:false,
+      ref: "Coupon",
+      required: false,
     },
-    transactionId:{
-      type:String,
-      default:null
+    transactionId: {
+      type: String,
+      default: null
     },
 
-  },{ timestamps: true });
+  }, { timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);
 

@@ -822,7 +822,7 @@ if (fields.altPhone !== "" && !/^\d{10}$/.test(fields.altPhone)) {
                             text: data.message,
                             icon: "success"
                         }).then(() => {
-                            window.location.href = "/cart";
+                            window.location.href = `/order-details?id=${data.orderId}`;
                         });
                     } else {
                         Swal.fire("Failed!", data.message || "Something went wrong.", "error");

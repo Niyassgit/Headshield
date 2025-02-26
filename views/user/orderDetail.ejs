@@ -265,21 +265,20 @@
                                     <%= order.couponApplied ? 'Yes' : 'No' %>
                                 </span></p>
 
-                            <p><strong>Delivery Address:</strong>
-                                <% if(order.address) { %>
-                                    <span id="deliveryAddress">
-                                        <%= address.name %><br>
-                                            <%= address.landmark %>
-                                                <%= address.city %>
-                                                    <%= address.state %>,
-                                                        <%= address.country %>
-                                                            <%= address.pincode %><br>
-                                                                <%= address.phone %>
-                                    </span>
+                                <p><strong>Delivery Address:</strong>
+                                    <% if(order.address) { %>
+                                        <span id="deliveryAddress">
+                                            <%= order.address.name %><br>
+                                            <%= order.address.landMark %><br> 
+                                            <%= order.address.city %>, <%= order.address.state %>, <%= order.address.country %><br>
+                                            <%= order.address.pincode %><br>
+                                            <%= order.address.phone %>
+                                        </span>
                                     <% } else { %>
                                         <span>No address available</span>
-                                        <% } %>
-                            </p>
+                                    <% } %>
+                                </p>
+                                
                             <% } %>
                     </div>
 
