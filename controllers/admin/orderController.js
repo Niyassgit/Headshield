@@ -67,17 +67,7 @@ const getOrderDetails=async(req,res)=>{
         if(!orderData){
             return res.status(404).json({success:false,message:"Failed to find the order"})
         }
-       const addressDoc=await Address.findOne({userId:orderData.userId});
-       if(!addressDoc){
-        return res.status(404).json({success:false,message:"Failed to finf Address"});
-       }
-       let selectedAddress = null;
-
-       if (addressDoc && addressDoc.address.length > 0) {
-         selectedAddress = addressDoc.address.find((addr) =>
-           addr._id.equals(orderData.address)
-         );
-       }
+    
 
        const products = orderData.orderedItems.map(item => ({
         productImage: item.productId?.productImage || 'default-image.jpg', 
@@ -89,8 +79,7 @@ const getOrderDetails=async(req,res)=>{
 
        return res.status(200).render("orderDetails",{
           orders:orderData,
-          address:selectedAddress,
-          products  :products
+          products:products
         })
     } catch (error) {
         console.error("Errror in order details page",error);
@@ -128,7 +117,7 @@ const updateStatus = async (req, res) => {
           );
         }
 
-        if (order.paymentMethod === "razorpay") {
+        if (order.paymentMethod === "razorpay" || order.paymentMethod === "wallet") {
           const productPrice = order.finalAmount;
           const orderId=order.orderId
   

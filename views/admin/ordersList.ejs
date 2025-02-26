@@ -126,7 +126,7 @@
             <!-- Previous Page Link -->
             <% if (currentPage > 1) { %>
               <li class="page-item">
-                <a class="page-link" href="/admin/getOrders?page=<%= currentPage - 1 %>">
+                <a class="page-link" href="/admin/orders?page=<%= currentPage - 1 %>">
                   <i class="material-icons md-chevron_left"></i>
                 </a>
               </li>
@@ -141,7 +141,7 @@
               <% if (i === currentPage) { %>
                 <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
               <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
-                <li class="page-item"><a class="page-link" href="/admin/getOrders?page=<%= i %>">0<%= i %></a></li>
+                <li class="page-item"><a class="page-link" href="/admin/orders?page=<%= i %>">0<%= i %></a></li>
               <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
                 <li class="page-item"><a class="page-link dot" href="#">...</a></li>
               <% } %>
@@ -150,7 +150,7 @@
             <!-- Next Page Link -->
             <% if (currentPage < totalPage) { %>
               <li class="page-item">
-                <a class="page-link" href="/admin/getOrders?page=<%= currentPage + 1 %>">
+                <a class="page-link" href="/admin/orders?page=<%= currentPage + 1 %>">
                   <i class="material-icons md-chevron_right"></i>
                 </a>
               </li>

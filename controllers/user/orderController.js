@@ -135,8 +135,6 @@ const placeOrder = async (req, res) => {
                     discountAmount = coupon.maximumPrice;
                 }
 
-                await Coupon.findByIdAndUpdate(couponId, { $push: { userId: userId }, $inc: { usedCount: 1 } });
-
                 finalDiscount = discountAmount;
             } else {
                 return res.status(400).json({
@@ -203,15 +201,17 @@ const placeOrder = async (req, res) => {
     cart.items.forEach(item => {
         savedAmount += (item.productId.savedAmount || 0) * item.quantity; 
     });
-   
+
+    console.log(totalPrice);
+     
 
         const order = await Order.create({
-            userId,
+             userId,
             orderedItems,
             totalPrice,
             couponDiscount: finalDiscount,
             productDiscount:savedAmount,
-            finalAmount: finalAmount - finalDiscount,
+            finalAmount: finalAmount,
             address: selectedAddress,
             paymentMethod: paymentMethod,
             invoiceDate: new Date(),
@@ -220,6 +220,27 @@ const placeOrder = async (req, res) => {
             couponId,
             transactionId:razorpay_payment_id || null
         });
+
+        if(couponApplied){
+            await Coupon.findByIdAndUpdate(couponId, { $push: { userId: userId }, $inc: { usedCount: 1 } });
+        }
+
+        if (paymentMethod === "wallet") {
+            await Wallet.findOneAndUpdate(
+                { userId: userId },
+                {
+                    $push: {
+                        transactions: {
+                            transactionType: 'debit',
+                            amount: finalAmount - finalDiscount,
+                            description: 'Order placed using wallet',
+                            status: 'Completed',
+                            orderId: order._id  
+                        }
+                    }
+                }
+            );
+        }
 
         for (let item of cart.items) {
             await Product.updateOne(
@@ -321,7 +342,7 @@ const cancelOrder = async (req, res) => {
       const productPrice = order.finalAmount;
       const orderId=order.orderId;
   
-      if (order.paymentMethod === "razorpay") {
+      if (order.paymentMethod === "razorpay" || order.paymentMethod === "wallet") {
 
         await Order.updateOne(
           { _id: id },

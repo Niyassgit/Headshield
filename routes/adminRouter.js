@@ -52,12 +52,12 @@ router.post("/addProductOffer",adminAuth,productController.addOffer);
 router.post("/cancelProductOffer",adminAuth,productController.removeOffer);
 
 //orders management
-router.get("/getOrders",adminAuth,orderController.getOrderslist);
+router.get("/orders",adminAuth,orderController.getOrderslist);
 router.get("/order-details",adminAuth,orderController.getOrderDetails);
 router.put("/update-order-status/:orderId",adminAuth,orderController.updateStatus);
 router.put("/cancelOrder",adminAuth,orderController.cancelOrder);
 //coupon management
-router.get("/getCoupon",adminAuth,couponController.getCouponPage);
+router.get("/coupons",adminAuth,couponController.getCouponPage);
 router.post("/addCoupon",adminAuth,couponController.addCoupon);
 router.put("/getCoupon/editCoupon",adminAuth,couponController.editCoupon);
 router.delete("/getCoupon/cancelCoupon/:couponId",adminAuth,couponController.removeCoupon);

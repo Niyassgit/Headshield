@@ -26,7 +26,7 @@ const addCoupon = async(req,res)=>{
         const {couponName,couponCode,discountType,discountValue,maxDiscountAmount,minPurchaseAmount,startDate,endDate,usageLimit}=req.body;
         const userId=req.session.user;
 
-        // Check for duplicate coupon code instead of user
+        
         const existingCoupon = await Coupon.findOne({ couponCode: couponCode });
 
         if(existingCoupon){
