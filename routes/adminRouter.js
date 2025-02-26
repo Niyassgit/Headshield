@@ -64,9 +64,10 @@ router.delete("/getCoupon/cancelCoupon/:couponId",adminAuth,couponController.rem
 //sales report management
 router.get('/sales-report',adminAuth,salesReportController.getSalesReport);
 router.get('/salesReportPDF/pdf', adminAuth, salesReportController.getSalesReportPDF);  
+router.get('/sales-report/excel', adminAuth, salesReportController.getSalesReportExcel);
 
 
 
 
-module.exports=router;
+module.exports=router;  
 //private router

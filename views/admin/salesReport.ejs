@@ -33,6 +33,18 @@
     .pdf-btn:hover {
         background: linear-gradient(to right, #FF8C00, #FFD700);
     }
+    .excel-btn {
+        background: linear-gradient(to right, hwb(216 16% 23%), #0f4791);
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .excel-btn:hover {
+        background: linear-gradient(to right, #0f4791, hwb(216 16% 23%));
+    }
 
     .filters {
         display: flex;
@@ -134,7 +146,9 @@
 
     <div class="top-buttons">
         <a id="downloadPDF" href="#" class="pdf-btn">Download PDF</a>
+        <a id="downloadExcel" href="#" class="excel-btn">Download Excel</a>
     </div>
+    
 
     <form id="filterForm" method="GET" action="/admin/sales-report" class="filters">
         <div>
@@ -232,6 +246,8 @@
 
             const queryString = query.length ? `?${query.join('&')}` : '';
             document.getElementById('downloadPDF').href = `/admin/salesReportPDF/pdf${queryString}`;
+            document.getElementById('downloadExcel').href = `/admin/sales-report/excel${queryString}`;
+        
         }
 
         updateDownloadLink();
