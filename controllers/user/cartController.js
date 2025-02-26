@@ -3,7 +3,7 @@ const Product=require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Wishlist =require("../../models/wishlistSchema");
 const mongoose = require("mongoose");
-
+const {applyBestOffer}=require("../../helpers/offerHelper");
 
 const viewCartPage = async (req, res) => {
     try {
@@ -53,6 +53,7 @@ const addToCart = async (req, res) => {
         }
 
         const objectId = new mongoose.Types.ObjectId(cleanProductId);
+        await applyBestOffer(); 
 
         const productData=await Product.findById(objectId);
         
@@ -93,6 +94,7 @@ const addToCart = async (req, res) => {
 
             cartData.items[existingItemIndex].quantity = newQuantity;
             cartData.items[existingItemIndex].totalPrice = newQuantity * productData.salePrice;
+          
             
         } else {
             cartData.items.push({

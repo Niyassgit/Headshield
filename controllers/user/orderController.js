@@ -23,7 +23,7 @@ const placeOrder = async (req, res) => {
         const cart = await Cart.findOne({ userId })
             .populate({
                 path: 'items.productId',
-                select: 'productName quantity isBlocked savedAmount' 
+                select: 'productName quantity isBlocked savedAmount regularPrice' 
             });
 
         if (!cart || !cart.items.length) {
@@ -62,8 +62,10 @@ const placeOrder = async (req, res) => {
         const orderedItems = cart.items.map(item => ({
             productId: item.productId._id,
             productName: item.productId.productName,
+            regularPrice:item.productId.regularPrice,
             quantity: item.quantity,
-            price: item.price
+            price: item.price,
+    
         }));
 
         let couponApplied = false;
@@ -240,6 +242,7 @@ const getOrders= async(req,res)=>{
         res.status(500).json({success:false,message:"Internal Server Error"});
     }
 };
+
 const getOrderDetails=async(req,res)=>{
     try {
         const userId=req.session.user;
@@ -261,7 +264,7 @@ const getOrderDetails=async(req,res)=>{
         const products = orderData.orderedItems.map(item => ({
             productImage: item.productId?.productImage || 'default-image.jpg', 
             productName: item.productName,
-            price: item.price,
+            price: item.regularPrice,
             quantity: item.quantity,
             total: item.price * item.quantity
           }));

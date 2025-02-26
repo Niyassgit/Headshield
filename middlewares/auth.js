@@ -36,13 +36,15 @@ const isBlocked= async(req,res,next)=>{
  } catch (error) {
     console.log(error);
     res.redirect('/pageerror')
-   }
+  
+  }
 
-}
+};
 
 
 module.exports={
   userAuth,
   adminAuth,
   isBlocked,
+
 }

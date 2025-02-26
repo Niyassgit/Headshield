@@ -51,7 +51,7 @@ router.post("/verify-changepassword-otp",userAuth,profileController.verifyChange
 router.get("/reset-password-user",userAuth,profileController.getResetPassPageUser);
 router.post("/reset-password-user",userAuth,profileController.postNewPassword);
 //adress management
-router.get("/getAllAddress",userAuth,profileController.getAllAddress);
+router.get("/address",userAuth,profileController.getAllAddress);
 router.get("/addAddress",userAuth,profileController.addAddress);
 router.post("/addAddress",userAuth,profileController.postAddAddress);
 router.get("/editAddress",userAuth,profileController.editAddress);
@@ -75,12 +75,12 @@ router.patch("/cancel-order/:id",userAuth,orderController.cancelOrder);
 router.patch("/return-order/:id",userAuth,orderController.returnOrder);
 //wishlist management
 router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);
-router.get("/getWishlist",userAuth,wishlistController.getWishlist);
+router.get("/wishlist",userAuth,wishlistController.getWishlist);
 router.delete("/getWishlist/removeItem/:productId",userAuth,wishlistController.removeItem);
 //wallet management
-router.get("/getWallet",userAuth,walletController.getWalletAdd);
+router.get("/wallet",userAuth,walletController.getWalletAdd);
 router.post("/addMoney",userAuth,walletController.addMoney);
-router.get("/getWalletHistory",userAuth,walletController.getWalletHistory);
+router.get("/walletHistory",userAuth,walletController.getWalletHistory);
 //razor Pay management
 router.post("/createOrder",userAuth,razorPayController.createOrder);
 

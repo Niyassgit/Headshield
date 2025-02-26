@@ -142,9 +142,9 @@
                 <% } %>
         
                 <div class="social-icons d-flex justify-content-center">
-                    <a href="/auth/facebook" class="text-primary ms-3" title="Sign in with Facebook">
+                    <!-- <a href="/auth/facebook" class="text-primary ms-3" title="Sign in with Facebook">
                         <i class="fab fa-facebook"></i>
-                    </a>
+                    </a> -->
                     <a href="/auth/google" class="text-danger" title="Sign in with Google">
                         <i class="fab fa-google"></i>
                     </a>
@@ -196,11 +196,7 @@
         });
 
     
-        let loginLink = document.getElementById('loginLink');
-        loginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert("Redirecting to login page...");
-        });
+      
 
         document.addEventListener("DOMContentLoaded", function () {
     const signform = document.getElementById("signform");

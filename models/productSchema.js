@@ -27,7 +27,7 @@ const productSchema = new Schema(
     },
     salePrice: {
       type: Number,
-      required: true,
+      default:0,
     },
     productOffer: {
       type: Number,
