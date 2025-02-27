@@ -34,21 +34,35 @@ const getWalletAdd=async(req,res)=>{
 
 const addMoney = async (req, res) => {
     try {
-        const { amount } = req.body;
-        const userId = req.session.user; 
+        const { amount, orderId } = req.body;
+        const userId = req.session.user;
 
-        let wallet = await Wallet.findOneAndUpdate(
-            { userId: userId }, 
-            { $inc: { balance: amount } },
-            { new: true } 
-        );
+        let wallet = await Wallet.findOne({ userId: userId });
 
         if (!wallet) {
-       
             wallet = await Wallet.create({
                 userId: userId,
-                balance: amount
+                balance: amount,
+                transactions: [
+                    {
+                        transactionType: 'credit',
+                        amount: amount,
+                        description: 'Wallet recharge',
+                        status: 'Completed',
+                        orderId: orderId || null,
+                    },
+                ],
             });
+        } else {
+            wallet.balance += amount;
+            wallet.transactions.push({
+                transactionType: 'credit',
+                amount: amount,
+                description: 'Wallet recharge',
+                status: 'Completed',
+                orderId: orderId || null,
+            });
+            await wallet.save();
         }
    
         return res.status(200).json({ success: true, message: "Amount added to Wallet successfully.", wallet });
@@ -64,7 +78,7 @@ const getWalletHistory=async(req,res)=>{
     try {
         const userId=req.session.user;
         const userData=await User.findById(userId);
-        const wallet=await Wallet.findOne({userId:userId});
+        const wallet=await Wallet.findOne({userId:userId}).sort({createdAt:-1});
 
         if(!wallet){
             return res.status(404).json({success:false,message:"Wallet not found!"});

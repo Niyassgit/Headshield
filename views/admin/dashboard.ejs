@@ -1,4 +1,544 @@
 <%- include('../partials/admin/header') %>
 
-<h1>dashboard 123</h1>
+<div class="container py-4">
+    <!-- Global Time Period Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Dashboard Overview</h5>
+                    <div class="form-group mb-0">
+                        <select id="globalFilter" class="form-select" onchange="updateAllCharts()">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly" selected>Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards with Original Style -->
+    <div class="row mb-4">
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Revenue</h6>
+                        <span id="revenueValue">₹13,456.5</span>
+                        <span class="text-sm">
+                            Shipping fees are not included
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-success-light"><i class="text-success material-icons md-local_shipping"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Orders</h6> 
+                        <span id="ordersValue">53,668</span>
+                        <span class="text-sm">
+                            Excluding orders in transit
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Products</h6> 
+                        <span>9,856</span>
+                        <span class="text-sm">
+                            In 19 Categories
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Users</h6> 
+                        <span>12,784</span>
+                        <span class="text-sm">
+                            Active accounts
+                        </span>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Revenue Line Chart -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Sales Revenue</h5>
+                    <div style="height: 300px">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Pie Chart & Orders Bar Chart -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Category Performance</h5>
+                    <div style="height: 260px">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Orders Overview</h5>
+                    <div style="height: 260px">
+                        <canvas id="ordersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Selling Products -->
+    <div class="row mb-4">
+        <div class="col-md-8 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Best Selling Products</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bestSellingTable">
+                                <tr>
+                                    <td>Axor Venom</td>
+                                    <td>Motocross</td>
+                                    <td>₹8,500</td>
+                                    <td>320</td>
+                                </tr>
+                                <tr>
+                                    <td>Steelbird Air</td>
+                                    <td>Full Face</td>
+                                    <td>₹4,200</td>
+                                    <td>280</td>
+                                </tr>
+                                <tr>
+                                    <td>MT Thunder 3</td>
+                                    <td>Full Face</td>
+                                    <td>₹5,800</td>
+                                    <td>250</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Top Performers</h5>
+                    <div class="mb-4">
+                        <p class="mb-1">Best Selling Brand</p>
+                        <h5 id="bestBrand" class="mb-0">Axor</h5>
+                        <small id="bestBrandSales" class="text-muted">1,500 sales</small>
+                    </div>
+                    <div>
+                        <p class="mb-1">Best Selling Category</p>
+                        <h5 id="bestCategory" class="mb-0">Motocross</h5>
+                        <small id="bestCategorySales" class="text-muted">850 sales</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders Section (ADDED) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Recent Orders</h5>
+                        <a href="/admin/orders" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersTable">
+                                <tr>
+                                    <td>#ORD-2458</td>
+                                    <td>Amit Sharma</td>
+                                    <td>Axor Venom</td>
+                                    <td>27 Feb 2025</td>
+                                    <td>₹8,500</td>
+                                    <td><span class="badge bg-success">Delivered</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-light">Details</a></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-2457</td>
+                                    <td>Priya Patel</td>
+                                    <td>Steelbird Air</td>
+                                    <td>26 Feb 2025</td>
+                                    <td>₹4,200</td>
+                                    <td><span class="badge bg-warning text-dark">Shipped</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-light">Details</a></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-2456</td>
+                                    <td>Rahul Mehra</td>
+                                    <td>MT Thunder 3</td>
+                                    <td>26 Feb 2025</td>
+                                    <td>₹5,800</td>
+                                    <td><span class="badge bg-info">Processing</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-light">Details</a></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-2455</td>
+                                    <td>Neha Gupta</td>
+                                    <td>Steelbird Air</td>
+                                    <td>25 Feb 2025</td>
+                                    <td>₹4,200</td>
+                                    <td><span class="badge bg-danger">Cancelled</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-light">Details</a></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-2454</td>
+                                    <td>Vikram Singh</td>
+                                    <td>Axor Venom</td>
+                                    <td>25 Feb 2025</td>
+                                    <td>₹8,500</td>
+                                    <td><span class="badge bg-success">Delivered</span></td>
+                                    <td><a href="#" class="btn btn-sm btn-light">Details</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+let salesChart, categoryChart, ordersChart;
+const chartColors = {
+    primary: '#4361ee',
+    success: '#2ecc71',
+    warning: '#f39c12',
+    info: '#3498db'
+};
+
+// Data for different time periods
+const allData = {
+    daily: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        revenue: [1200, 1800, 2200, 1600, 2400, 2800, 2100],
+        orders: [32, 41, 38, 35, 48, 52, 45],
+        categories: {
+            labels: ['Motocross', 'Full Face', 'Open Face'],
+            data: [45, 30, 25]
+        },
+        bestSelling: [
+            { product: 'Axor Venom', category: 'Motocross', price: '₹8,500', sold: 45 },
+            { product: 'Steelbird Air', category: 'Full Face', price: '₹4,200', sold: 38 },
+            { product: 'MT Thunder 3', category: 'Full Face', price: '₹5,800', sold: 32 }
+        ],
+        topPerformers: {
+            brand: { name: 'Axor', sales: 145 },
+            category: { name: 'Motocross', sales: 120 }
+        },
+        summaryValues: {
+            revenue: '₹13,100',
+            orders: '291'
+        }
+    },
+    weekly: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        revenue: [7500, 9200, 8100, 10500],
+        orders: [180, 210, 195, 230],
+        categories: {
+            labels: ['Motocross', 'Full Face', 'Open Face'],
+            data: [42, 33, 25]
+        },
+        bestSelling: [
+            { product: 'Axor Venom', category: 'Motocross', price: '₹8,500', sold: 120 },
+            { product: 'Steelbird Air', category: 'Full Face', price: '₹4,200', sold: 98 },
+            { product: 'MT Thunder 3', category: 'Full Face', price: '₹5,800', sold: 85 }
+        ],
+        topPerformers: {
+            brand: { name: 'Axor', sales: 410 },
+            category: { name: 'Motocross', sales: 320 }
+        },
+        summaryValues: {
+            revenue: '₹35,300',
+            orders: '815'
+        }
+    },
+    monthly: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        revenue: [4500, 5200, 6800, 5700, 6500, 7200, 8100, 7600, 9200, 8700, 9800, 11200],
+        orders: [320, 410, 380, 480, 520, 580, 620, 590, 650, 610, 680, 720],
+        categories: {
+            labels: ['Motocross', 'Full Face', 'Open Face'],
+            data: [42, 28, 30]
+        },
+        bestSelling: [
+            { product: 'Axor Venom', category: 'Motocross', price: '₹8,500', sold: 320 },
+            { product: 'Steelbird Air', category: 'Full Face', price: '₹4,200', sold: 280 },
+            { product: 'MT Thunder 3', category: 'Full Face', price: '₹5,800', sold: 250 }
+        ],
+        topPerformers: {
+            brand: { name: 'Axor', sales: 1500 },
+            category: { name: 'Motocross', sales: 850 }
+        },
+        summaryValues: {
+            revenue: '₹13,456.5',
+            orders: '53,668'
+        }
+    },
+    yearly: {
+        labels: ['2021', '2022', '2023', '2024', '2025'],
+        revenue: [56000, 72000, 88000, 102000, 124000],
+        orders: [4200, 5300, 6100, 7500, 8900],
+        categories: {
+            labels: ['Motocross', 'Full Face', 'Open Face'],
+            data: [45, 25, 30]
+        },
+        bestSelling: [
+            { product: 'Axor Venom', category: 'Motocross', price: '₹8,500', sold: 1250 },
+            { product: 'Steelbird Air', category: 'Full Face', price: '₹4,200', sold: 980 },
+            { product: 'MT Thunder 3', category: 'Full Face', price: '₹5,800', sold: 850 }
+        ],
+        topPerformers: {
+            brand: { name: 'Axor', sales: 5800 },
+            category: { name: 'Motocross', sales: 3200 }
+        },
+        summaryValues: {
+            revenue: '₹442,000',
+            orders: '32,000'
+        }
+    }
+};
+
+// Initialize sales chart
+function initSalesChart(filterValue) {
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const data = allData[filterValue];
+    
+    // Destroy existing chart if it exists
+    if (salesChart) {
+        salesChart.destroy();
+    }
+    
+    salesChart = new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Revenue',
+                data: data.revenue,
+                borderColor: chartColors.primary,
+                backgroundColor: `${chartColors.primary}20`,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Category Performance Pie Chart
+function initCategoryChart(filterValue) {
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const data = allData[filterValue].categories;
+    
+    // Destroy existing chart if it exists
+    if (categoryChart) {
+        categoryChart.destroy();
+    }
+    
+    categoryChart = new Chart(categoryCtx, {
+        type: 'pie',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                data: data.data,
+                backgroundColor: [chartColors.primary, chartColors.success, chartColors.warning],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Orders Overview Bar Chart
+function initOrdersChart(filterValue) {
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    const data = allData[filterValue];
+    
+    // Destroy existing chart if it exists
+    if (ordersChart) {
+        ordersChart.destroy();
+    }
+    
+    ordersChart = new Chart(ordersCtx, {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Orders',
+                data: data.orders,
+                backgroundColor: chartColors.primary,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Update best selling products table
+function updateBestSellingTable(filterValue) {
+    const bestSellingData = allData[filterValue].bestSelling;
+    const tableBody = document.getElementById('bestSellingTable');
+    
+    let html = '';
+    bestSellingData.forEach(item => {
+        html += `
+            <tr>
+                <td>${item.product}</td>
+                <td>${item.category}</td>
+                <td>${item.price}</td>
+                <td>${item.sold}</td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
+}
+
+// Update top performers section
+function updateTopPerformers(filterValue) {
+    const topPerformers = allData[filterValue].topPerformers;
+    
+    document.getElementById('bestBrand').textContent = topPerformers.brand.name;
+    document.getElementById('bestBrandSales').textContent = topPerformers.brand.sales + ' sales';
+    
+    document.getElementById('bestCategory').textContent = topPerformers.category.name;
+    document.getElementById('bestCategorySales').textContent = topPerformers.category.sales + ' sales';
+}
+
+// Update summary values
+function updateSummaryValues(filterValue) {
+    const summaryValues = allData[filterValue].summaryValues;
+    
+    document.getElementById('revenueValue').textContent = summaryValues.revenue;
+    document.getElementById('ordersValue').textContent = summaryValues.orders;
+}
+
+// Update all charts and data based on global filter
+function updateAllCharts() {
+    const filterValue = document.getElementById('globalFilter').value;
+    
+    // Update charts
+    initSalesChart(filterValue);
+    initCategoryChart(filterValue);
+    initOrdersChart(filterValue);
+    
+    // Update data displays
+    updateBestSellingTable(filterValue);
+    updateTopPerformers(filterValue);
+    updateSummaryValues(filterValue);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+   
+    document.getElementById('globalFilter').value = 'monthly';
+    
+    
+    updateAllCharts();
+});
+</script>
+
 <%- include('../partials/admin/footer') %>

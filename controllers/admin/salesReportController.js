@@ -1,7 +1,7 @@
 const Order = require("../../models/orderSchema");
 const User = require("../../models/userSchema");
 const PDFDocument = require("pdfkit");
-const ExcelJS= require("exceljs")
+const ExcelJS = require("exceljs")
 const fs = require("fs");
 const path = require("path");
 const moment = require("moment");
@@ -183,16 +183,16 @@ const getSalesReportPDF = async (req, res) => {
       .text(`Total Product Discount: Rs.${totalProductDiscount.toLocaleString()}.00`, 60, doc.y + 5)
       .moveDown(2);
 
-    
+
     doc.fontSize(12).text("Order Details", { align: "center" }).moveDown(0.5);
 
     const tableTop = doc.y;
     const columnSpacing = 20;
     const columns = {
-      orderId: { x: 50, width: 180 },  
-      customer: { x: 250, width: 120 }, 
-      amount: { x: 390, width: 80 },    
-      date: { x: 490, width: 60 }       
+      orderId: { x: 50, width: 180 },
+      customer: { x: 250, width: 120 },
+      amount: { x: 390, width: 80 },
+      date: { x: 490, width: 60 }
     };
 
 
@@ -205,7 +205,7 @@ const getSalesReportPDF = async (req, res) => {
 
     Object.entries(columns).forEach(([key, column]) => {
       const header = key.charAt(0).toUpperCase() + key.slice(1);
-      doc.text(header, column.x + columnSpacing/2, tableTop + 5, {
+      doc.text(header, column.x + columnSpacing / 2, tableTop + 5, {
         width: column.width,
         align: key === 'amount' ? 'right' : 'left'
       });
@@ -224,19 +224,19 @@ const getSalesReportPDF = async (req, res) => {
       }
 
       doc.fillColor("black")
-        .text(order._id.toString(), columns.orderId.x + columnSpacing/2, rowTop + 5, {
+        .text(order._id.toString(), columns.orderId.x + columnSpacing / 2, rowTop + 5, {
           width: columns.orderId.width,
           align: 'left'
         })
-        .text(order.userId.name, columns.customer.x + columnSpacing/2, rowTop + 5, {
+        .text(order.userId.name, columns.customer.x + columnSpacing / 2, rowTop + 5, {
           width: columns.customer.width,
           align: 'left'
         })
-        .text(`Rs.${order.finalAmount.toLocaleString()}.00`, columns.amount.x + columnSpacing/2, rowTop + 5, {
+        .text(`Rs.${order.finalAmount.toLocaleString()}.00`, columns.amount.x + columnSpacing / 2, rowTop + 5, {
           width: columns.amount.width,
           align: 'right'
         })
-        .text(moment(order.createdAt).format("DD/MM/YYYY"), columns.date.x + columnSpacing/2, rowTop + 5, {
+        .text(moment(order.createdAt).format("DD/MM/YYYY"), columns.date.x + columnSpacing / 2, rowTop + 5, {
           width: columns.date.width,
           align: 'left'
         });
@@ -250,14 +250,14 @@ const getSalesReportPDF = async (req, res) => {
       }
     });
 
-  
+
     doc.rect(50, tableTop, 500, rowTop - tableTop).stroke();
 
 
     Object.values(columns).forEach(column => {
       doc.moveTo(column.x, tableTop)
-         .lineTo(column.x, rowTop)
-         .stroke();
+        .lineTo(column.x, rowTop)
+        .stroke();
     });
 
     doc.end();
@@ -312,7 +312,7 @@ const getSalesReportExcel = async (req, res) => {
       .populate("userId", "name email phone")
       .populate("orderedItems.productId", "productName salePrice")
       .sort({ createdAt: -1 });
-      const totalOrders = orders.length;
+    const totalOrders = orders.length;
 
     const totals = await Order.aggregate([
       { $match: filter },
@@ -357,12 +357,12 @@ const getSalesReportExcel = async (req, res) => {
 
     worksheet.addRow({}); // Empty row for spacing
     worksheet.addRow(["Summary"]).font = { bold: true }; // Title Row
-    
+
     worksheet.addRow(["Total Orders", totalOrders]);
     worksheet.addRow(["Total Revenue (Rs.)", `Rs.${totalRevenue.toLocaleString()}.00`]);
     worksheet.addRow(["Total Coupon Discount (Rs.)", `Rs.${totalCouponDiscount.toLocaleString()}.00`]);
     worksheet.addRow(["Total Product Discount (Rs.)", `Rs.${totalProductDiscount.toLocaleString()}.00`]);
-    
+
 
     // Save the Excel file
     const salesReportDir = path.join(__dirname, "../../public/salesReport");

@@ -30,7 +30,13 @@
               <div class="transaction-content">
                 <div class="transaction-type credit">+₹<%= item.amount.toLocaleString('en-IN') %></div>
                 <div class="transaction-details">
-                  <span class="transaction-title">Refund for Order #<%= item.orderId %></span>
+                  <span class="transaction-title">
+                    <% if (item.description === "Wallet recharge") { %>
+                      Wallet Top-Up
+                    <% } else { %>
+                      <%= item.description %>
+                    <% } %>
+                  </span>
                   <span class="transaction-date">
                     <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
                   </span>
@@ -49,7 +55,9 @@
                 <div class="transaction-type debit">-₹<%= item.amount.toLocaleString('en-IN') %></div>
                 <div class="transaction-details">
                   <span class="transaction-title">Purchase - Order Id <%=item.orderId %></span>
-                  <span class="transaction-date"><%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                  <span class="transaction-date">
+                    <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                  </span>
                 </div>
               </div>
             </div>
@@ -61,7 +69,8 @@
   <% } else { %>
     <p class="no-transaction">No transactions found.</p>
   <% } %>
-</div>
+  </div>
+  
 
   
         
@@ -235,13 +244,11 @@
     }
   </style>
 
-
-  <!--sidebar Footer section-->
+         <!--sidebar Footer section-->
         </section>
-        </div>
-        </div>
-        </div>
-        </main>
-        
+      </div>
+      </div>
+      </div>
+      </main>
 
     <%- include("../../views/partials/user/footer") %>

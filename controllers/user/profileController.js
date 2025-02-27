@@ -325,7 +325,7 @@ const postAddAddress= async(req,res)=>{
             userAddress.address.push({addressType,name,phone,altPhone,landMark,city,state,country,pincode});
             await userAddress.save();
         }
-        res.redirect("/getAllAddress");
+        res.redirect("/address");
     } catch (error) {
         console.log("Error adding Address:",error);
         res.redirect("/pageNotFound");
@@ -409,7 +409,7 @@ const postEditAddress=async(req,res)=>{
         
                 })
 
-     return res.redirect("/getAllAddress");
+     return res.redirect("/address");
 
         
     } catch (error) {
@@ -440,7 +440,7 @@ const deleteAddress =async(req,res)=>{
             }
         }
     )
-    res.redirect("/getAllAddress");
+    res.redirect("/address");
 
     } catch (error) {
         console.log("error while deleting address:", error);
