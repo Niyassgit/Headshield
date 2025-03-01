@@ -18,6 +18,7 @@ router.get("/admin-error", adminController.pageError);
 router.get("/login", adminController.loadLogin);
 router.post("/login", adminController.login);
 router.get("/", adminAuth, adminController.loadDashboard);
+router.get("/dashboard-data",adminAuth,adminController.loadDashboardData);
 router.get("/logout", adminController.logout);
 //customer management
 router.get("/users", adminAuth, customerController.customerInfo);

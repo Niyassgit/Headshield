@@ -202,8 +202,14 @@ const placeOrder = async (req, res) => {
         savedAmount += (item.productId.savedAmount || 0) * item.quantity; 
     });
 
-    console.log(totalPrice);
-     
+    if (paymentMethod === "cod" && totalPrice > 7000) {
+        return res.status(400).json({
+            success: false,
+            message: "Cash on Delivery is not available for orders above ₹7000."
+        });
+    }
+    
+    
 
         const order = await Order.create({
              userId,

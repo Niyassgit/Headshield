@@ -271,18 +271,24 @@
                                 <% }) %>
                                     <% } %>
 
-                                        <div class="summary-item">
-                                            <span>Shipping</span>
+                                    <div class="summary-item">
+                                        <span>Shipping</span>
+                                        <% if (shippingCharge > 0) { %>
+                                            <span>+₹<%= shippingCharge %></span>
+                                        <% } else { %>
                                             <span>Free</span>
-                                        </div>
-                                        <div class="summary-item">
-                                            <span>Discount</span>
-                                            <span id="discountAmount" class="text-success">-₹0</span>
-                                        </div>
-                                        <div class="summary-item">
-                                            <strong>Total</strong>
-                                            <strong id="totalAmount">₹<%= cartTotal %></strong> 
-                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span>Discount</span>
+                                        <span id="discountAmount" class="text-success">-₹0</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span>Total</span>
+                                        <span id="totalAmount">₹<%= cartTotal + shippingCharge %></span>
+                                    </div>
+                                    
+                                    
                                         
                     </div>
 
@@ -327,30 +333,36 @@
                     <!-- Payment Method Box -->
                     <div class="product-card mt-3">
                         <h2 class="section-title">Payment Method</h2>
-                        <div class="payment-option selected">
+                    
+                        <!-- COD Option -->
+                        <div class="payment-option">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" checked
-                                    value="cod">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" 
+                                    <%= cartTotal> 7000 ? 'disabled' : '' %>>
                                 <label class="form-check-label" for="cod">
                                     <i class="fas fa-money-bill-wave me-2"></i> Cash on Delivery
                                 </label>
                             </div>
+                            <% if(cartTotal> 7000) { %>
+                                <p class="text-danger mt-1">⚠ COD is not available for orders above ₹7000.</p>
+                            <% } %>
                         </div>
-
+                    
+                        <!-- Wallet Option -->
                         <div class="payment-option">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="wallet"
-                                    value="wallet">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="wallet">
                                 <label class="form-check-label" for="wallet">
                                     <% if(wallet.length==0){ %>
                                         <i class="fas fa-wallet me-2 text-danger"></i> <span class="text-danger">Activate wallet</span>
-                                    <% } else{%>
-                                        <i class="fas fa-wallet me-2"></i> Wallet Balance: ₹<%=wallet.balance %>
-                                        <% } %>
+                                    <% } else { %>
+                                        <i class="fas fa-wallet me-2"></i> Wallet Balance: ₹<%= wallet.balance %>
+                                    <% } %>
                                 </label>
                             </div>
                         </div>
-
+                    
+                        <!-- Razorpay Option -->
                         <div class="payment-option">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
@@ -359,6 +371,8 @@
                                 </label>
                             </div>
                         </div>
+                    </div>
+                    
 
                         
 

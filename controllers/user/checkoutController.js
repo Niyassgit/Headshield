@@ -28,15 +28,14 @@ const getcheckoutPage = async (req, res) => {
 
         let cartList = [];
         let cartTotal = 0;
+        let shippingCharge=40;
 
         if (cartData) {
             cartList = cartData.items;  
             cartTotal = cartData.cartTotal; 
         }
-   
+        let finalTotal = cartTotal < 7000 ? cartTotal + shippingCharge : cartTotal;
         const currentDate = new Date();
-  
-    
        
         let coupons = await Coupon.find({
             isActive: true, 
@@ -52,7 +51,8 @@ const getcheckoutPage = async (req, res) => {
             user: userData,
             address: addressList,
             cart: cartList,
-            cartTotal: cartTotal,
+            cartTotal: finalTotal,
+            shippingCharge: cartTotal < 7000 ? shippingCharge : 0,
             coupons: coupons || [], 
             wallet:wallet?wallet:[],
         });
