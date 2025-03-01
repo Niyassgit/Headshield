@@ -9,7 +9,6 @@ const getCouponPage=async(req,res)=>{
         const coupons=await Coupon.find();
         const couponsAvailable = coupons.length > 0;
 
-
         return res.render("couponPage", {
             user: userData,
             couponsAvailable, 

@@ -161,7 +161,8 @@ const applyCoupon = async (req, res) => {
 
         discountAmount = Math.min(discountAmount, totalAmount);
         
-        const finalAmount = totalAmount - discountAmount;
+        discountAmount = Math.round(discountAmount);
+        const finalAmount = Math.round(totalAmount - discountAmount);
 
         res.json({
             success: true,

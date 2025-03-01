@@ -33,9 +33,15 @@
               <td><%= data[i].category.name %></td>
               <td><%= data[i].salePrice %></td>
               <td><%= data[i].quantity %></td>
-              <td><%=data[i].productOffer %>%</td>
+              <td>
+                <% if(data[i].offerExpiry && new Date(data[i].offerExpiry) < new Date()){ %>
+                      0%
+                  <% }else{ %>
+                <%=data[i].productOffer %>%
+                  <% } %>
+                </td>
               <td class="text-center">
-                <% if(data[i].productOffer===0){ %>
+                <% if(data[i].productOffer===0  || (data[i].offerExpiry && new Date(data[i].offerExpiry) < new Date())){ %>
                 <button class="btn btn-success btn-sm text-white" onclick="openOfferModal('<%= data[i]._id %>', '<%= data[i].productName %>')">
                   Add Offer
                 </button>

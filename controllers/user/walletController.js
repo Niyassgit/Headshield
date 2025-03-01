@@ -87,7 +87,7 @@ const getWalletHistory=async(req,res)=>{
 
         return res.render("WalletHistory",{
             user:userData,
-            wallet:wallet,
+            wallet:wallet || [],
            
         })
     } catch (error) {
