@@ -158,18 +158,18 @@
                 <option value="daily" <%= filterBy === "daily" ? "selected" : "" %>>Daily</option>
                 <option value="weekly" <%= filterBy === "weekly" ? "selected" : "" %>>Weekly</option>
                 <option value="monthly" <%= filterBy === "monthly" ? "selected" : "" %>>Monthly</option>
+                <option value="custom" <%= filterBy === "custom" ? "selected" : "" %>>Custom Date</option>
             </select>
+            
         </div>
 
-        <div>
+        <div id="dateInputs" style="display: none;">
             <label>From:</label>
             <input type="date" name="fromDate" id="fromDate" value="<%= fromDate %>">
-        </div>
-
-        <div>
-            <label>To:</label>
+            <label> To: </label>
             <input type="date" name="toDate" id="toDate" value="<%= toDate %>">
         </div>
+        
 
         <button type="submit" class="generate-btn">Generate Report</button>
     </form>
@@ -226,23 +226,32 @@
         <ul class="pagination">
             <% for(let i = 1; i <= totalPages; i++) { %>
                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    <a class="page-link" href="?page=<%= i %>&filterBy=<%= filterBy %>&fromDate=<%= fromDate %>&toDate=<%= toDate %>">
+                        <%= i %>
+                    </a>
                 </li>
             <% } %>
         </ul>
     </nav>
-
+    
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         function updateDownloadLink() {
             const filterBy = document.getElementById('filterBy').value;
             const fromDate = document.getElementById('fromDate').value;
             const toDate = document.getElementById('toDate').value;
+            const dateInputs = document.getElementById('dateInputs');
 
-            let query = [];
-            if (filterBy) query.push(`filterBy=${filterBy}`);
-            if (fromDate) query.push(`fromDate=${fromDate}`);
-            if (toDate) query.push(`toDate=${toDate}`);
+            if (filterBy === "custom") {
+            dateInputs.style.display = "flex";
+        } else {
+            dateInputs.style.display = "none";
+        }
+
+           let query = [];
+        if (filterBy) query.push(`filterBy=${filterBy}`);
+        if (fromDate) query.push(`fromDate=${fromDate}`);
+        if (toDate) query.push(`toDate=${toDate}`)
 
             const queryString = query.length ? `?${query.join('&')}` : '';
             document.getElementById('downloadPDF').href = `/admin/salesReportPDF/pdf${queryString}`;

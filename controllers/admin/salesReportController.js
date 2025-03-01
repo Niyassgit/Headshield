@@ -29,19 +29,26 @@ const getSalesReport = async (req, res) => {
           $lte: new Date(),
         };
       } else if (filterBy === "weekly") {
-        const lastWeek = new Date();
-        lastWeek.setDate(lastWeek.getDate() - 7);
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        
+        const lastSunday = new Date(today);
+        lastSunday.setDate(today.getDate() - dayOfWeek); 
+        
         filter.createdAt = {
-          $gte: lastWeek,
-          $lte: new Date(),
+            $gte: lastSunday,  
+            $lte: today       
         };
+    
       } else if (filterBy === "monthly") {
-        const lastMonth = new Date();
-        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        
         filter.createdAt = {
-          $gte: lastMonth,
-          $lte: new Date(),
+            $gte: firstDayOfMonth, 
+            $lte: today         
         };
+    
       } else if (filterBy === "yearly") {
         const lastYear = new Date();
         lastYear.setFullYear(lastYear.getFullYear() - 1);
