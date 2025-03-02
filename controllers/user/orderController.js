@@ -194,18 +194,19 @@ const placeOrder = async (req, res) => {
     }
     let status="Pending";
     if(paymentMethod==="razorpay" || paymentMethod=== "wallet"){
-        status="Processing";
+        status="Confirmed";
     }
 
+   
     let savedAmount = 0;
     cart.items.forEach(item => {
         savedAmount += (item.productId.savedAmount || 0) * item.quantity; 
     });
 
-    if (paymentMethod === "cod" && totalPrice > 7000) {
+    if (paymentMethod === "cod" && totalPrice > 10000) {
         return res.status(400).json({
             success: false,
-            message: "Cash on Delivery is not available for orders above ₹7000."
+            message: "Cash on Delivery is not available for orders above ₹10000."
         });
     }
     

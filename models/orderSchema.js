@@ -110,10 +110,10 @@ const orderSchema = new Schema(
       required: true,
       enum: [
         "Pending",
-        "Processing",
+        "Confirmed",
         "Shipped",
-        "Delivered",
         "Out for Delivery",
+        "Delivered",
         "Cancelled",
         "Return Request",
         "Return Rejected",

@@ -71,4 +71,4 @@ router.get('/sales-report/excel', adminAuth, salesReportController.getSalesRepor
 
 
 module.exports = router;
-//private router
+

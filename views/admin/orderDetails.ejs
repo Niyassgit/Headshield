@@ -180,7 +180,7 @@
         <% function getStatusBadgeClass(status) { 
             switch (status) {
                 case "Pending": return "bg-warning text-dark"; 
-                case "Processing": return "bg-primary"; 
+                case "Confirmed": return "bg-primary"; 
                 case "Shipped": return "bg-info text-dark"; 
                 case "Delivered": return "bg-success"; 
                 case "Cancelled": return "bg-danger"; 
@@ -246,7 +246,7 @@
     <label for="orderStatus">Update Order Status: </label>
     <select id="orderStatus" data-order-id="<%= orders._id %>">
         <option value="Pending" <%= orders.status === "Pending" ? "selected" : "" %>>Pending</option>
-        <option value="Processing" <%= orders.status === "Processing" ? "selected" : "" %>>Processing</option>
+        <option value="Confirmed" <%= orders.status === "Confirmed" ? "selected" : "" %>>Confirmed</option>
         <option value="Shipped" <%= orders.status === "Shipped" ? "selected" : "" %>>Shipped</option>
         <option value="Delivered" <%= orders.status === "Delivered" ? "selected" : "" %>>Delivered</option>
         <option value="Cancelled" <%= orders.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
