@@ -73,6 +73,10 @@ router.get("/orders",userAuth,orderController.getOrders);
 router.get("/order-details/",userAuth,orderController.getOrderDetails);
 router.patch("/cancel-order/:id",userAuth,orderController.cancelOrder);
 router.patch("/return-order/:id",userAuth,orderController.returnOrder);
+router.get("/get-order-amount/:orderId", userAuth, orderController.getOrderAmount);
+router.patch("/update-payment/:orderId", userAuth, orderController.updatePayment);
+router.post("/mark-payment-failed", userAuth, orderController.markPaymentAsFailed);
+
 //wishlist management
 router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);
 router.get("/wishlist",userAuth,wishlistController.getWishlist);
@@ -83,7 +87,6 @@ router.post("/addMoney",userAuth,walletController.addMoney);
 router.get("/walletHistory",userAuth,walletController.getWalletHistory);
 //razor Pay management
 router.post("/createOrder",userAuth,razorPayController.createOrder);
-
 
 
 

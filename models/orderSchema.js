@@ -110,6 +110,7 @@ const orderSchema = new Schema(
       required: true,
       enum: [
         "Pending",
+        "Payment Failed",
         "Confirmed",
         "Shipped",
         "Out for Delivery",
@@ -119,6 +120,11 @@ const orderSchema = new Schema(
         "Return Rejected",
         "Returned",
       ],
+      default: "Pending",
+    },
+    paymentStatus: { 
+      type: String,
+      enum: ["Pending", "Completed", "Failed"],
       default: "Pending",
     },
     couponApplied: {

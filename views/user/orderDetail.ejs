@@ -1,477 +1,636 @@
 <%- include("../../views/partials/user/header") %>
-    <%- include("../../views/partials/user/sidebar") %>
-        <style>
-            /* General Styles */
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f9;
-                margin: 0;
-                padding: 0;
-            }
+<%- include("../../views/partials/user/sidebar") %>
+<style>
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+    }
 
-            /* Order Container */
-            .order-container {
-                width: 80%;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: #fff;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                border-radius: 10px;
-            }
+    /* Order Container */
+    .order-container {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
 
-            /* Header Section */
-            .order-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 2px solid #f1f1f1;
-                padding-bottom: 20px;
-                margin-bottom: 20px;
-            }
+    /* Header Section */
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #f1f1f1;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
 
-            .order-header h2 {
-                margin: 0;
-                color: #333;
-            }
+    .order-header h2 {
+        margin: 0;
+        color: #333;
+    }
 
-            .status-badge {
-                padding: 5px 10px;
-                background-color: #ffcc00;
-                color: #fff;
-                border-radius: 5px;
-                font-weight: bold;
-            }
+    .status-badge {
+        padding: 5px 10px;
+        background-color: #ffcc00;
+        color: #fff;
+        border-radius: 5px;
+        font-weight: bold;
+    }
 
-            /* Order Info Section */
-            .order-info p {
-                font-size: 14px;
-                color: #555;
-                line-height: 1.6;
-            }
+    /* Order Info Section */
+    .order-info p {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.6;
+    }
 
-            /* Ordered Items Section */
-            .products-container {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 20px;
-                margin-bottom: 30px;
-            }
+    /* Ordered Items Section */
+    .products-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
 
-            .product-box {
-                padding: 15px;
-                background-color: #f9f9f9;
-                border-radius: 8px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
+    .product-box {
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-            .product-details {
-                display: flex;
-                align-items: center;
-                margin-bottom: 10px;
-            }
+    .product-details {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
 
-            .product-image {
-                width: 80px;
-                height: 80px;
-                object-fit: cover;
-                margin-right: 15px;
-                border-radius: 8px;
-            }
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        margin-right: 15px;
+        border-radius: 8px;
+    }
 
-            .product-info {
-                flex: 1;
-            }
+    .product-info {
+        flex: 1;
+    }
 
-            .product-info p {
-                margin: 5px 0;
-            }
+    .product-info p {
+        margin: 5px 0;
+    }
 
-            .product-info strong {
-                font-size: 16px;
-            }
+    .product-info strong {
+        font-size: 16px;
+    }
 
-            /* Order Totals Section (No Separate Boxes) */
-            .order-totals p {
-                font-size: 16px;
-                color: #333;
-                font-weight: bold;
-                margin-top: 15px;
-            }
+    /* Order Totals Section (No Separate Boxes) */
+    .order-totals p {
+        font-size: 16px;
+        color: #333;
+        font-weight: bold;
+        margin-top: 15px;
+    }
 
-            .order-totals p strong {
-                color: #000;
-            }
+    .order-totals p strong {
+        color: #000;
+    }
 
-            .cancel-btn {
-                background-color: red;
-                color: white;
-                padding: 10px 15px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-                display: block;
-                margin: 20px 0;
-            }
+    .cancel-btn {
+        background-color: red;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        display: block;
+        margin: 20px 0;
+    }
 
-            .cancel-btn:hover {
-                background-color: darkred;
-            }
+    .cancel-btn:hover {
+        background-color: darkred;
+    }
 
-            /* Modal Styles */
-            .modal {
-                display: none;
-                position: fixed;
-                z-index: 1000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-            }
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
 
-            .modal-content {
-                background-color: white;
-                width: 50%;
-                margin: 10% auto;
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-                text-align: center;
-            }
+    .modal-content {
+        background-color: white;
+        width: 50%;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
 
-            .close-btn {
-                float: right;
-                font-size: 24px;
-                cursor: pointer;
-            }
+    .close-btn {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+    }
 
-            textarea {
-                width: 100%;
-                padding: 10px;
-                margin-top: 10px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-            .submit-btn {
-                background-color: red;
-                color: white;
-                padding: 10px 15px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-                margin-top: 10px;
-            }
+    .submit-btn {
+        background-color: red;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+    }
 
-            .submit-btn:hover {
-                background-color: darkred;
-            }
+    .submit-btn:hover {
+        background-color: darkred;
+    }
 
-            /* Return Button Styles */
-            .return-btn {
-                background-color: #f0ad4e;
-                /* Orange color for return button */
-                color: white;
-                padding: 10px 15px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-                display: block;
-                margin: 20px 0;
-                transition: background-color 0.3s ease;
-            }
+    /* Return Button Styles */
+    .return-btn {
+        background-color: #f0ad4e;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        display: block;
+        margin: 20px 0;
+        transition: background-color 0.3s ease;
+    }
 
-            .return-btn:hover {
-                background-color: #ec971f;
-            }
+    .return-btn:hover {
+        background-color: #ec971f;
+    }
 
-            /* Modal Styles - Adding specific styles for return modal */
-            .modal-content h2 {
-                color: #333;
-                margin-bottom: 20px;
-            }
+    /* Modal Styles - Adding specific styles for return modal */
+    .modal-content h2 {
+        color: #333;
+        margin-bottom: 20px;
+    }
 
-            .modal-content label {
-                display: block;
-                margin-bottom: 10px;
-                color: #555;
-                font-weight: bold;
-            }
+    .modal-content label {
+        display: block;
+        margin-bottom: 10px;
+        color: #555;
+        font-weight: bold;
+    }
 
-            #returnReason {
-                width: 100%;
-                padding: 12px;
-                margin: 10px 0;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                resize: vertical;
-                min-height: 100px;
-            }
+    #returnReason {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        min-height: 100px;
+    }
 
-            /* Making submit button consistent for both modals */
-            .submit-btn-return {
-                background-color: #f0ad4e;
-                color: white;
-                padding: 12px 20px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-                margin-top: 15px;
-                transition: background-color 0.3s ease;
-            }
+    /* Making submit button consistent for both modals */
+    .submit-btn-return {
+        background-color: #f0ad4e;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 15px;
+        transition: background-color 0.3s ease;
+    }
 
-            .submit-btn-return:hover {
-                background-color: #ec971f;
-            }
-        </style>
-        </head>
+    .submit-btn-return:hover {
+        background-color: #ec971f;
+    }
 
-        <body>
-            <% function getStatusBadgeClass(status) { switch (status) { case "Pending" : return "bg-warning text-dark" ;
-                case "Confirmed" : return "bg-primary" ; case "Shipped" : return "bg-info text-dark" ;
-                case "Out for Delivery" : return "bg-orange text-dark" ; case "Delivered" : return "bg-success" ;
-                case "Cancelled" : return "bg-danger" ; case "Return Request" : return "bg-secondary" ;  case "Return Rejected": return "bg-danger text-warning";  case "Returned"
-                : return "bg-dark" ; default: return "bg-light text-dark" ; } } %>
-                <div class="order-container">
-                    <!-- Order Header -->
-                    <div class="order-header">
-                        <h2>Order Details</h2>
-                        <span class="badge <%= getStatusBadgeClass(order.status) %>">
-                            <%= order.status %>
+    .payment-retry-section {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #fff8f8;
+        border: 1px solid #ffcccc;
+        border-radius: 5px;
+    }
+
+    .retry-payment-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+    }
+
+    .retry-payment-btn:hover {
+        background-color: #218838;
+    }
+</style>
+</head>
+
+<body>
+    <% function getStatusBadgeClass(status) { 
+        switch (status) { 
+            case "Pending": return "bg-warning text-dark"; 
+            case "Confirmed": return "bg-primary"; 
+            case "Shipped": return "bg-info text-dark"; 
+            case "Out for Delivery": return "bg-orange text-dark"; 
+            case "Delivered": return "bg-success"; 
+            case "Cancelled": return "bg-danger"; 
+            case "Return Request": return "bg-secondary"; 
+            case "Return Rejected": return "bg-danger text-warning"; 
+            case "Returned": return "bg-dark"; 
+            case "Payment Failed": return "bg-danger text-white"; 
+            default: return "bg-light text-dark"; 
+        } 
+    } %>
+    <div class="order-container">
+        <!-- Order Header -->
+        <div class="order-header">
+            <h2>Order Details</h2>
+            <span class="badge <%= getStatusBadgeClass(order.status) %>">
+                <%= order.status %>
+            </span>
+        </div>
+
+        <!-- Order Information Section -->
+        <div class="order-info">
+            <% if(order) { %>
+                <p><strong>Order ID:</strong> <span id="orderId"><%= order.orderId %></span></p>
+                <p><strong>Invoice Date:</strong> <span id="invoiceDate">
+                    <%= new Date(order.invoiceDate).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                </span></p>
+                <p><strong>Payment Method:</strong> <span id="paymentMethod"><%= order.paymentMethod %></span></p>
+                <p><strong>Coupon Applied:</strong> <span id="couponApplied"><%= order.couponApplied ? 'Yes' : 'No' %></span></p>
+                <p><strong>Delivery Address:</strong>
+                    <% if(order.address) { %>
+                        <span id="deliveryAddress">
+                            <%= order.address.name %><br>
+                            <%= order.address.landMark %><br>
+                            <%= order.address.city %>, <%= order.address.state %>, <%= order.address.country %><br>
+                            <%= order.address.pincode %><br>
+                            <%= order.address.phone %>
                         </span>
+                    <% } else { %>
+                        <span>No address available</span>
+                    <% } %>
+                </p>
+            <% } %>
+        </div>
+
+        <!-- Ordered Items Section -->
+        <h4>Ordered Items</h4>
+        <div class="products-container">
+            <% if(products.length > 0) { %>
+                <% products.forEach(function(item) { %>
+                    <div class="product-box">
+                        <div class="product-details">
+                            <img class="product-image" src="/uploads/re-image/<%= item.productImage[0] %>" alt="<%= item.productName %>">
+                            <div class="product-info">
+                                <p><strong><%= item.productName %></strong></p>
+                                <p>Quantity: <%= item.quantity %></p>
+                                <p>Price: ₹<%= item.price %></p>
+                            </div>
+                        </div>
+                        <p><strong>Total: ₹<%= item.total %></strong></p>
                     </div>
+                <% }) %>
+            <% } else { %>
+                <p>No items in the order.</p>
+            <% } %>
+        </div>
 
-                    <!-- Order Information Section -->
-                    <div class="order-info">
-                        <% if(order) { %>
-                            <p><strong>Order ID:</strong> <span id="orderId">
-                                    <%= order.orderId %>
-                                </span></p>
-                            <p><strong>Invoice Date:</strong> <span id="invoiceDate">
-                                    <%= new Date(order.invoiceDate).toLocaleString('en-IN', { weekday: 'long' ,
-                                        year: 'numeric' , month: 'long' , day: 'numeric' }) %>
-                                </span></p>
-                            <p><strong>Payment Method:</strong> <span id="paymentMethod">
-                                    <%= order.paymentMethod %>
-                                </span></p>
-                            <p><strong>Coupon Applied:</strong> <span id="couponApplied">
-                                    <%= order.couponApplied ? 'Yes' : 'No' %>
-                                </span></p>
+        <!-- Order Totals Section -->
+        <div class="order-totals">
+            <p><strong>Total Price:</strong> ₹<span id="totalPrice"><%= order.totalPrice + order.couponDiscount + order.productDiscount %></span></p>
+            <p><strong>Coupon Deduction:</strong> ₹<span id="discount"><%= order.couponDiscount %></span></p>
+            <p><strong>Offer Discount:</strong> ₹<span id="discount"><%= order.productDiscount %></span></p>
+            <p><strong>Final Amount:</strong> ₹<span id="finalAmount"><%= order.finalAmount %></span></p>
+        </div>
 
-                                <p><strong>Delivery Address:</strong>
-                                    <% if(order.address) { %>
-                                        <span id="deliveryAddress">
-                                            <%= order.address.name %><br>
-                                            <%= order.address.landMark %><br> 
-                                            <%= order.address.city %>, <%= order.address.state %>, <%= order.address.country %><br>
-                                            <%= order.address.pincode %><br>
-                                            <%= order.address.phone %>
-                                        </span>
-                                    <% } else { %>
-                                        <span>No address available</span>
-                                    <% } %>
-                                </p>
-                                
-                            <% } %>
-                    </div>
+        <% if (order.status === "Payment Failed" || order.paymentStatus === "Failed") { %>
+            <div class="payment-retry-section">
+                <h4>Payment Failed</h4>
+                <p>Your payment for this order was not completed. You can retry payment by clicking the button below.</p>
+                <button id="retryPaymentBtn" class="retry-payment-btn" data-order-id="<%= order.orderId %>">Retry Payment</button>
+            </div>
+        <% } %>
 
-                    <!-- Ordered Items Section -->
-                    <h4>Ordered Items</h4>
-                    <div class="products-container">
-                        <% if(products.length> 0) { %>
-                            <% products.forEach(function(item) { %>
-                                <div class="product-box">
-                                    <div class="product-details">
-                                        <img class="product-image" src="/uploads/re-image/<%= item.productImage[0] %>"
-                                            alt="<%= item.productName %>">
-                                        <div class="product-info">
-                                            <p><strong>
-                                                    <%= item.productName %>
-                                                </strong></p>
-                                            <p>Quantity: <%= item.quantity %>
-                                            </p>
-                                            <p>Price: ₹<%= item.price %> 
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p><strong>Total: ₹<%= item.total %></strong></p>
-                                </div>
-                                <% }) %>
-                                    <% } else { %>
-                                        <p>No items in the order.</p>
-                                        <% } %>
-                    </div>
+        <% if (["Pending", "Confirmed", "Shipped", "Out for Delivery"].includes(order.status)) { %>
+            <button id="cancelOrderBtn" class="cancel-btn">Cancel Order</button>
+        <% } else if (order.status === "Delivered") { %>
+            <button id="returnOrderBtn" class="return-btn">Return</button>
+        <% } %>
+    </div>
 
-                    <!-- Order Totals Section (Without Divisions) -->
-                    <div class="order-totals">
-                        <p><strong>Total Price:</strong> ₹<span id="totalPrice">
-                                <%= order.totalPrice+order.couponDiscount+order.productDiscount %>
-                            </span></p>
-                        <p><strong>Coupon Diduction:</strong> ₹<span id="discount">
-                                <%= order.couponDiscount %>
-                            </span></p>
-                            <p><strong>Offer Discount:</strong> ₹<span id="discount">
-                                <%= order.productDiscount %>
-                            </span></p>
-                        <p><strong>Final Amount:</strong> ₹<span id="finalAmount">
-                                <%= order.finalAmount %>
-                            </span></p>
-                    </div>
-                    <% if (["Pending", "Processing" , "Shipped" , "Out for Delivery" ].includes(order.status)) { %>
-                        <button id="cancelOrderBtn" class="cancel-btn">Cancel Order</button>
-                        <% } else if (order.status==="Delivered" ) { %>
-                            <button id="returnOrderBtn" class="return-btn">Return</button>
-                            <% } %>
+    <!-- Modal for Cancellation -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <h3>Cancel Order</h3>
+            <label for="cancelReason">Reason for cancellation:</label>
+            <textarea id="cancelReason" rows="4" placeholder="Enter reason here..."></textarea>
+            <button id="submitCancel" class="submit-btn">Cancel Order</button>
+        </div>
+    </div>
 
-                </div>
+    <!-- Return Modal -->
+    <div id="returnModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <h2>Return Order</h2>
+            <label for="returnReason">Reason for Return:</label>
+            <textarea id="returnReason" rows="3" placeholder="Enter reason..."></textarea>
+            <button id="submitReturn" class="submit-btn-return">Submit</button>
+        </div>
+    </div>
 
-                <!-- Modal for Cancellation -->
-                <div id="cancelModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-btn">&times;</span>
-                        <h3>Cancel Order</h3>
-                        <label for="cancelReason">Reason for cancellation:</label>
-                        <textarea id="cancelReason" rows="4" placeholder="Enter reason here..."></textarea>
-                        <button id="submitCancel" class="submit-btn">Cancel Order</button>
-                    </div>
-                </div>
+    <!-- Sidebar Footer Section -->
+    </section>
+    </div>
+    </div>
+    </div>
+    </main>
 
-                <!-- Return Modal -->
-                <div id="returnModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-btn">&times;</span>
-                        <h2>Return Order</h2>
-                        <label for="returnReason">Reason for Return:</label>
-                        <textarea id="returnReason" rows="3" placeholder="Enter reason..."></textarea>
-                        <button id="submitReturn" class="submit-btn-return">Submit</button>
-                    </div>
-                </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-                <!--sidebar Footer section-->
-                </section>
-                </div>
-                </div>
-                </div>
-                </main>
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cancelModal = document.getElementById("cancelModal");
+            const cancelBtn = document.getElementById("cancelOrderBtn");
+            const returnModal = document.getElementById("returnModal");
+            const returnBtn = document.getElementById("returnOrderBtn");
+            const retryPaymentBtn = document.getElementById("retryPaymentBtn");
 
-                <script>
-                    const cancelModal = document.getElementById("cancelModal");
-                    const cancelBtn = document.getElementById("cancelOrderBtn");
-                    const returnModal = document.getElementById("returnModal");
-                    const returnBtn = document.getElementById("returnOrderBtn");
+            // Cancel Order Modal
+            if (cancelBtn) {
+                cancelBtn.addEventListener("click", function () {
+                    cancelModal.style.display = "block";
+                });
+            }
 
-                    if (cancelBtn) {
-                        cancelBtn.addEventListener("click", function () {
-                            cancelModal.style.display = "block";
-                        });
-                    }
+            // Return Order Modal
+            if (returnBtn) {
+                returnBtn.addEventListener("click", function () {
+                    returnModal.style.display = "block";
+                });
+            }
 
-                    if (returnBtn) {
-                        returnBtn.addEventListener("click", function () {
-                            returnModal.style.display = "block";
-                        });
-                    }
+            // Close Modals
+            document.querySelectorAll(".close-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    cancelModal.style.display = "none";
+                    returnModal.style.display = "none";
+                });
+            });
 
-                    document.querySelectorAll(".close-btn").forEach(btn => {
-                        btn.addEventListener("click", function () {
-                            cancelModal.style.display = "none";
-                            returnModal.style.display = "none";
-                        });
+            window.addEventListener("click", function (event) {
+                if (event.target === cancelModal) cancelModal.style.display = "none";
+                if (event.target === returnModal) returnModal.style.display = "none";
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    cancelModal.style.display = "none";
+                    returnModal.style.display = "none";
+                }
+            });
+
+            // Submit Cancel Order
+            document.getElementById("submitCancel")?.addEventListener("click", function () {
+                let reason = document.getElementById("cancelReason").value.trim();
+                if (!reason) {
+                    Swal.fire("Error!", "Please enter a cancellation reason.", "error");
+                    return;
+                }
+
+                fetch(`/cancel-order/<%= order._id %>`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ reason })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire("Cancelled", "Order cancelled successfully!", "success").then(() => {
+                                cancelModal.style.display = "none";
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Error!", data.message || "Error cancelling order.", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire("Error!", "Error cancelling order.", "error");
+                    });
+            });
+
+            // Submit Return Order
+            document.getElementById("submitReturn")?.addEventListener("click", function () {
+                let reason = document.getElementById("returnReason").value.trim();
+                if (!reason) {
+                    Swal.fire("Error!", "Please enter a return reason.", "error");
+                    return;
+                }
+
+                fetch(`/return-order/<%= order._id %>`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ reason })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire("Return Requested", "Return request submitted successfully!", "success").then(() => {
+                                returnModal.style.display = "none";
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Error!", data.message || "Error submitting return request.", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire("Error!", "Error submitting return request.", "error");
+                    });
+            });
+
+            // Retry Payment
+            if (retryPaymentBtn) {
+                retryPaymentBtn.addEventListener("click", function () {
+                    const orderId = this.getAttribute("data-order-id");
+                    Swal.fire({
+                        title: "Retrying Payment",
+                        text: "Please wait while we fetch the order details...",
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
                     });
 
-                    window.addEventListener("click", function (event) {
-                        if (event.target === cancelModal) {
-                            cancelModal.style.display = "none";
-                        }
-                        if (event.target === returnModal) {
-                            returnModal.style.display = "none";
-                        }
-                    });
+                    fetch(`/get-order-amount/${orderId}`, {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json" }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.close();
+                            if (data.success) {
+                                initiateRazorpayPaymentForExistingOrder(data.amount, orderId);
+                            } else {
+                                Swal.fire("Error!", data.message || "Failed to get order details", "error");
+                            }
+                        })
+                        .catch(error => {
+                            Swal.close();
+                            console.error("Error:", error);
+                            Swal.fire("Error!", "An unexpected error occurred.", "error");
+                        });
+                });
+            }
 
-                    document.getElementById("submitCancel")?.addEventListener("click", function () {
-                        let reason = document.getElementById("cancelReason").value.trim();
+            // Initiate Razorpay Payment for Existing Order
+            function initiateRazorpayPaymentForExistingOrder(amount, orderId) {
+                if (typeof Razorpay === "undefined") {
+                    Swal.fire("Error!", "Razorpay SDK is not loaded. Please check your internet connection.", "error");
+                    return;
+                }
 
-                        if (reason === "") {
-                            Swal.fire("Error!", "Please enter a cancellation reason.", "error");
+                fetch("/createOrder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: amount, currency: "INR" })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            Swal.fire("Error!", "Failed to create payment order.", "error");
                             return;
                         }
 
-                        fetch(`/cancel-order/<%= order._id %>`, {
-                            method: "PATCH",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({ reason: reason })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire("Cancelled", "Order cancelled successfully!", "success")
-                                        .then(() => {
-                                            cancelModal.style.display = "none";
-                                            location.reload(); 
-                                        });
-                                } else {
-                                    Swal.fire("Error!", "Error cancelling order. Please try again.", "error");
+                        const options = {
+                            key: "rzp_test_ju0hCIjA1oCJcC",
+                            amount: data.order.amount,
+                            currency: "INR",
+                            name: "Headshield Store",
+                            description: "Helmet Purchase",
+                            order_id: data.order.id,
+                            handler: function (response) {
+                                if (!response.razorpay_payment_id) {
+                                    Swal.fire("Error!", "Payment failed. No payment ID received.", "error");
+                                    markPaymentAsFailed(orderId);
+                                    return;
                                 }
-                            })
-                            .catch(error => {
-                                console.error("Error:", error);
-                                Swal.fire("Error!", "Error cancelling order.", "error");
-                            });
-                    });
-
-                    document.getElementById("submitReturn")?.addEventListener("click", function () {
-                        let reason = document.getElementById("returnReason").value.trim();
-
-                        if (reason === "") {
-                            Swal.fire("Error!", "Please enter a return reason.", "error");
-                            return;
-                        }
-                           console.log(reason);
-                        fetch(`/return-order/<%= order._id %>`, {  
-                            method: "PATCH",
-                            headers: {
-                                "Content-Type": "application/json"
+                                updateOrderPayment(orderId, response.razorpay_payment_id);
                             },
-                            body: JSON.stringify({ reason: reason })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire("Return Requested", "Return request submitted successfully!", "success")
-                                        .then(() => {
-                                            returnModal.style.display = "none";
-                                            location.reload();
-                                        });
-                                } else {
-                                    Swal.fire("Error!", "Error submitting return request. Please try again.", "error");
+                            prefill: {
+                                name: "Niyas Nazar",
+                                email: "niyas28nazar@gmail.com",
+                                contact: "7907291887"
+                            },
+                            theme: { color: "#3399cc" },
+                            modal: {
+                                ondismiss: function () {
+                                    markPaymentAsFailed(orderId);
                                 }
-                            })
-                            .catch(error => {
-                                console.error("Error:", error);
-                                Swal.fire("Error!", "Error submitting return request.", "error");
+                            }
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.on('payment.failed', function (response) {
+                            Swal.fire("Payment Failed!", "The payment attempt was unsuccessful.", "error");
+                            markPaymentAsFailed(orderId);
+                        });
+                        rzp.open();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire("Error!", "An unexpected error occurred.", "error");
+                    });
+            }
+
+            // Update Order Payment
+            function updateOrderPayment(orderId, razorpay_payment_id) {
+                Swal.fire({
+                    title: "Processing Payment",
+                    text: "Please wait while we verify your payment...",
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                fetch(`/update-payment/${orderId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ razorpay_payment_id })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.close();
+                        if (data.success) {
+                            Swal.fire("Success!", "Payment completed successfully!", "success").then(() => {
+                                location.reload();
                             });
-                    });
-                    
-                    document.addEventListener("keydown", function (event) {
-                        if (event.key === "Escape") {
-                            cancelModal.style.display = "none";
-                            returnModal.style.display = "none";
+                        } else {
+                            Swal.fire("Error!", data.message || "Payment verification failed", "error");
+                            markPaymentAsFailed(orderId);
                         }
+                    })
+                    .catch(error => {
+                        Swal.close();
+                        console.error("Error:", error);
+                        Swal.fire("Error!", "An unexpected error occurred.", "error");
                     });
+            }
 
-                </script>
+            // Mark Payment as Failed
+            function markPaymentAsFailed(orderId) {
+                fetch("/mark-payment-failed", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            console.error("Failed to mark payment as failed:", data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error marking payment as failed:", error);
+                    });
+            }
+        });
+    </script>
 
-
-
-
-                <%- include("../../views/partials/user/footer") %>
+    <%- include("../../views/partials/user/footer") %>
+</body>
+</html>
