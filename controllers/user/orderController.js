@@ -14,7 +14,6 @@ const placeOrder = async (req, res) => {
         const userId = req.session.user;
         const { address, paymentMethod, totalPrice, discount, finalAmount, couponCode, razorpay_payment_id, paymentStatus: clientPaymentStatus } = req.body;
 
-        // Validate required fields
         if (!address || !paymentMethod) {
             return res.status(400).json({
                 success: false,
@@ -22,7 +21,6 @@ const placeOrder = async (req, res) => {
             });
         }
 
-        // Fetch and validate address
         const userAddress = await Address.findOne(
             { userId, "address._id": address },
             { "address.$": 1 }
@@ -35,7 +33,6 @@ const placeOrder = async (req, res) => {
         }
         const selectedAddress = userAddress.address[0];
 
-        // Fetch and validate cart
         const cart = await Cart.findOne({ userId }).populate({
             path: 'items.productId',
             select: 'productName quantity isBlocked savedAmount regularPrice'
@@ -47,7 +44,7 @@ const placeOrder = async (req, res) => {
             });
         }
 
-        // Check stock and blocked items
+
         const outOfStockItems = [];
         const blockedItems = [];
         for (let item of cart.items) {
@@ -71,7 +68,6 @@ const placeOrder = async (req, res) => {
             });
         }
 
-        // Prepare ordered items
         const orderedItems = cart.items.map(item => ({
             productId: item.productId._id,
             productName: item.productId.productName,
@@ -80,60 +76,82 @@ const placeOrder = async (req, res) => {
             price: item.price
         }));
 
-        // Coupon handling
         let couponApplied = false;
         let couponId = null;
-        let finalDiscount = discount || 0;
+        let finalDiscount = 0;
 
         if (couponCode) {
-            const coupon = await Coupon.findOne({ couponCode });
-            if (!coupon) {
-                return res.status(400).json({ success: false, message: 'Invalid coupon code.' });
-            }
-            if (!coupon.isActive) {
-                return res.status(400).json({ success: false, message: 'This coupon is inactive.' });
-            }
-            if (coupon.expiredOn < Date.now()) {
-                return res.status(400).json({ success: false, message: 'This coupon has expired.' });
-            }
-            if (coupon.usedCount >= coupon.usageLimit) {
-                return res.status(400).json({ success: false, message: 'This coupon has reached its usage limit.' });
-            }
+            const coupon = await Coupon.findOne({ couponCode: couponCode });
 
-            couponApplied = true;
-            couponId = coupon._id;
-            let discountAmount = coupon.type === 'percentage'
-                ? (totalPrice * coupon.offerPrice) / 100
-                : coupon.offerPrice;
-            finalDiscount = coupon.maximumPrice && discountAmount > coupon.maximumPrice
-                ? coupon.maximumPrice
-                : discountAmount;
+            if (coupon) {
+            
+                if (!coupon.isActive) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'This coupon is inactive.'
+                    });
+                }
+
+                if (coupon.expiredOn < Date.now()) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'This coupon has expired.'
+                    });
+                }
+
+                if (coupon.usedCount >= coupon.usageLimit) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'This coupon has reached its usage limit.'
+                    });
+                }
+
+                couponApplied = true;
+                couponId = coupon._id;
+
+                let discountAmount = 0;
+                if (coupon.type === 'percentage') {
+                    discountAmount = (totalPrice * coupon.offerPrice) / 100;
+                } else {
+                    discountAmount = coupon.offerPrice;
+                }
+
+
+                if (coupon.maximumPrice && discountAmount > coupon.maximumPrice) {
+                    discountAmount = coupon.maximumPrice;
+                }
+
+                finalDiscount = discountAmount;
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid coupon code.'
+                });
+            }
         }
 
-        // Calculate saved amount from product discounts
+
         let savedAmount = 0;
         cart.items.forEach(item => {
-            savedAmount += (item.productId.savedAmount || 0) * item.quantity;
+            savedAmount += (item.productId.savedAmount || 0) * item.quantity; 
         });
 
-        // Validate final amount server-side
+      
         const calculatedFinalAmount = totalPrice - finalDiscount;
         if (finalAmount !== calculatedFinalAmount) {
             console.warn(`Final amount mismatch: Client sent ${finalAmount}, calculated ${calculatedFinalAmount}`);
         }
 
-        // Payment status logic
-        let paymentStatus = clientPaymentStatus || "Pending"; // Use client-provided status if present
+        let paymentStatus = clientPaymentStatus || "Pending"; 
         let status = "Pending";
 
-        // Check for existing Payment Failed order to prevent duplicates
         if (paymentStatus === "Failed") {
             const existingOrder = await Order.findOne({
                 userId,
                 totalPrice,
                 paymentStatus: "Failed",
                 status: "Payment Failed",
-                invoiceDate: { $gte: new Date(Date.now() - 5 * 60 * 1000) } // Within last 5 minutes
+                invoiceDate: { $gte: new Date(Date.now() - 5 * 60 * 1000) } 
             });
             if (existingOrder) {
                 console.log("Duplicate Payment Failed order detected:", existingOrder.orderId);
@@ -168,7 +186,6 @@ const placeOrder = async (req, res) => {
             status = "Confirmed";
         } else if (paymentMethod === "razorpay") {
             if (paymentStatus === "Failed") {
-                // Client explicitly marked as failed (e.g., modal dismissed)
                 status = "Payment Failed";
             } else if (!razorpay_payment_id) {
                 paymentStatus = "Failed";
@@ -191,7 +208,7 @@ const placeOrder = async (req, res) => {
             }
         }
 
-        // Create the order
+
         const order = await Order.create({
             userId,
             orderedItems,
@@ -209,49 +226,49 @@ const placeOrder = async (req, res) => {
             paymentStatus
         });
 
-        // Post-order updates (only if payment is successful)
-        if (paymentStatus === "Completed") {
-            if (couponApplied) {
-                await Coupon.findByIdAndUpdate(couponId, {
-                    $push: { userId: userId },
-                    $inc: { usedCount: 1 }
-                });
-            }
+     
+ 
+     const isOrderSuccessful = status === "Confirmed" || status === "Pending";
 
-            if (paymentMethod === "wallet") {
-                await Wallet.findOneAndUpdate(
-                    { userId },
-                    {
-                        $push: {
-                            transactions: {
-                                transactionType: 'debit',
-                                amount: calculatedFinalAmount,
-                                description: 'Order placed using wallet',
-                                status: 'Completed',
-                                orderId: order._id
-                            }
-                        }
-                    }
-                );
-            }
+     if (isOrderSuccessful) {
+         if (couponApplied) {
+             await Coupon.findByIdAndUpdate(couponId, {
+                 $push: { userId: userId },
+                 $inc: { usedCount: 1 }
+             });
+         }
+         if (paymentMethod === "wallet" && paymentStatus === "Completed") {
+             await Wallet.findOneAndUpdate(
+                 { userId },
+                 {
+                     $push: {
+                         transactions: {
+                             transactionType: 'debit',
+                             amount: calculatedFinalAmount,
+                             description: 'Order placed using wallet',
+                             status: 'Completed',
+                             orderId: order._id
+                         }
+                     }
+                 }
+             );
+         }
+         for (let item of cart.items) {
+             await Product.updateOne(
+                 { _id: item.productId._id },
+                 { $inc: { quantity: -item.quantity } }
+             );
+         }
+     }
 
-            // Update product stock
-            for (let item of cart.items) {
-                await Product.updateOne(
-                    { _id: item.productId._id },
-                    { $inc: { quantity: -item.quantity } }
-                );
-            }
+     
+     await Cart.findByIdAndDelete(cart._id);
 
-            // Clear cart
-            await Cart.findByIdAndDelete(cart._id);
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: paymentStatus === "Failed" ? "Order created with payment failed. Retry from order details." : "Order placed successfully!",
-            orderId: order.orderId
-        });
+     return res.status(200).json({
+         success: true,
+         message: paymentStatus === "Failed" ? "Order created with payment failed. Retry from order details." : "Order placed successfully!",
+         orderId: order.orderId
+     });
     } catch (error) {
         console.error('Place order error:', error);
         return res.status(500).json({
@@ -386,7 +403,7 @@ const cancelOrder = async (req, res) => {
                 amount: productPrice,
                 description: `Refund for Order #${order._id}`,
                 createdAt: new Date(),
-                status: "completed",
+                status: "Completed",
               },
             ],
           });
@@ -466,7 +483,7 @@ const getOrderAmount = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
-  // Update payment status after retry
+ 
 const updatePayment = async (req, res) => {
     try {
         const { orderId } = req.params;

@@ -621,12 +621,48 @@
 
 
             const placeOrderForm = document.querySelector("form[action='/placeOrder']");
-        if (placeOrderForm) {
-            placeOrderForm.addEventListener("submit", function (e) {
-                e.preventDefault();
-                handlePlaceOrder(placeOrderForm);
+            if (placeOrderForm) {
+
+                placeOrderForm.addEventListener("submit", function (e) {
+                    const submitter = e.submitter;
+                    if (!submitter || submitter.type !== 'button') {
+                        e.preventDefault();
+                    }
+                });
+                const placeOrderButton = placeOrderForm.querySelector("button[type='submit']");
+                if (placeOrderButton) {
+                    placeOrderButton.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handlePlaceOrder(placeOrderForm);
+                    });
+                }
+            };
+
+            if (placeOrderForm) {
+                placeOrderForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                })
+
+                const placeOrderButton = placeOrderForm.querySelector("button[type='submit']");
+                if (placeOrderButton) {
+                    placeOrderButton.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handlePlaceOrder(placeOrderForm);
+                    });
+                }
+            }
+
+            document.querySelectorAll(".select-coupon").forEach(button => {
+                button.addEventListener("click", function () {
+                    const selectedCoupon = this.getAttribute("data-code");
+                    document.getElementById("couponCodeInput").value = selectedCoupon;
+                });
             });
-        }
+
+
+     
             document.querySelectorAll(".select-coupon").forEach(button => {
                 button.addEventListener("click", function () {
                     const selectedCoupon = this.getAttribute("data-code");
@@ -755,20 +791,22 @@
 
         }
         function handlePlaceOrder(form) {
-        const selectedAddress = form.querySelector("input[name='address']:checked");
-        const selectedPayment = form.querySelector("input[name='paymentMethod']:checked");
-        const totalAmountElement = document.getElementById("totalAmount");
-        const discountElement = document.getElementById("discountAmount");
-        const couponInput = document.getElementById("couponCodeInput");
+            const selectedAddress = form.querySelector("input[name='address']:checked");
+            const selectedPayment = form.querySelector("input[name='paymentMethod']:checked");
+            const totalAmountElement = document.getElementById("totalAmount");
+            const discountElement = document.getElementById("discountAmount");
+            const couponInput = document.getElementById("couponCodeInput");
 
-        if (!selectedAddress || !selectedPayment) {
-            Swal.fire("Error!", "Please select an address and payment method.", "error");
-            return;
-        }
+            if (!selectedAddress || !selectedPayment) {
+                Swal.fire("Error!", "Please select an address and payment method.", "error");
+                return;
+            }
 
-        const totalPrice = parseFloat(totalAmountElement.innerText.replace("₹", "").trim());
-        const discountAmount = parseFloat(discountElement.innerText.replace("-₹", "").trim()) || 0;
-        const couponCode = couponInput ? couponInput.value.trim() : "";
+
+            const totalPrice = parseFloat(totalAmountElement.innerText.replace("₹", "").trim());
+            const discountAmount = parseFloat(discountElement.innerText.replace("-₹", "").trim()) || 0;
+            const couponCode = couponInput ? couponInput.value.trim() : "";
+
 
         Swal.fire({
             title: "Are you sure?",

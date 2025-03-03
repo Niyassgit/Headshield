@@ -64,10 +64,8 @@ const logout = async (req, res) => {
     }
 };
 
-// Load dashboard view
 const loadDashboard = async (req, res) => {
     try {
-        // Get basic stats for initial page load
         const users = await User.countDocuments({ isAdmin: false });
         const products = await Product.countDocuments();
         const orders = await Order.countDocuments();
@@ -76,7 +74,7 @@ const loadDashboard = async (req, res) => {
             { $group: { _id: null, total: { $sum: "$finalAmount" } } }
         ]);
         
-        // Get best selling products for initial view
+
         const bestSellingProducts = await Order.aggregate([
             { $unwind: "$orderedItems" },
             { $group: { 
@@ -108,7 +106,6 @@ const loadDashboard = async (req, res) => {
             }}
         ]);
         
-        // Get best brand and category
         const topCategory = await Order.aggregate([
             { $unwind: "$orderedItems" },
             { $lookup: { 
@@ -150,7 +147,6 @@ const loadDashboard = async (req, res) => {
             { $limit: 1 }
         ]);
         
-        // Get recent orders
         const recentOrders = await Order.find()
             .sort({ createdAt: -1 })
             .limit(5)
@@ -178,12 +174,9 @@ const loadDashboard = async (req, res) => {
     }
 };
 
-// Load dashboard data for AJAX requests (filtered by period)
 const loadDashboardData = async (req, res) => {
     try {
-        const filter = req.query.filter || "monthly"; // Default to monthly
-        
-        // Get current date info
+        const filter = req.query.filter || "monthly"; 
         const now = new Date();
         const currentYear = now.getFullYear();
         let periodFilter = {};
@@ -192,19 +185,15 @@ const loadDashboardData = async (req, res) => {
         let revenueData = [];
         let ordersData = [];
         
-        // Days of the week array (for weekly view)
         const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
         
-        // Setup time periods and labels
         if (filter === "weekly") {
-            // Calculate the start date (previous Monday)
             const lastWeekStart = new Date(now);
-            const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-            const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Adjust to get Monday (0 for Monday)
+            const dayOfWeek = now.getDay(); 
+            const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1; 
             lastWeekStart.setDate(now.getDate() - diff);
             lastWeekStart.setHours(0, 0, 0, 0);
             
-            // End date is the current time
             const lastWeekEnd = new Date(now);
             
             periodFilter = {
@@ -214,25 +203,22 @@ const loadDashboardData = async (req, res) => {
                 }
             };
             
-            // Set labels for days of the current week
             revenueLabels = [...daysOfWeek];
             ordersLabels = [...daysOfWeek];
             
-            // Initialize arrays with zeros for each day
             revenueData = Array(7).fill(0);
             ordersData = Array(7).fill(0);
             
-            // Fetch order data grouped by day of the week for the past week
+
             const weeklyData = await Order.aggregate([
                 { $match: { status: "Delivered", ...periodFilter } },
                 {
                     $addFields: {
-                        // Convert to day of week (1 = Monday, 2 = Tuesday, ..., 7 = Sunday)
+
                         dayOfWeek: {
                             $let: {
                                 vars: {
-                                    // MongoDB's $dayOfWeek returns 1 for Sunday, 2 for Monday, etc.
-                                    // We convert it so 1 = Monday, ..., 7 = Sunday
+
                                     dow: { $dayOfWeek: "$createdAt" }
                                 },
                                 in: { $cond: [{ $eq: ["$$dow", 1] }, 7, { $subtract: ["$$dow", 1] }] }
@@ -250,15 +236,15 @@ const loadDashboardData = async (req, res) => {
                 { $sort: { "_id": 1 } }
             ]);
             
-            // Map the aggregation results to the arrays
+  
             weeklyData.forEach(item => {
-                const dayIndex = item._id - 1; // Convert 1-based to 0-based index
+                const dayIndex = item._id - 1;
                 revenueData[dayIndex] = item.revenue;
                 ordersData[dayIndex] = item.count;
             });
             
         } else if (filter === "monthly") {
-            // For monthly view (grouped by weeks in the current month)
+     
             const startOfMonth = new Date(currentYear, now.getMonth(), 1);
             const endOfMonth = new Date(currentYear, now.getMonth() + 1, 0);
             
@@ -269,7 +255,7 @@ const loadDashboardData = async (req, res) => {
                 }
             };
             
-            // Divide the month into weeks
+
             const totalDays = endOfMonth.getDate();
             const numWeeks = Math.ceil(totalDays / 7);
             
@@ -281,7 +267,7 @@ const loadDashboardData = async (req, res) => {
             }
             ordersLabels = [...revenueLabels];
             
-            // Monthly data (by weeks in current month)
+ 
             const monthlyData = await Order.aggregate([
                 { $match: { status: "Delivered", ...periodFilter } },
                 {
@@ -307,13 +293,12 @@ const loadDashboardData = async (req, res) => {
                 { $sort: { "_id": 1 } }
             ]);
             
-            // Initialize empty arrays with proper length
+
             revenueData = Array(numWeeks).fill(0);
             ordersData = Array(numWeeks).fill(0);
-            
-            // Fill data from query
+
             monthlyData.forEach(item => {
-                const weekIndex = item._id - 1; // Convert to 0-based index
+                const weekIndex = item._id - 1;
                 if (weekIndex >= 0 && weekIndex < numWeeks) {
                     revenueData[weekIndex] = item.revenue;
                     ordersData[weekIndex] = item.count;
@@ -321,7 +306,6 @@ const loadDashboardData = async (req, res) => {
             });
             
         } else if (filter === "yearly") {
-            // For yearly view (all 12 months of the current year)
             const startOfYear = new Date(currentYear, 0, 1);
             const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59);
             
@@ -338,7 +322,7 @@ const loadDashboardData = async (req, res) => {
             ];
             ordersLabels = [...revenueLabels];
             
-            // Yearly data (all months in current year)
+
             const yearlyData = await Order.aggregate([
                 { $match: { status: "Delivered", ...periodFilter } },
                 {
@@ -351,22 +335,22 @@ const loadDashboardData = async (req, res) => {
                 { $sort: { "_id.month": 1 } }
             ]);
             
-            // Initialize empty arrays
+
             revenueData = Array(12).fill(0);
             ordersData = Array(12).fill(0);
             
-            // Fill data from query
+   
             yearlyData.forEach(item => {
-                const monthIndex = item._id.month - 1; // Convert to 0-based index
+                const monthIndex = item._id.month - 1; 
                 revenueData[monthIndex] = item.revenue;
                 ordersData[monthIndex] = item.count;
             });
         }
         
-        // Apply filter to queries for other aggregations
+    
         const matchStage = { $match: { status: "Delivered", ...periodFilter } };
         
-        // Get category performance data
+   
         const categoryPerformance = await Order.aggregate([
             matchStage,
             { $unwind: "$orderedItems" },
@@ -391,7 +375,7 @@ const loadDashboardData = async (req, res) => {
             { $sort: { revenue: -1 } }
         ]);
         
-        // Get best selling products
+      
         const bestSellingProducts = await Order.aggregate([
             matchStage,
             { $unwind: "$orderedItems" },
@@ -424,7 +408,7 @@ const loadDashboardData = async (req, res) => {
             }}
         ]);
         
-        // Get summary metrics
+
         const summary = await Order.aggregate([
             { $match: { status: "Delivered" } },
             { $group: { 
@@ -434,7 +418,7 @@ const loadDashboardData = async (req, res) => {
             }}
         ]);
         
-        // Get top performers
+
         const topCategory = await Order.aggregate([
             matchStage,
             { $unwind: "$orderedItems" },
@@ -478,7 +462,7 @@ const loadDashboardData = async (req, res) => {
             { $limit: 1 }
         ]);
         
-        // Return the dashboard data as JSON
+      
         res.json({
             filter,
             revenueLabels,
