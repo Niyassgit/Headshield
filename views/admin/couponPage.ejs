@@ -20,6 +20,7 @@
                             <th>Discount Type</th>
                             <th>Value</th>
                             <th>Max Discount</th>
+                            <th>Order upto</th>
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Offer Limit</th>
@@ -49,6 +50,9 @@
                                         <%= coupon.maximumPrice %>
                                     </td>
                                     <td>
+                                        ₹<%= coupon.minimumPrice %>
+                                    </td>
+                                    <td>
                                         <%= new Date(coupon.createdOn).toLocaleDateString('en-GB') %>
                                     </td>
                                     <td>
@@ -58,12 +62,13 @@
                                         <%= coupon.usedCount %>/<%= coupon.usageLimit %>
                                     </td>
                                     <td>
-                                        <% if(coupon.isActive) { %>
+                                        <% if (coupon.expiredOn && coupon.expiredOn > Date.now()) { %>
                                             <span class="badge bg-success">Active</span>
-                                            <% } else { %>
-                                                <span class="badge bg-danger">Inactive</span>
-                                                <% } %>
+                                        <% } else { %>
+                                            <span class="badge bg-danger">Inactive</span>
+                                        <% } %>
                                     </td>
+                                    
                                     <td>
                                     <button class="btn btn-sm btn-outline-primary edit-coupon"
                                         data-coupon-id="<%= coupon._id %>"

@@ -1,5 +1,46 @@
 <%- include('../partials/admin/header') %>
 
+<style>
+    /* Add this to your stylesheet or in a <style> tag in your header */
+.loading-state {
+    position: relative;
+}
+
+.loading-state::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.loading-state::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #4361ee;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 2;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+</style>
+
 <div class="container py-4">
     <!-- Global Time Period Filter -->
     <div class="row mb-4">
@@ -44,7 +85,7 @@
                         <h6 class="mb-1 card-title">Orders</h6> 
                         <span id="ordersValue"><%= orders %></span>
                         <span class="text-sm">
-                            Excluding orders in transit
+                             Delivered Orders 
                         </span>
                     </div>
                 </article>
@@ -192,7 +233,7 @@
                                 </tr>
                             </thead>
                             <tbody id="recentOrdersTable">
-                                <% recentOrders.forEach(order=>{%>
+                                <% recentOrders.forEach(order => { %>
                                     <tr>
                                         <td>#ORD-<%= order.orderId %></td>
                                         <td><%= order.address.name %></td>
@@ -200,18 +241,14 @@
                                         <td><%= order.createdAt.toDateString() %></td>
                                         <td>₹<%= order.finalAmount %></td>
                                         <td>
-                                            <% if(order.status === 'Delivered') { %>
-                                                <span class="badge bg-success">Delivered</span>
-                                            <% } else { %>
-                                                <span class="badge bg-danger" style="color: yellow;">Return Rejected</span>
-
-                                            <% } %>
+                                            <% let badgeClass = getStatusBadgeClass(order.status); %>
+                                            <span class="badge <%= badgeClass %>"><%= order.status %></span>
                                         </td>
-                                        <td><a href="#" class="btn btn-sm btn-light">Details</a></td>
+                                        <td><a href="/admin/order-details?orderId=<%= order._id %>" class="btn btn-sm btn-light">Details</a></td>
                                     </tr>
                                 <% }) %>
-                              
                             </tbody>
+                            
                         </table>
                     </div>
                 </div>
@@ -219,6 +256,20 @@
         </div>
     </div>
 </div>
+<% function getStatusBadgeClass(status) { 
+    switch (status) {
+        case "Pending": return "bg-warning text-dark"; 
+        case "Confirmed": return "bg-primary"; 
+        case "Shipped": return "bg-info text-dark"; 
+        case "Delivered": return "bg-success"; 
+        case "Cancelled": return "bg-danger"; 
+        case "Return Request": return "bg-secondary";
+        case "Return Rejected": return "bg-danger text-warning"; 
+        case "Returned": return "bg-dark text-white";case "Payment Failed": 
+        return "bg-danger text-white"; 
+        default: return "bg-light text-dark"; 
+    }
+} %>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/perfect-scrollbar/1.5.5/perfect-scrollbar.min.js"></script>
 
@@ -382,11 +433,34 @@ function updateTopPerformers(data) {
 
 // Update Summary Metrics
 function updateSummaryValues(data) {
-    if (document.getElementById('revenueValue')) {
-        document.getElementById('revenueValue').textContent = `₹${data.totalRevenue || 0}`;
+    // Update Revenue value
+    const revenueElement = document.getElementById('revenueValue');
+    if (revenueElement) {
+        revenueElement.textContent = `₹${data.totalRevenue || 0}`;
     }
-    if (document.getElementById('ordersValue')) {
-        document.getElementById('ordersValue').textContent = data.totalOrders || 0;
+    
+    // Update Orders value
+    const ordersElement = document.getElementById('ordersValue');
+    if (ordersElement) {
+        ordersElement.textContent = data.totalOrders || 0;
+    }
+    
+    // Add period indicator to the titles (optional enhancement)
+    const filterElement = document.getElementById('globalFilter');
+    if (filterElement) {
+        const periodText = filterElement.options[filterElement.selectedIndex].text;
+        
+        // Update Revenue heading
+        const revenueTitle = document.querySelector('.col-lg-3:nth-child(1) .card-title');
+        if (revenueTitle) {
+            revenueTitle.innerHTML = `Revenue <small class="text-muted">(${periodText})</small>`;
+        }
+        
+        // Update Orders heading
+        const ordersTitle = document.querySelector('.col-lg-3:nth-child(2) .card-title');
+        if (ordersTitle) {
+            ordersTitle.innerHTML = `Orders <small class="text-muted">(${periodText})</small>`;
+        }
     }
 }
 
@@ -397,9 +471,15 @@ async function updateAllCharts() {
 
     const filterValue = filterElement.value;
     console.log("Filter changed to:", filterValue);
+    const cards = document.querySelectorAll('.card-body');
+    cards.forEach(card => card.classList.add('loading-state'));
+       const data = await fetchDashboardData(filterValue);
+    if (!data) {
+        // Remove loading state if there was an error
+        cards.forEach(card => card.classList.remove('loading-state'));
+        return;
+    }
 
-    const data = await fetchDashboardData(filterValue);
-    if (!data) return;
 
     // Update charts
     initSalesChart(data);
@@ -410,6 +490,8 @@ async function updateAllCharts() {
     updateBestSellingTable(data);
     updateTopPerformers(data);
     updateSummaryValues(data);
+
+    cards.forEach(card => card.classList.remove('loading-state'));
 }
 
 // Initialize everything when the page loads

@@ -63,19 +63,19 @@ const logout = async (req, res) => {
         res.redirect("/pageerror")
     }
 };
-
 const loadDashboard = async (req, res) => {
     try {
         const users = await User.countDocuments({ isAdmin: false });
         const products = await Product.countDocuments();
         const orders = await Order.countDocuments();
         const revenue = await Order.aggregate([
-            { $match: { status: "Delivered" } },
+            { $match: { status: { $in: ["Delivered", "Return Rejected"] } } },
             { $group: { _id: null, total: { $sum: "$finalAmount" } } }
         ]);
         
 
         const bestSellingProducts = await Order.aggregate([
+            { $match: { status: { $in: ["Delivered", "Return Rejected"] } } },
             { $unwind: "$orderedItems" },
             { $group: { 
                 _id: "$orderedItems.productId", 
@@ -107,6 +107,7 @@ const loadDashboard = async (req, res) => {
         ]);
         
         const topCategory = await Order.aggregate([
+            { $match: { status: { $in: ["Delivered", "Return Rejected"] } } },
             { $unwind: "$orderedItems" },
             { $lookup: { 
                 from: "products", 
@@ -131,6 +132,7 @@ const loadDashboard = async (req, res) => {
         ]);
         
         const topBrand = await Order.aggregate([
+            { $match: { status: { $in: ["Delivered", "Return Rejected"] } } },
             { $unwind: "$orderedItems" },
             { $lookup: { 
                 from: "products", 
@@ -149,7 +151,7 @@ const loadDashboard = async (req, res) => {
         
         const recentOrders = await Order.find()
             .sort({ createdAt: -1 })
-            .limit(5)
+            .limit(10)
             .populate("userId", "name")
             .populate({
                 path: "orderedItems.productId",
@@ -211,7 +213,7 @@ const loadDashboardData = async (req, res) => {
             
 
             const weeklyData = await Order.aggregate([
-                { $match: { status: "Delivered", ...periodFilter } },
+                { $match: { status: { $in: ["Delivered", "Return Rejected"] }, ...periodFilter } },
                 {
                     $addFields: {
 
@@ -269,7 +271,7 @@ const loadDashboardData = async (req, res) => {
             
  
             const monthlyData = await Order.aggregate([
-                { $match: { status: "Delivered", ...periodFilter } },
+                { $match: { status: { $in: ["Delivered", "Return Rejected"] }, ...periodFilter } },
                 {
                     $project: {
                         week: {
@@ -324,7 +326,7 @@ const loadDashboardData = async (req, res) => {
             
 
             const yearlyData = await Order.aggregate([
-                { $match: { status: "Delivered", ...periodFilter } },
+                { $match: { status: { $in: ["Delivered", "Return Rejected"] }, ...periodFilter } },
                 {
                     $group: {
                         _id: { month: { $month: "$createdAt" } },
@@ -348,7 +350,7 @@ const loadDashboardData = async (req, res) => {
         }
         
     
-        const matchStage = { $match: { status: "Delivered", ...periodFilter } };
+        const matchStage = { $match: { status: { $in: ["Delivered", "Return Rejected"] }, ...periodFilter } };
         
    
         const categoryPerformance = await Order.aggregate([
@@ -410,7 +412,7 @@ const loadDashboardData = async (req, res) => {
         
 
         const summary = await Order.aggregate([
-            { $match: { status: "Delivered" } },
+            { $match: { status: { $in: ["Delivered", "Return Rejected"] } } },
             { $group: { 
                 _id: null, 
                 totalRevenue: { $sum: "$finalAmount" },
@@ -461,6 +463,15 @@ const loadDashboardData = async (req, res) => {
             { $sort: { sales: -1 } },
             { $limit: 1 }
         ]);
+
+        const periodTotals = await Order.aggregate([
+            { $match: { status: { $in: ["Delivered", "Return Rejected"] }, ...periodFilter } },
+            { $group: { 
+                _id: null, 
+                totalRevenue: { $sum: "$finalAmount" },
+                totalOrders: { $sum: 1 }
+            }}
+        ]);
         
       
         res.json({
@@ -471,8 +482,8 @@ const loadDashboardData = async (req, res) => {
             orders: ordersData,
             categoryPerformance,
             bestSellingProducts,
-            totalRevenue: summary[0]?.totalRevenue?.toLocaleString() || "0",
-            totalOrders: summary[0]?.totalOrders || 0,
+            totalRevenue: periodTotals[0]?.totalRevenue?.toLocaleString() || "0",
+            totalOrders: periodTotals[0]?.totalOrders || 0,
             bestBrand: topBrand[0]?._id || "N/A",
             bestBrandSales: topBrand[0]?.sales || 0,
             bestCategory: topCategory[0]?._id || "N/A",
@@ -484,6 +495,8 @@ const loadDashboardData = async (req, res) => {
         res.status(500).json({ error: "Error loading dashboard data" });
     }
 };
+
+
 module.exports = {
     loadLogin,
     login,
