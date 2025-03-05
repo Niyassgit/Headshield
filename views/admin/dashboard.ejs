@@ -284,7 +284,7 @@ const chartColors = {
     info: '#3498db'
 };
 
-// Fetch data from the server based on filter
+
 async function fetchDashboardData(filterType = "weekly") { 
     try {
         const response = await fetch(`/admin/dashboard-data?filter=${filterType}`);
@@ -297,7 +297,7 @@ async function fetchDashboardData(filterType = "weekly") {
     }
 }
 
-// Initialize Sales Chart
+
 function initSalesChart(data) {
     const salesCanvas = document.getElementById('salesChart');
     if (!salesCanvas) return;
@@ -336,7 +336,7 @@ function initSalesChart(data) {
     });
 }
 
-// Initialize Category Performance Pie Chart
+
 function initCategoryChart(data) {
     const categoryCanvas = document.getElementById('categoryChart');
     if (!categoryCanvas) return;
@@ -364,7 +364,6 @@ function initCategoryChart(data) {
     });
 }
 
-// Initialize Orders Overview Bar Chart
 function initOrdersChart(data) {
     const ordersCanvas = document.getElementById('ordersChart');
     if (!ordersCanvas) return;
@@ -396,7 +395,6 @@ function initOrdersChart(data) {
     });
 }
 
-// Update Best-Selling Products Table
 function updateBestSellingTable(data) {
     const tableBody = document.getElementById('bestSellingTable');
     if (!tableBody) return;
@@ -415,7 +413,7 @@ function updateBestSellingTable(data) {
     tableBody.innerHTML = html;
 }
 
-// Update Top Performers Section
+
 function updateTopPerformers(data) {
     if (document.getElementById('bestBrand')) {
         document.getElementById('bestBrand').textContent = data.bestBrand || 'N/A';
@@ -431,32 +429,30 @@ function updateTopPerformers(data) {
     }
 }
 
-// Update Summary Metrics
+
 function updateSummaryValues(data) {
-    // Update Revenue value
     const revenueElement = document.getElementById('revenueValue');
     if (revenueElement) {
         revenueElement.textContent = `₹${data.totalRevenue || 0}`;
     }
     
-    // Update Orders value
+
     const ordersElement = document.getElementById('ordersValue');
     if (ordersElement) {
         ordersElement.textContent = data.totalOrders || 0;
     }
     
-    // Add period indicator to the titles (optional enhancement)
+
     const filterElement = document.getElementById('globalFilter');
     if (filterElement) {
         const periodText = filterElement.options[filterElement.selectedIndex].text;
         
-        // Update Revenue heading
+
         const revenueTitle = document.querySelector('.col-lg-3:nth-child(1) .card-title');
         if (revenueTitle) {
             revenueTitle.innerHTML = `Revenue <small class="text-muted">(${periodText})</small>`;
         }
         
-        // Update Orders heading
         const ordersTitle = document.querySelector('.col-lg-3:nth-child(2) .card-title');
         if (ordersTitle) {
             ordersTitle.innerHTML = `Orders <small class="text-muted">(${periodText})</small>`;
@@ -464,7 +460,7 @@ function updateSummaryValues(data) {
     }
 }
 
-// Update all charts and tables when filter is changed
+
 async function updateAllCharts() {
     const filterElement = document.getElementById('globalFilter');
     if (!filterElement) return;
@@ -475,18 +471,17 @@ async function updateAllCharts() {
     cards.forEach(card => card.classList.add('loading-state'));
        const data = await fetchDashboardData(filterValue);
     if (!data) {
-        // Remove loading state if there was an error
+
         cards.forEach(card => card.classList.remove('loading-state'));
         return;
     }
 
 
-    // Update charts
+
     initSalesChart(data);
     initCategoryChart(data);
     initOrdersChart(data);
 
-    // Update tables and stats
     updateBestSellingTable(data);
     updateTopPerformers(data);
     updateSummaryValues(data);
@@ -494,19 +489,16 @@ async function updateAllCharts() {
     cards.forEach(card => card.classList.remove('loading-state'));
 }
 
-// Initialize everything when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM Content Loaded - Initializing Dashboard");
     const filterElement = document.getElementById('globalFilter');
     if (!filterElement) return;
 
-    // Set default filter value
+
     filterElement.value = 'monthly';
     
-    // Add event listener for filter changes
     filterElement.addEventListener('change', updateAllCharts);
     
-    // Initial load of charts
     updateAllCharts();
 });
 </script>

@@ -5,6 +5,8 @@ const Wishlist =require("../../models/wishlistSchema");
 const mongoose = require("mongoose");
 const {applyBestOffer}=require("../../helpers/offerHelper");
 
+
+
 const viewCartPage = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -17,11 +19,13 @@ const viewCartPage = async (req, res) => {
                 cart: {
                     items: [],
                     cartTotal: 0, 
+                    cartRegularTotal:0,
                 },
             });
         }
 
         cartData.cartTotal = cartData.items.reduce((total, item) => total + item.totalPrice, 0); 
+        cartData.cartRegularTotal = cartData.items.reduce((total, item) => total + item.totalRegularPrice, 0);
 
         return res.render("cartPage", {
             user: userData,
@@ -56,6 +60,7 @@ const addToCart = async (req, res) => {
         await applyBestOffer(); 
 
         const productData=await Product.findById(objectId);
+       
         
         if (!productData) {
             return res.status(404).json({ success: false, message: "Product not found" });
@@ -73,7 +78,8 @@ const addToCart = async (req, res) => {
             cartData = new Cart({
                 userId,
                 items: [],
-                cartTotal: 0
+                cartTotal: 0,
+                cartRegularTotal: 0
             });
         }
 
@@ -81,7 +87,7 @@ const addToCart = async (req, res) => {
 
         if (existingItemIndex > -1) {
             let newQuantity = Number(cartData.items[existingItemIndex].quantity) + Number(itemQuantity);
-
+        
             if (newQuantity > 5) {
                 return res.status(400).json({ success: false, message: "You can only order up to 5 items" });
             }
@@ -91,21 +97,26 @@ const addToCart = async (req, res) => {
             if (newQuantity < 1) {
                 return res.status(400).json({ success: false, message: "You cannot order less than 1 item" });
             }
-
+        
             cartData.items[existingItemIndex].quantity = newQuantity;
-            cartData.items[existingItemIndex].totalPrice = newQuantity * productData.salePrice;
-          
-            
+            cartData.items[existingItemIndex].totalPrice = newQuantity * Number(productData.salePrice);
+            cartData.items[existingItemIndex].totalRegularPrice = newQuantity * Number(productData.regularPrice);
         } else {
             cartData.items.push({
                 productId: objectId,
-                productQuantity: itemQuantity,
-                price: productData.salePrice,
-                totalPrice: productData.salePrice * itemQuantity
+                quantity: itemQuantity,
+                price: Number(productData.salePrice),
+                totalPrice: Number(productData.salePrice) * itemQuantity,
+                regularPrice: Number(productData.regularPrice),
+                totalRegularPrice: Number(productData.regularPrice) * itemQuantity
             });
         }
-
-        cartData.cartTotal = cartData.items.reduce((total, item) => total + item.totalPrice, 0);
+        
+        cartData.cartTotal = cartData.items.reduce((total, item) => total + Number(item.totalPrice), 0);
+        cartData.cartRegularTotal = cartData.items.reduce((total, item) => total + Number(item.totalRegularPrice), 0);
+        
+        cartData.markModified('items'); 
+        await cartData.save();
 
         await cartData.save();
         await Wishlist.findOneAndUpdate(
@@ -120,23 +131,30 @@ const addToCart = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
 const deleteItem = async (req, res) => {
     try {
         const { productId } = req.body; 
         const userId = req.session.user;
         const productObjectId = new mongoose.Types.ObjectId(productId);
-        await Cart.updateOne(
+        
+        // Find the cart and remove the specific item
+        const cartData = await Cart.findOneAndUpdate(
             { userId: userId },
-            { $pull: { items: { productId: productObjectId } } }
-        );
-        const cartData = await Cart.findOne({ userId }).populate("items.productId");
+            { $pull: { items: { productId: productObjectId } } },
+            { new: true } // Return the updated document
+        ).populate("items.productId");
 
         if (!cartData) {
             return res.status(404).json({ success: false, message: "Cart not found" });
         }
+
+        // Recalculate totals
         cartData.cartTotal = cartData.items.length > 0
             ? cartData.items.reduce((total, item) => total + (item.totalPrice || 0), 0)
+            : 0;
+        
+        cartData.cartRegularTotal = cartData.items.length > 0
+            ? cartData.items.reduce((total, item) => total + (item.totalRegularPrice || 0), 0)
             : 0;
 
         await cartData.save();
@@ -144,7 +162,9 @@ const deleteItem = async (req, res) => {
         return res.status(200).json({ 
             success: true, 
             message: "Item removed from cart",
-            cartTotal: cartData.cartTotal
+            cartTotal: cartData.cartTotal,
+            cartRegularTotal: cartData.cartRegularTotal,
+            remainingItems: cartData.items.length
         });
 
     } catch (error) {
@@ -152,6 +172,7 @@ const deleteItem = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
 const updateQuantity = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -198,9 +219,13 @@ const updateQuantity = async (req, res) => {
             return res.status(400).json({ success: false, message: "Minimum quantity is 1" });
         }
 
+  
         cartData.items[existingItemIndex].quantity = newQuantity;
         cartData.items[existingItemIndex].totalPrice = newQuantity * productData.salePrice;
+        cartData.items[existingItemIndex].totalRegularPrice = newQuantity * productData.regularPrice;
+
         cartData.cartTotal = cartData.items.reduce((total, item) => total + item.totalPrice, 0);
+        cartData.cartRegularTotal = cartData.items.reduce((total, item) => total + item.totalRegularPrice, 0);
 
         await cartData.save();
 
@@ -208,6 +233,7 @@ const updateQuantity = async (req, res) => {
             success: true, 
             message: "Quantity updated successfully",
             cartTotal: cartData.cartTotal,
+            cartRegularTotal: cartData.cartRegularTotal,
             newQuantity: newQuantity
         });
 
@@ -216,7 +242,6 @@ const updateQuantity = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
 
 module.exports={
 

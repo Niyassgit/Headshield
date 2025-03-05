@@ -21,11 +21,19 @@ items:[{
         type:Number,
         default:1
     },
+    regularPrice:{
+        type:Number,
+        required:true,
+    },
     price:{
         type:Number,
         required:true
     },
     totalPrice:{
+        type:Number,
+        required:true,
+    },
+    totalRegularPrice:{
         type:Number,
         required:true,
     },
@@ -40,6 +48,13 @@ items:[{
     }
 }],
 cartTotal:{
+    type:Number,
+    required:true,
+    default:0,
+    min:0
+
+},
+cartRegularTotal:{
     type:Number,
     required:true,
     default:0,

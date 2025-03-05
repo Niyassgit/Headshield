@@ -69,6 +69,7 @@ router.post("/checkoutPage/editAddress",userAuth,checkoutController.postEditAddr
 router.post("/applyCoupon",userAuth,checkoutController.applyCoupon);
 //place order
 router.post("/placeOrder",userAuth,orderController.placeOrder);
+router.get("sucess",userAuth,orderController.successPage);
 router.get("/orders",userAuth,orderController.getOrders);
 router.get("/order-details/",userAuth,orderController.getOrderDetails);
 router.patch("/cancel-order/:id",userAuth,orderController.cancelOrder);

@@ -89,17 +89,32 @@
         </div>
         <!-- Right Side: Cart Summary -->
         <div class="col-lg-4">
-            <div class="cart-summary p-4 rounded" style="background: rgba(0, 0, 0, 0.05);">
-                <h4>Cart Summary</h4>
+            <div class="cart-summary p-4 rounded shadow-sm" style="background: rgba(0, 0, 0, 0.05);">
+                <h4 class="fw-bold mb-3 text-dark text-center">Cart Summary</h4>
+                
                 <div class="border-bottom pb-3">
-                    <p>Total: <strong>₹<span id="cart-total"><%= cart.cartTotal %></span></strong></p>
+                    <p class="d-flex justify-content-between fs-6 text-dark">
+                        <span>Total:</span> 
+                        <strong>₹<span id="cart-total"><%= cart.cartRegularTotal %></span></strong>
+                    </p>
+                    <p class="d-flex justify-content-between fs-6 text-success">
+                        <span>You Have Saved:</span> 
+                        <strong>- ₹<span id="cart-saved"><%= cart.cartRegularTotal - cart.cartTotal %></span></strong>
+                    </p>                    
+                    <p class="d-flex justify-content-between fs-5 fw-bold text-dark">
+                        <span>Sub Total:</span> 
+                        <strong>₹<span id="cart-subtotal"><%= cart.cartTotal %></span></strong>
+                    </p>
                 </div>
-
-                <% if(cart.items.length!=0){ %>
-                <a href="/checkoutPage" class="btn btn-success w-100 mt-4">Proceed to Checkout</a>
+        
+                <% if(cart.items.length != 0){ %>
+                    <a href="/checkoutPage" class="btn btn-success w-100 mt-4 py-2 rounded-pill fw-bold">
+                        Proceed to Checkout <i class="fas fa-arrow-right"></i>
+                    </a>
                 <% } %>
             </div>
         </div>
+        
     </div>
 </div> 
 
@@ -107,64 +122,104 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 <!-- Toastify JS -->
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-   document.addEventListener("DOMContentLoaded", function() {
+ document.addEventListener("DOMContentLoaded", function() {
     const removeButtons = document.querySelectorAll(".remove-item-btn");
+    const plusButtons = document.querySelectorAll(".plus-btn");
+    const minusButtons = document.querySelectorAll(".minus-btn");
+
+    function updateCartDisplay(data) {
+        // Update total
+        document.getElementById("cart-total").textContent = data.cartRegularTotal.toFixed(2);
+        
+        // Update saved amount
+        const savedAmount = data.cartRegularTotal - data.cartTotal;
+        document.getElementById("cart-saved").textContent = `${savedAmount.toFixed(2)}`;
+        
+        // Update subtotal
+        document.getElementById("cart-subtotal").textContent = data.cartTotal.toFixed(2);
+    }
 
     removeButtons.forEach(button => {
         button.addEventListener("click", function() {
             const productId = this.getAttribute("data-product-id");
-        
-            fetch("/cart/deleteItem", {
-                method: "DELETE", 
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ productId: productId }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
-                    if (cartItem) {
-                        cartItem.remove();
-                    }
-                    const cartTotalElement = document.getElementById("cart-total");
-                    if (cartTotalElement) {
-                         cartTotalElement.innerText = data.cartTotal;
-                    }
 
-                    Toastify({
-                        text: data.message,
-                        duration: 3000,
-                        backgroundColor: "green",
-                        close: true
-                    }).showToast();
-                } else {
-                   
-                    Toastify({
-                        text: data.message,
-                        duration: 3000,
-                        backgroundColor: "red",
-                        close: true
-                    }).showToast();
+            // SweetAlert2 Confirmation
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you really want to remove this item from your cart?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, remove it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteCartItem(productId);
                 }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                Toastify({
-                    text: "Something went wrong. Please try again later.",
-                    duration: 3000,
-                    backgroundColor: "red",
-                    close: true
-                }).showToast();
             });
         });
     });
 
-    const plusButtons = document.querySelectorAll(".plus-btn");
-    const minusButtons = document.querySelectorAll(".minus-btn");
+    function deleteCartItem(productId) {
+        fetch("/cart/deleteItem", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ productId: productId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the cart item from DOM
+                const cartItem = document.querySelector(`[data-product-id="${productId}"]`);
+                if (cartItem) {
+                    cartItem.remove();
+                }
+
+                // Update cart display
+                updateCartDisplay(data);
+
+                // If no items left, show empty cart message
+                if (data.remainingItems === 0) {
+                    const cartItemsContainer = document.getElementById("cart-items-container");
+                    cartItemsContainer.innerHTML = `
+                        <div class="empty-cart text-center">
+                            <h5>Your shopping cart is empty.</h5>
+                            <p>Browse our products and add items to your cart.</p>
+                        </div>
+                    `;
+                }
+
+                // SweetAlert2 Success Message
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "The item has been removed from your cart.",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    title: "Error!",
+                    text: data.message,
+                    icon: "error"
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again later.",
+                icon: "error"
+            });
+        });
+    }
+
 
     function updateQuantity(productId, change) {
         const quantityDisplay = document.querySelector(`.cart-item[data-product-id="${productId}"] .quantity-display`);
@@ -185,9 +240,8 @@
         .then(data => {
             if (data.success) {
                 quantityDisplay.textContent = newQuantity;
-                
-                const cartTotalElement = document.getElementById("cart-total");
-                cartTotalElement.textContent = data.cartTotal;
+
+                updateCartDisplay(data);
 
                 Toastify({
                     text: "Cart updated successfully",
@@ -229,7 +283,6 @@
         });
     });
 });
-
 
 
        

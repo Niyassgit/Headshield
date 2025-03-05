@@ -1,0 +1,43 @@
+<%- include("../partials/user/header") %>
+
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        text-align: center;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .success-icon {
+        font-size: 60px;
+        color: #28a745;
+    }
+    .btn-custom {
+        margin: 10px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="success-container">
+        <i class="success-icon">&#10004;</i>
+        <h2>Order Placed Successfully!</h2>
+        <p>Thank you for your purchase. Your order ID is <strong><%= orderId %></strong>.</p>
+        <p>Total Amount: <strong>₹<%= totalAmount %></strong></p>
+        <a href="/" class="btn btn-primary btn-custom">Continue Shopping</a>
+        <a href="/orders" class="btn btn-success btn-custom">View Orders</a>
+    </div>
+</div>
+</body>
+
+
+
+
+
+
+
+
+
+<%- include("../partials/user/footer") %>

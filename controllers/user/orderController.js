@@ -247,7 +247,7 @@ const placeOrder = async (req, res) => {
                              amount: calculatedFinalAmount,
                              description: 'Order placed using wallet',
                              status: 'Completed',
-                             orderId: order._id
+                             orderId: order.orderId
                          }
                      }
                  }
@@ -382,7 +382,7 @@ const cancelOrder = async (req, res) => {
               transactions: {
                 transactionType: "credit",
                 amount: productPrice,
-                description: `Refund for Order #${order._id}`,
+                description: `Refund for Order #${order.orderId}`,
                 createdAt: new Date(),
                 status: "Completed",
                 orderId:orderId,
@@ -401,7 +401,7 @@ const cancelOrder = async (req, res) => {
               {
                 transactionType: "credit",
                 amount: productPrice,
-                description: `Refund for Order #${order._id}`,
+                description: `Refund for Order #${order.orderId}`,
                 createdAt: new Date(),
                 status: "Completed",
               },
@@ -558,6 +558,22 @@ const markPaymentAsFailed = async (req, res) => {
     }
 };
 
+const successPage=async(req,res)=>{
+
+    try {
+        const userId=req.session.user;
+        const userData=await User.findById(userId);
+
+
+        return res.render("successPage",{
+            user:userData,
+
+        })
+        
+    } catch (error) {
+        
+    }
+};
 
 module.exports = {
     placeOrder,
@@ -567,6 +583,7 @@ module.exports = {
     returnOrder,
     getOrderAmount,
     updatePayment,
-    markPaymentAsFailed
+    markPaymentAsFailed,
+    successPage,
   
 };

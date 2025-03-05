@@ -63,63 +63,63 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <% cat.reverse().forEach((category, index)=> { %>
-                      <tr>
-                        <td class="text-center">
-                          <%= (currentPage - 1) * 4 + (index+1) %>
-                        </td>
-                        <td>
-                          <%= category.name %>
-                        </td>
-                        <td>
-                          <%= category.description %>
-                        </td>
-                        <td>
-                          <% if (category.isListed) { %>
-                            <span class="badge badge-success">Listed</span>
-                            <% } else { %>
-                              <span class="badge badge-danger">Unlisted</span>
-                              <% } %>
-                        </td>
-                        <td>
-                          <% if (category.categoryOffer) { %>
-                            <span class="badge badge-success"><%= category.categoryOffer %>% Off</span>
-                          <% } else { %>
-                            <span class="badge badge-secondary">No Offer</span>
-                          <% } %>
-                        </td>
+                    <% cat.reverse().forEach((category, index)=> { 
+                         let isExpired = category.expiredOn && new Date(category.expiredOn) < new Date(); 
+                    %>
+                    <tr>
+                      <td class="text-center">
+                        <%= (currentPage - 1) * 4 + (index+1) %>
+                      </td>
+                      <td>
+                        <%= category.name %>
+                      </td>
+                      <td>
+                        <%= category.description %>
+                      </td>
+                      <td>
+                        <% if (category.isListed) { %>
+                          <span class="badge badge-success">Listed</span>
+                        <% } else { %>
+                          <span class="badge badge-danger">Unlisted</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (category.categoryOffer && !isExpired) { %>
+                          <span class="badge badge-success"><%= category.categoryOffer %>% Off</span>
+                        <% } else { %>
+                          <span class="badge badge-secondary">No Offer</span>
+                        <% } %>
+                      </td>
+                  
+                      <td>
+                        <% if (category.isListed) { %>
+                          <button class="btn btn-danger btn-sm">
+                            <a href="/admin/listCategory?id=<%= category._id %>" class="text-white">Unlist</a>
+                          </button>
+                        <% } else { %>
+                          <button class="btn btn-success btn-sm">
+                            <a href="/admin/unListCategory?id=<%= category._id %>" class="text-white">List</a>
+                          </button>
+                        <% } %>
                         
-
-                        <td>
-                          <% if (category.isListed) { %>
-                            <button class="btn btn-danger btn-sm">
-                              <a href="/admin/listCategory?id=<%= category._id %>" class="text-white">Unlist</a>
-                            </button>
-                            <% } else { %>
-                              <button class="btn btn-success btn-sm">
-                                <a href="/admin/unListCategory?id=<%= category._id %>" class="text-white">List</a>
-                              </button>
-                              <% } %>
-                                <a href="/admin/editCategory?id=<%= category._id %>"
-                                  class="btn btn-info btn-sm text-white">Edit</a>
-
-                                <!-- Add Offer Button -->
-                                 <% if(category.categoryOffer===0){ %>
-                                <button class="btn btn-success btn-sm text-white"
-                                  onclick="openOfferModal('<%= category._id %>', '<%= category.name %>')">
-                                  Add Offer
-                                </button>
-                                <% }else{ %>
-                                  <button class="btn btn-warning btn-sm text-white" onclick="cancelOffer('<%= category._id %>')">
-                                    Cancel Offer
-                                  </button>
-
-                                <% } %>
-                        </td>
-
-                      </tr>
-                      <% }); %>
+                        <a href="/admin/editCategory?id=<%= category._id %>"
+                          class="btn btn-info btn-sm text-white">Edit</a>
+                  
+                        <% if (!category.categoryOffer || isExpired) { %>
+                          <button class="btn btn-success btn-sm text-white"
+                            onclick="openOfferModal('<%= category._id %>', '<%= category.name %>')">
+                            Add Offer
+                          </button>
+                        <% } else { %>
+                          <button class="btn btn-warning btn-sm text-white" onclick="cancelOffer('<%= category._id %>')">
+                            Cancel Offer
+                          </button>
+                        <% } %>
+                      </td>
+                    </tr>
+                    <% }); %>
                   </tbody>
+                  
                 </table>
               </div>
             </div>
