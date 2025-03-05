@@ -857,7 +857,8 @@
                         text: data.message,
                         icon: "success"
                     }).then(() => {
-                        window.location.href = `/order-details?id=${data.orderId}`;
+                        window.location.href = `/success?id=${data.orderId}`;
+
                     });
                 } else {
                     Swal.fire("Failed!", data.message || "Something went wrong.", "error");
@@ -921,7 +922,7 @@
             didOpen: () => Swal.showLoading()
         });
 
-        let hasFailed = false; // Flag to prevent duplicate failure calls
+        let hasFailed = false; 
 
         fetch("/createOrder", {
             method: "POST",
@@ -1013,7 +1014,7 @@
                         text: "Your payment was not completed. You can retry from the order details page.",
                         icon: "error"
                     }).then(() => {
-                        window.location.href = `/order-details?id=${data.orderId}`;
+                        window.location.href = `/failed?id=${data.orderId}`;
                     });
                 } else {
                     Swal.fire("Error!", data.message || "Failed to create order after payment failure.", "error");

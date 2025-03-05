@@ -351,7 +351,21 @@ const getCount=async(req,res)=>{
       
 };
 
+const loadAboutPage= async(req,res)=>{
+    try {
+        const userId =req.session.user;
+       const userData=await User.findById(userId);
 
+       return res.render("aboutPage",{
+        user:userData,
+       });
+        
+    } catch (error) {
+        console.error("Error while rendering About page",error);
+        res.status(500).json({success:false,message:"Internal Server Error"});
+        
+    }
+};
 
 module.exports={
 
@@ -365,4 +379,5 @@ module.exports={
     logout,
     loadShoppingPage,
     getCount,
+    loadAboutPage,
 }

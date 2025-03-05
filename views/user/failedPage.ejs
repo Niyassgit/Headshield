@@ -1,0 +1,23 @@
+<%- include("../partials/user/header") %>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+    <div class="container d-flex justify-content-center align-items-center flex-grow-1 py-5">
+        <div class="col-md-6 col-lg-5 p-5 shadow rounded bg-white text-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/580/580185.png" alt="Failed Icon" width="80">
+            <h3 class="text-danger mt-3">Oops! Payment Failed</h3>
+            <p class="text-muted">We couldn't process your payment. Please check your order details and retry.</p>
+
+            <div class="mt-3 text-start">
+                <p><strong>Order ID:</strong> <%= order.orderId %></p>
+                <p><strong>Order Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %></p>
+            </div>
+
+            <div class="d-grid gap-3 mt-4">
+                <a href="/order-details?id=<%= order.orderId %>" class="btn btn-warning">View Order Details</a>
+                <a href="/" class="btn btn-success">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+<%- include("../partials/user/footer") %>

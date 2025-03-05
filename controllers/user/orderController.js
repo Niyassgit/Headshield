@@ -563,14 +563,42 @@ const successPage=async(req,res)=>{
     try {
         const userId=req.session.user;
         const userData=await User.findById(userId);
-
+        const orderId=req.query.id;
+        const orderData = await Order.findOne({orderId: orderId});
+        if(!orderData){
+            return res.status(404).json({success:false,message:"Order not found!"});
+        }
 
         return res.render("successPage",{
             user:userData,
+            order:orderData,
 
-        })
+        });
+        
         
     } catch (error) {
+        console.error("Error while rendering Sucess page",error);
+        res.status(500).json({success:false,message:"Internal Server Issue"});
+    }
+};
+const failedPage=async(req,res)=>{
+    try {
+        
+        const userId=req.session.user;
+        const userData=await User.findById(userId);
+        const orderId=req.query.id;
+        
+        const orderData=await Order.findOne({orderId:orderId});
+        if(!orderData){
+            return res.status(404).json({success:false,message:"order not found!"});
+        }
+        return res.render("failedPage",{
+            user:userData,
+            order:orderData,
+        });
+    } catch (error) {
+        console.error("Failed page Error".error);
+        return res.status(500).json({success:false,message:"Internal Server Error"});
         
     }
 };
@@ -585,5 +613,6 @@ module.exports = {
     updatePayment,
     markPaymentAsFailed,
     successPage,
+    failedPage
   
 };

@@ -19,6 +19,7 @@ router.get("/",isBlocked,userController.loadHomepage);
 router.get("/shop",userController.loadShoppingPage);
 router.get("/productDetails",isBlocked,productController.productDetails);
 router.get("/get-counts",userAuth,userController.getCount);
+router.get("/about",userController.loadAboutPage);
 
 //Authentication Routes
 router.get("/signup",userController.loadSignup);
@@ -69,7 +70,8 @@ router.post("/checkoutPage/editAddress",userAuth,checkoutController.postEditAddr
 router.post("/applyCoupon",userAuth,checkoutController.applyCoupon);
 //place order
 router.post("/placeOrder",userAuth,orderController.placeOrder);
-router.get("sucess",userAuth,orderController.successPage);
+router.get("/success", userAuth, orderController.successPage);
+router.get("/failed",userAuth,orderController.failedPage);
 router.get("/orders",userAuth,orderController.getOrders);
 router.get("/order-details/",userAuth,orderController.getOrderDetails);
 router.patch("/cancel-order/:id",userAuth,orderController.cancelOrder);

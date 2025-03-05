@@ -24,9 +24,9 @@
     <div class="success-container">
         <i class="success-icon">&#10004;</i>
         <h2>Order Placed Successfully!</h2>
-        <p>Thank you for your purchase. Your order ID is <strong><%= orderId %></strong>.</p>
-        <p>Total Amount: <strong>₹<%= totalAmount %></strong></p>
-        <a href="/" class="btn btn-primary btn-custom">Continue Shopping</a>
+        <p>Thank you for your purchase. Your order ID is <strong><%= order.orderId %></strong>.</p>
+        <p>Total Amount: <strong>₹<%= order.finalAmount %></strong></p>
+        <a href="/" class="btn btn-dark btn-custom">Continue Shopping</a>
         <a href="/orders" class="btn btn-success btn-custom">View Orders</a>
     </div>
 </div>
