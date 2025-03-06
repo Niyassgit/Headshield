@@ -26,6 +26,7 @@ const addProducts= async(req,res)=>{
   try {
       
       const products=req.body;
+    
       const productExists=await Product.findOne({productName:products.productName,
 
       });
@@ -50,7 +51,6 @@ const addProducts= async(req,res)=>{
               brand:products.brand,
               category:categoryId._id,
               regularPrice:products.regularPrice,
-              salePrice:products.salePrice,
               createdOn:new Date(),
               quantity:products.quantity,
               size:products.size,

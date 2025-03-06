@@ -97,14 +97,6 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Sale price</label>
-                                        <input name="salePrice" type="text" value="<%= product.salePrice %>"
-                                            class="form-control border">
-                                    </div>
-                                    <div id="salePrice-error" class="error-message"></div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
                                         <label class="form-label">Quantity</label>
                                         <input name="quantity" type="text" value="<%= product.quantity %>"
                                             class="form-control border">
@@ -422,7 +414,6 @@ function viewImage(event, index) {
             const description = document.getElementsByName("descriptionData")[0].value;
             const brand = document.getElementsByName("brand")[0].value;
             const price = document.getElementsByName("regularPrice")[0].value;
-            const salePrice = document.getElementsByName("salePrice")[0].value;
             const quantity = document.getElementsByName("quantity")[0].value;
             const color = document.getElementsByName("color")[0].value;
             const category = document.getElementsByName("category")[0].value;
@@ -439,16 +430,6 @@ function viewImage(event, index) {
 
             if (!/^\d+(\.\d{1,2})?$/.test(price) || parseFloat(price) < 0) {
                 displayErrorMessage("regularPrice-error", "Enter a valid non-negative price.");
-                isValid = false;
-            }
-
-            if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0) {
-                displayErrorMessage("salePrice-error", "Enter a valid non-negative sale price.");
-                isValid = false;
-            }
-
-            if (parseFloat(price) <= parseFloat(salePrice)) {
-                displayErrorMessage("salePrice-error", "Sale price must be less than regular price.");
                 isValid = false;
             }
 

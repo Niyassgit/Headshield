@@ -21,6 +21,7 @@ router.get("/productDetails",isBlocked,productController.productDetails);
 router.get("/get-counts",userAuth,userController.getCount);
 router.get("/about",userController.loadAboutPage);
 
+
 //Authentication Routes
 router.get("/signup",userController.loadSignup);
 router.post("/signup",userController.signup);
@@ -79,6 +80,7 @@ router.patch("/return-order/:id",userAuth,orderController.returnOrder);
 router.get("/get-order-amount/:orderId", userAuth, orderController.getOrderAmount);
 router.patch("/update-payment/:orderId", userAuth, orderController.updatePayment);
 router.post("/mark-payment-failed", userAuth, orderController.markPaymentAsFailed);
+router.get("/generateInvoice/:orderId",userAuth,orderController.invoiceDawnload);
 
 //wishlist management
 router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);

@@ -13,7 +13,8 @@ const productSchema = new Schema(
       required: true,
     },
     brand: {
-      type: String,
+      type: Schema.Types.ObjectId, 
+      ref: "Brand", 
       required: true,
     },
     category: {
@@ -27,6 +28,7 @@ const productSchema = new Schema(
     },
     salePrice: {
       type: Number,
+      required:false,
       default:0,
     },
     productOffer: {

@@ -24,12 +24,16 @@ const loadHomepage = async (req, res) => {
     try {
         const user = req.session.user;
         const categories = await Category.find({ isListed: true });
+        const blockedBrands = await Brand.find({ isBlocked: true }).distinct("_id");
+
         await applyBestOffer();
         let productData = await Product.find({
             isBlocked: false,
             category: { $in: categories.map(category => category._id) },
-            quantity: { $gt: 0 }
+            quantity: { $gt: 0 },
+            brand: { $nin: blockedBrands } 
         })
+        .populate("brand","brandName")
         .sort({ createdAt: -1 }) 
         .limit(3); 
 
@@ -298,6 +302,10 @@ const loadShoppingPage = async (req, res) => {
         if (searchQuery) {
             filter.productName = { $regex: searchQuery, $options: "i" }; 
         }
+        const blockedBrands = await Brand.find({ isBlocked: true }).distinct("_id");
+        if (blockedBrands.length > 0) {
+            filter.brand = { $nin: blockedBrands };
+        }
 
         let sortQuery = {};
         if (sortOption === "price_asc") sortQuery = { salePrice: 1 };
@@ -309,6 +317,7 @@ const loadShoppingPage = async (req, res) => {
         await applyBestOffer(); 
 
         const products = await Product.find(filter)
+        .populate("brand","brandName")
             .sort(sortQuery)
             .skip(skip)
             .limit(limit)
@@ -366,6 +375,7 @@ const loadAboutPage= async(req,res)=>{
         
     }
 };
+
 
 module.exports={
 

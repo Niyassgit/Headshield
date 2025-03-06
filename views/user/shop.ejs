@@ -152,7 +152,7 @@
                     <% } else { %>
                         <div class="row" id="product-list">
                             <% for (let i = 0; i < products.length; i++) { %>
-                                <div class="col-md-4 product-item" data-brand="<%= products[i].brand %>">
+                                <div class="col-md-4 product-item" data-brand="<%= products[i].brand.brandName %>">
                                     <div class="card mb-4 product-wap rounded-0">
                                         <div class="card rounded-0 position-relative">
                                             <% if (products[i].finalOffer) { %>
@@ -179,7 +179,7 @@
                                         </div>
                                         <div class="card-body">
                                             <a href="/productDetails?id=<%= products[i]._id %>" class="h3 text-decoration-none"><%= products[i].productName %></a>
-                                            <p class="brand-name"><%= products[i].brand %></p>
+                                            <p class="brand-name"><%= products[i].brand.brandName %></p>
                                             <ul class="w-100 list-unstyled d-flex justify-content-between mb-0">
                                                 <li>M/L/X/XL</li>
                                             </ul>

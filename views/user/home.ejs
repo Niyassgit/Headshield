@@ -198,7 +198,16 @@
                             <a href="/productDetails?id=<%= products[i]._id %>" class="h2 text-decoration-none text-dark">
                                 <%= products[i].productName %>
                             </a>
-                            <p class="text-muted">Reviews (24)</p>
+                            <p><%= products[i].brand ? products[i].brand.brandName : 'No Brand' %></p>
+
+                            <p class="py-2">
+                                <i class="fa fa-star text-warning"></i>
+                                <i class="fa fa-star text-warning"></i>
+                                <i class="fa fa-star text-warning"></i>
+                                <i class="fa fa-star text-warning"></i>
+                                <i class="fa fa-star text-secondary"></i>
+                                <span class="list-inline-item text-dark">Rating 4.8 | 36 Comments</span>
+                            </p>
                         </div>
                         
                     </div>

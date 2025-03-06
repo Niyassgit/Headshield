@@ -6,7 +6,9 @@ const Address = require("../../models/addressSchema");
 const Coupon =require("../../models/couponSchema");
 const Wallet=require("../../models/walletSchema");
 const axios = require("axios");
-
+const puppeteer=require("puppeteer");
+const fs = require("fs");
+const path = require("path");
 
 
 const placeOrder = async (req, res) => {
@@ -602,7 +604,95 @@ const failedPage=async(req,res)=>{
         
     }
 };
+const invoiceDawnload=async(req,res)=>{
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findOne({ orderId }).populate("orderedItems.productId");
 
+        if (!order || (order.status !== "Delivered" && order.status !== "Return Rejected")) {
+            return res.status(403).send("Invoice access restricted");
+        }
+
+        const invoiceDir = path.join(__dirname, "../public/invoices");
+        if (!fs.existsSync(invoiceDir)) {
+            fs.mkdirSync(invoiceDir, { recursive: true });
+        }
+    
+        const totalAmount = order.totalPrice + order.couponDiscount + order.productDiscount;
+
+
+        const pdfPath = path.join(invoiceDir, `invoice-${orderId}.pdf`);
+
+        const invoiceHTML = `
+        <html>
+        <head>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .invoice-container { width: 80%; margin: auto; padding: 20px; border: 1px solid #ddd; }
+            .header { text-align: center; font-size: 24px; font-weight: bold; }
+            .details { margin-top: 20px; }
+            .product-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            .product-table th, .product-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        </style>
+        </head>
+        <body>
+        <div class="invoice-container">
+            <div class="header">Invoice - Headshield</div>
+            <div class="details">
+                <p><strong>Order ID:</strong> ${order.orderId}</p>
+                <p><strong>Invoice Date:</strong> ${new Date(order.invoiceDate).toLocaleDateString()}</p>
+                <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+                <p><strong>Delivery Address:</strong> ${order.address.name}, ${order.address.landMark} ${order.address.city}, ${order.address.state},${order.address.country},${order.address.pincode}<br>${order.address.phone}</p>
+            </div>
+            <table class="product-table">
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+                ${order.orderedItems.map(item => `
+                <tr>
+                    <td>${item.productId.productName}</td>
+                    <td>${item.quantity}</td>
+                    <td>₹${item.price}</td>
+                    <td>₹${item.quantity * item.price}</td>
+                </tr>
+                `).join('')}
+            </table>
+  
+
+            <p><strong>Total Price:</strong> ₹${totalAmount}</p>
+            <p><strong>Coupon Discount:</strong> ₹${order.couponDiscount}</p>
+             <p><strong>ptoduct Offer:</strong> ₹${order.productDiscount}</p>
+            <p><strong>Final Amount:</strong> ₹${order.finalAmount}</p>
+        </div>
+        </body>
+        </html>
+        `;
+
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.setContent(invoiceHTML);
+        
+        await page.pdf({ path: pdfPath, format: "A4" });
+
+        await browser.close();
+
+        res.download(pdfPath, `invoice-${orderId}.pdf`, (err) => {
+            if (err) {
+                console.error("Error sending PDF:", err);
+                res.status(500).send("Error downloading PDF");
+            }
+
+            setTimeout(() => fs.unlinkSync(pdfPath), 5000);
+        });
+
+    } catch (error) {
+        console.error("Error generating invoice:", error);
+        res.status(500).send("Error generating invoice");
+    }
+};
 module.exports = {
     placeOrder,
     getOrders,
@@ -613,6 +703,7 @@ module.exports = {
     updatePayment,
     markPaymentAsFailed,
     successPage,
-    failedPage
+    failedPage,
+    invoiceDawnload,
   
 };
