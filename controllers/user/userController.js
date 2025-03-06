@@ -267,7 +267,6 @@ const logout=async(req,res)=>{
         res.redirect("/page-404");
     }
 };
-
 const loadShoppingPage = async (req, res) => {
     try {
         const user = req.session.user;
@@ -275,14 +274,11 @@ const loadShoppingPage = async (req, res) => {
 
         const categories = await Category.find({ isListed: true });
         const categoryIds = categories.map(category => category._id.toString());
-        const categoryMap = categories.reduce((map, cat) => {
-            map[cat._id.toString()] = cat.name.toLowerCase(); 
-            return map;
-        }, {});
-
+        
         let selectedCategory = req.query.category;
         const searchQuery = req.query.q ? req.query.q.trim() : null;
         const sortOption = req.query.sort || "latest"; 
+        const selectedBrand = req.query.brand;
 
         const page = parseInt(req.query.page) || 1;
         const limit = 9;
@@ -300,11 +296,62 @@ const loadShoppingPage = async (req, res) => {
         }
 
         if (searchQuery) {
-            filter.productName = { $regex: searchQuery, $options: "i" }; 
+            const matchingBrands = await Brand.find({ 
+                brandName: { $regex: searchQuery, $options: "i" }
+            });
+            
+            const brandIds = matchingBrands.map(brand => brand._id);
+            
+
+            filter.$or = [
+                { productName: { $regex: searchQuery, $options: "i" } },
+                { description: { $regex: searchQuery, $options: "i" } },
+                { brand: { $in: brandIds } }
+            ];
+            
         }
+
+        if (selectedBrand) {
+            const brand = await Brand.findOne({ brandName: selectedBrand });
+            if (brand) {
+                if (filter.$or) {
+
+                    filter = {
+                        $and: [
+                            { brand: brand._id },
+                            filter
+                        ]
+                    };
+                } else {
+
+                    filter.brand = brand._id;
+                }
+            }
+        }
+
         const blockedBrands = await Brand.find({ isBlocked: true }).distinct("_id");
         if (blockedBrands.length > 0) {
-            filter.brand = { $nin: blockedBrands };
+            if (filter.$and) {
+                filter.$and.push({ brand: { $nin: blockedBrands } });
+            } 
+            else if (filter.$or) {
+                filter = {
+                    $and: [
+                        { brand: { $nin: blockedBrands } },
+                        filter
+                    ]
+                };
+            } 
+
+            else {
+                if (filter.brand && !filter.brand.$in) {
+                    if (blockedBrands.some(id => id.equals(filter.brand))) {
+                        delete filter.brand;
+                    }
+                } else {
+                    filter.brand = { $nin: blockedBrands };
+                }
+            }
         }
 
         let sortQuery = {};
@@ -317,27 +364,26 @@ const loadShoppingPage = async (req, res) => {
         await applyBestOffer(); 
 
         const products = await Product.find(filter)
-        .populate("brand","brandName")
+            .populate("brand", "brandName")
             .sort(sortQuery)
             .skip(skip)
             .limit(limit)
             .lean();  
+        
         const totalProducts = await Product.countDocuments(filter);
         const totalPages = Math.ceil(totalProducts / limit);
 
         const brands = await Brand.find({ isBlocked: false });
-        
-        
 
         return res.render("shop", {
             user: userData,
             products: products,
             category: categories,
             brand: brands,
-            totalProducts: totalProducts,
-            currentPage: page,
             totalPages: totalPages,
+            currentPage: page,
             selectedCategory: selectedCategory || null,
+            selectedBrand: selectedBrand || null,
             sort: sortOption,
             searchQuery,
             noResults: products.length === 0 
