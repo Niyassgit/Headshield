@@ -25,14 +25,9 @@ const userSchema=new Schema({
     },
     googleId: {
         type: String,
-        unique: true,
+        unique: false,
+        sparse:true
     },
-    // facebookId: {
-    //     type: String,
-    //     unique: true,
-    //     sparse: true,
-    //     default: null,
-    // },
     
     password:{
         type:String,

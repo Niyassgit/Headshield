@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const path = require("path");
-const env = require("dotenv");
+const env =require("dotenv");
 const db = require("./config/db");
 const session = require("express-session");
 const passport = require("./config/passport");
@@ -18,7 +18,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: false, // Set to true if using HTTPS
+    secure: false, 
     httpOnly: true,
     maxAge: 72 * 60 * 60 * 1000,
   },

@@ -1,15 +1,14 @@
-const env=require("dotenv").config();
-const mongoose=require("mongoose");
+require("dotenv").config();
+const mongoose = require("mongoose");
 
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log("✅ MongoDB Atlas connected successfully.");
+    } catch (error) {
+        console.error("❌ Error connecting to database:", error.message);
+        process.exit(1); 
+    }
+};
 
-const connectDB= ()=>{
-   return new Promise((resolve,reject)=>{
-    mongoose
-        .connect("mongodb://127.0.0.1:27017/HeadShield")
-        .then(() => resolve("Database connected successfully."))
-        .catch((error) => reject("Error connecting to database:", error.message));
-    
-   })
-}
-
-module.exports=connectDB;  
+module.exports = connectDB;
