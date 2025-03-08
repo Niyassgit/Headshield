@@ -10,7 +10,7 @@ const getBrandPage=async (req,res)=>{
         const limit=3;
         const skip = (page-1)*limit;
 
-        const brandData=await Brand.find({}).sort({createdAt:-1}).skip(skip).limit(limit);
+        const brandData = await Brand.find({ isDeleted: { $ne: true } }).sort({createdAt:-1}).skip(skip).limit(limit);
         const totalBrands=await Brand.countDocuments();
         const totalPages=Math.ceil(totalBrands/limit);
        
@@ -79,10 +79,11 @@ const deleteBrand=async(req,res)=>{
 
     try {
         const {id}=req.query;
+
         if(!id){
             return res.status(400).redirect("/admin-error");
         }
-        await Brand.deleteOne({_id:id});
+        await Brand.findOneAndUpdate({_id:id},{isDeleted:true});
         res.redirect("/admin/brands");
     } catch (error) {
         console.error("error while deleting",error);

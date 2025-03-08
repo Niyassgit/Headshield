@@ -24,14 +24,14 @@ const loadHomepage = async (req, res) => {
     try {
         const user = req.session.user;
         const categories = await Category.find({ isListed: true });
-        const blockedBrands = await Brand.find({ isBlocked: true }).distinct("_id");
+        const blockedOrDeletedBrands = await Brand.find({$or:[{isBlocked:true},{isDeleted:true}]}).distinct("_id");
 
         await applyBestOffer();
         let productData = await Product.find({
             isBlocked: false,
             category: { $in: categories.map(category => category._id) },
             quantity: { $gt: 0 },
-            brand: { $nin: blockedBrands } 
+            brand: { $nin: blockedOrDeletedBrands } 
         })
         .populate("brand","brandName")
         .sort({ createdAt: -1 }) 
@@ -267,6 +267,7 @@ const logout=async(req,res)=>{
         res.redirect("/page-404");
     }
 };
+
 const loadShoppingPage = async (req, res) => {
     try {
         const user = req.session.user;
@@ -284,10 +285,16 @@ const loadShoppingPage = async (req, res) => {
         const limit = 9;
         const skip = (page - 1) * limit;
 
+        const deletedBrandIds = await Brand.find({ isDeleted: true }).distinct("_id");
+
         let filter = {
             isBlocked: false,
             quantity: { $gt: 0 }
         };
+
+        if (deletedBrandIds.length > 0) {
+            filter.brand = { $nin: deletedBrandIds };
+        }
 
         if (selectedCategory && categoryIds.includes(selectedCategory)) {
             filter.category = selectedCategory;
@@ -297,25 +304,27 @@ const loadShoppingPage = async (req, res) => {
 
         if (searchQuery) {
             const matchingBrands = await Brand.find({ 
-                brandName: { $regex: searchQuery, $options: "i" }
+                brandName: { $regex: searchQuery, $options: "i" },
+                isDeleted: false 
             });
             
             const brandIds = matchingBrands.map(brand => brand._id);
             
-
             filter.$or = [
                 { productName: { $regex: searchQuery, $options: "i" } },
                 { description: { $regex: searchQuery, $options: "i" } },
                 { brand: { $in: brandIds } }
             ];
-            
         }
 
         if (selectedBrand) {
-            const brand = await Brand.findOne({ brandName: selectedBrand });
+            const brand = await Brand.findOne({ 
+                brandName: selectedBrand,
+                isDeleted: false
+            });
+            
             if (brand) {
                 if (filter.$or) {
-
                     filter = {
                         $and: [
                             { brand: brand._id },
@@ -323,7 +332,6 @@ const loadShoppingPage = async (req, res) => {
                         ]
                     };
                 } else {
-
                     filter.brand = brand._id;
                 }
             }
@@ -342,7 +350,6 @@ const loadShoppingPage = async (req, res) => {
                     ]
                 };
             } 
-
             else {
                 if (filter.brand && !filter.brand.$in) {
                     if (blockedBrands.some(id => id.equals(filter.brand))) {
@@ -373,7 +380,11 @@ const loadShoppingPage = async (req, res) => {
         const totalProducts = await Product.countDocuments(filter);
         const totalPages = Math.ceil(totalProducts / limit);
 
-        const brands = await Brand.find({ isBlocked: false });
+        // Only include non-deleted brands in the dropdown
+        const brands = await Brand.find({ 
+            isBlocked: false,
+            isDeleted: false
+        });
 
         return res.render("shop", {
             user: userData,
@@ -387,7 +398,7 @@ const loadShoppingPage = async (req, res) => {
             sort: sortOption,
             searchQuery,
             noResults: products.length === 0 
-        });
+        }); 
 
     } catch (error) {
         console.error("Error loading shop page:", error);

@@ -61,12 +61,12 @@
                     </td>
                     <td>
                       <% if (brand.isBlocked===false) { %>
-                        <a href="/admin/blockBrand?id=<%= brand._id %>" class="btn btn-warning btn-sm">Block</a>
+                        <a href="#" onclick="confirmAction(event, 'block', '<%= brand._id %>')" class="btn btn-warning btn-sm">Block</a>
                         <% } else { %>
-                          <a href="/admin/unblockBrand?id=<%= brand._id %>" class="btn btn-success btn-sm">Unblock</a>
+                          <a href="#" onclick="confirmAction(event, 'unblock', '<%= brand._id %>')" class="btn btn-success btn-sm">Unblock</a>
+
                           <% } %>
-                            <a href="/admin/deleteBrand?id=<%= brand._id %>" class="btn btn-danger btn-sm"
-                              onclick="return confirmDelete()">Delete</a>
+                          <a href="#" onclick="confirmDelete(event, '<%= brand._id %>')" class="btn btn-danger btn-sm">Delete</a>
                     </td>
                   </tr>
                   <% }); %>
@@ -122,16 +122,52 @@
     </div>
   </div>
 
-  <!-- Custom File Input Label Update -->
-  <script>
-    $(document).on('change', '.custom-file-input', function (event) {
-      var fileName = event.target.files[0].name;
-      $(this).next('.custom-file-label').html(fileName);
-    });
 
-    function confirmDelete() {
-      return confirm("Are you sure you want to delete this brand")
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    // Function to confirm blocking or unblocking a brand
+    function confirmAction(event, actionType, brandId) {
+      event.preventDefault(); // Prevent default anchor action
+  
+      let actionText = actionType === "block" ? "block this brand?" : "unblock this brand?";
+      let confirmButtonText = actionType === "block" ? "Yes, Block it!" : "Yes, Unblock it!";
+      let redirectUrl = actionType === "block" ? `/admin/blockBrand?id=${brandId}` : `/admin/unblockBrand?id=${brandId}`;
+  
+      Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to ${actionText}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: confirmButtonText
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = redirectUrl;
+        }
+      });
+    }
+  
+    // Function to confirm brand deletion
+    function confirmDelete(event, brandId) {
+      event.preventDefault(); // Prevent default anchor action
+  
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = `/admin/deleteBrand?id=${brandId}`;
+        }
+      });
     }
   </script>
+  
 
   <%- include("../partials/admin/footer") %>

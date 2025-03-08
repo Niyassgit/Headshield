@@ -76,23 +76,28 @@ const getWalletHistory = async (req, res) => {
     try {
         const userId = req.session.user;
         const userData = await User.findById(userId);
-        const wallet = await Wallet.findOne({ userId: userId }).lean();
+        let wallet = await Wallet.findOne({ userId: userId }).lean();
         
         if (!wallet) {
-            return res.status(404).json({ success: false, message: "Wallet not found!" });
+            wallet = await Wallet.create({
+                userId: userId,
+                balance: 0,
+                transactions: [],
+            });
         }
 
         wallet.transactions = wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         return res.render("WalletHistory", {
             user: userData,
-            wallet: wallet || [],
+            wallet: wallet,
         });
     } catch (error) {
         console.error("Error while rendering Wallet History", error);
         return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 
 
 

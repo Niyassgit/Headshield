@@ -14,6 +14,11 @@ const brandSchema = new Schema(
     isBlocked: {
       type: Boolean,
       default: false,
+    },
+    isDeleted:{
+      type:Boolean,
+      default:false,
+      
     }
   },
   { timestamps: true } 

@@ -69,53 +69,64 @@ const addProducts= async(req,res)=>{
       return res.redirect("/admin/admin-pageerror");
   }
 }
+
 const getAllProducts = async (req, res) => {
-    try {
-      const search = req.query.search || "";
-      const page = req.query.page || 1;
-      const limit = 4;
-  
-   
-      const productData = await Product.find({
-        $or: [
-            { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
-            { brand: { $regex: new RegExp(".*" + search + ".*", "i") } }
-        ]
-    })
-        .sort({ quantity: 1 }) 
-        .skip((page - 1) * limit) 
-        .limit(limit)
-        .populate("category")
-        .exec();
+  try {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = 4;
+
+    // First populate the brands and then search
+    let query = {};
+    
+    if (search) {
+      // We need to find products where either the productName matches OR
+      // any populated brand's name matches the search term
+      // First find brands that match the search term
+      const matchingBrands = await Brand.find({
+        name: { $regex: new RegExp(".*" + search + ".*", "i") }
+      });
       
-      const count = await Product.find({
+      const brandIds = matchingBrands.map(brand => brand._id);
+      
+      query = {
         $or: [
           { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
-          { brand: { $regex: new RegExp(".*" + search + ".*", "i") } }
+          { brand: { $in: brandIds } }
         ]
-      }).countDocuments();
-  
-     
-      const category = await Category.find({ isListed: true });
-      const brand = await Brand.find({ isBlocked: false });
-  
-     
-     
-      if (category && brand) {
-        res.render("products", {
-          data: productData,
-          currentPage: page,
-          totalPage: Math.ceil(count / limit),
-          cat: category,
-          brand: brand
-        });
-      }
-     } catch (error) {
-   
-      console.error("Error fetching product data:", error);
-      res.redirect("/admin-error?message=" + encodeURIComponent("Error loading product data"));
+      };
     }
-  };
+
+    // Get the products with pagination
+    const productData = await Product.find(query)
+      .sort({ quantity: 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate("category")
+      .populate("brand") // Populate the brand reference
+      .exec();
+
+    // Count total matching documents for pagination
+    const count = await Product.countDocuments(query);
+
+    // Get categories and brands
+    const category = await Category.find({ isListed: true });
+    const brand = await Brand.find({ isBlocked: false });
+
+    if (category && brand) {
+      res.render("products", {
+        data: productData,
+        currentPage: page,
+        totalPage: Math.ceil(count / limit),
+        cat: category,
+        brand: brand
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching product data:", error);
+    res.redirect("/admin-error?message=" + encodeURIComponent("Error loading product data"));
+  }
+};
 
   const productBlock=async(req,res)=>{
 
