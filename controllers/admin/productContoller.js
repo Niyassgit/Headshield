@@ -76,13 +76,10 @@ const getAllProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 4;
 
-    // First populate the brands and then search
     let query = {};
     
     if (search) {
-      // We need to find products where either the productName matches OR
-      // any populated brand's name matches the search term
-      // First find brands that match the search term
+   
       const matchingBrands = await Brand.find({
         name: { $regex: new RegExp(".*" + search + ".*", "i") }
       });
@@ -97,19 +94,17 @@ const getAllProducts = async (req, res) => {
       };
     }
 
-    // Get the products with pagination
+
     const productData = await Product.find(query)
       .sort({ quantity: 1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .populate("category")
-      .populate("brand") // Populate the brand reference
+      .populate("brand") 
       .exec();
 
-    // Count total matching documents for pagination
     const count = await Product.countDocuments(query);
 
-    // Get categories and brands
     const category = await Category.find({ isListed: true });
     const brand = await Brand.find({ isBlocked: false });
 

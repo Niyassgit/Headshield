@@ -16,7 +16,7 @@ const productDetails = async (req, res) => {
         }
 
         await applyBestOffer(); 
-        const product = await Product.findById(productId).populate("category");
+        const product = await Product.findById(productId).populate("category brand");
         
         if (!product) {
             console.error("Product not found:", productId);
