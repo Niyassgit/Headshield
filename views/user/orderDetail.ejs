@@ -339,16 +339,17 @@
                             </p>
                             <% } %>
                     </div>
-
                     <!-- Ordered Items Section -->
                     <h4>Ordered Items</h4>
                     <div class="products-container">
-                        <% if(products.length> 0) { %>
+                        <% if (products.length> 0) { %>
                             <% products.forEach(function(item) { %>
                                 <div class="product-box">
                                     <div class="product-details">
-                                        <img class="product-image" src="/uploads/re-image/<%= item.productImage[0] %>"
+                                        <img class="product-image"
+                                            src="<%= item.productImage && item.productImage.length > 0 ? '/uploads/re-image/' + item.productImage[0] : '/assets/img/Product Not Found.png' %>"
                                             alt="<%= item.productName %>">
+
                                         <div class="product-info">
                                             <p><strong>
                                                     <%= item.productName %>
@@ -366,6 +367,7 @@
                                         <p>No items in the order.</p>
                                         <% } %>
                     </div>
+
 
                     <!-- Order Totals Section -->
                     <div class="order-totals">
