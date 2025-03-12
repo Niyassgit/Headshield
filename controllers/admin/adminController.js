@@ -134,21 +134,40 @@ const loadDashboard = async (req, res) => {
         const topBrand = await Order.aggregate([
             { $match: { status: { $in: ["Delivered", "Return Rejected"] } } },
             { $unwind: "$orderedItems" },
-            { $lookup: { 
-                from: "products", 
-                localField: "orderedItems.productId", 
-                foreignField: "_id", 
-                as: "product" 
-            }},
+            { 
+                $lookup: { 
+                    from: "products", 
+                    localField: "orderedItems.productId", 
+                    foreignField: "_id", 
+                    as: "product" 
+                }
+            },
             { $unwind: "$product" },
-            { $group: { 
-                _id: "$product.brand", 
-                sales: { $sum: "$orderedItems.quantity" } 
-            }},
+            { 
+                $lookup: { 
+                    from: "brands",  
+                    localField: "product.brand",  
+                    foreignField: "_id",
+                    as: "brand"
+                }
+            },
+            { $unwind: "$brand" }, 
+            { 
+                $group: { 
+                    _id: "$brand.brandName", 
+                    sales: { $sum: "$orderedItems.quantity" }
+                }
+            },
             { $sort: { sales: -1 } },
-            { $limit: 1 }
+            { $limit: 1 },
+            { 
+                $project: { 
+                    _id: 0, 
+                    brandName: "$_id",
+                    sales: 1
+                }
+            }
         ]);
-        
         const recentOrders = await Order.find()
             .sort({ createdAt: -1 })
             .limit(10)
@@ -164,7 +183,7 @@ const loadDashboard = async (req, res) => {
             orders,
             revenue: revenue[0]?.total || 0,
             bestSellingProducts,
-            bestBrand: topBrand[0]?._id || 'N/A',
+            bestBrand: topBrand.length > 0 ? topBrand[0].brandName : 'N/A',
             bestBrandSales: topBrand[0]?.sales || 0,
             bestCategory: topCategory[0]?._id || 'N/A',
             bestCategorySales: topCategory[0]?.sales || 0,
@@ -447,22 +466,44 @@ const loadDashboardData = async (req, res) => {
         ]);
         
         const topBrand = await Order.aggregate([
-            matchStage,
+            { $match: { status: { $in: ["Delivered", "Return Rejected"] } } },
             { $unwind: "$orderedItems" },
-            { $lookup: { 
-                from: "products", 
-                localField: "orderedItems.productId", 
-                foreignField: "_id", 
-                as: "product" 
-            }},
+            { 
+                $lookup: { 
+                    from: "products", 
+                    localField: "orderedItems.productId", 
+                    foreignField: "_id", 
+                    as: "product" 
+                }
+            },
             { $unwind: "$product" },
-            { $group: { 
-                _id: "$product.brand", 
-                sales: { $sum: "$orderedItems.quantity" } 
-            }},
+            { 
+                $lookup: { 
+                    from: "brands",  
+                    localField: "product.brand",  
+                    foreignField: "_id",
+                    as: "brand"
+                }
+            },
+            { $unwind: "$brand" },  
+            { 
+                $group: { 
+                    _id: "$brand.brandName",  
+                    sales: { $sum: "$orderedItems.quantity" }
+                }
+            },
             { $sort: { sales: -1 } },
-            { $limit: 1 }
+            { $limit: 1 },
+            { 
+                $project: { 
+                    _id: 0, 
+                    brandName: "$_id", 
+                    sales: 1
+                }
+            }
         ]);
+        
+        
 
         const periodTotals = await Order.aggregate([
             { $match: { status: { $in: ["Delivered", "Return Rejected"] }, ...periodFilter } },
@@ -484,7 +525,7 @@ const loadDashboardData = async (req, res) => {
             bestSellingProducts,
             totalRevenue: periodTotals[0]?.totalRevenue?.toLocaleString() || "0",
             totalOrders: periodTotals[0]?.totalOrders || 0,
-            bestBrand: topBrand[0]?._id || "N/A",
+            bestBrand: topBrand.length > 0 ? topBrand[0].brandName : 'N/A',
             bestBrandSales: topBrand[0]?.sales || 0,
             bestCategory: topCategory[0]?._id || "N/A",
             bestCategorySales: topCategory[0]?.sales || 0,

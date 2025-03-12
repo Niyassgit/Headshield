@@ -61,7 +61,7 @@ router.post("/editAddress",userAuth,profileController.postEditAddress);
 router.get("/deleteAddress",userAuth,profileController.deleteAddress);
 //cart management
 router.get("/cart",userAuth,cartController.viewCartPage);
-router.post("/addToCart",userAuth,cartController.addToCart);
+router.post("/addToCart",userAuth,cartController.addToCart); 
 router.delete("/cart/deleteItem",userAuth,cartController.deleteItem);
 router.post('/cart/updateQuantity', cartController.updateQuantity);
 //checkout page
@@ -69,6 +69,7 @@ router.get("/checkoutPage",userAuth,checkoutController.getcheckoutPage);
 router.post("/addNewAddress",userAuth,checkoutController.postAddAddress);
 router.post("/checkoutPage/editAddress",userAuth,checkoutController.postEditAddress);
 router.post("/applyCoupon",userAuth,checkoutController.applyCoupon);
+router.post("/checkout-direct",userAuth,checkoutController.directCheckout);
 //place order
 router.post("/placeOrder",userAuth,orderController.placeOrder);
 router.get("/success", userAuth, orderController.successPage);
@@ -81,6 +82,7 @@ router.get("/get-order-amount/:orderId", userAuth, orderController.getOrderAmoun
 router.patch("/update-payment/:orderId", userAuth, orderController.updatePayment);
 router.post("/mark-payment-failed", userAuth, orderController.markPaymentAsFailed);
 router.get("/generateInvoice/:orderId",userAuth,orderController.invoiceDawnload);
+
 
 //wishlist management
 router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);

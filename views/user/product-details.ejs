@@ -239,7 +239,7 @@
                                         </strong></p>
                                 </li>
                             </ul>
-                          
+
 
 
                             <!-- Add to Cart Section -->
@@ -285,7 +285,9 @@
                             </div>
                         </div>
                     </div>
-                </div> <!-- col end -->
+                </div>
+                <!-- col end -->
+
             </div>
         </div>
     </section>
@@ -362,7 +364,7 @@
                                                 <span class="text-muted">
                                                     <s>&#8377;<%=
                                                             relatedProducts[i].regularPrice.toLocaleString('en-IN') %>
-                                                            </s>
+                                                    </s>
                                                 </span>
                                         </p>
                                     </div>
@@ -374,15 +376,25 @@
         </div>
     </section>
     <!-- End Article -->
+        <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 
     <script src="https://cdn.rawgit.com/elevatezoom/3.0.8/jquery.elevatezoom.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const addToCartButton = document.getElementById("addToCartButton");
             const productDetail = document.getElementById('product-detail');
             const zoomContainer = document.querySelector('.zoom-container');
             const zoomedImage = document.getElementById('zoomedImage');
+            const addToCartButton = document.getElementById("addToCartButton");
+            const buyButton = document.getElementById("buyButton");
+            const productId = document.getElementById("productId").value;
+            const quantityElement = document.getElementById("var-value");
+            const minusBtn = document.getElementById("btn-minus");
+            const plusBtn = document.getElementById("btn-plus");
 
             // Initialize elevateZoom
             if (typeof $.fn.elevateZoom !== 'undefined') {
@@ -421,91 +433,86 @@
                 });
             }
 
-            // Add to Cart functionality
-            addToCartButton.addEventListener("click", async function () {
-                const productId = document.getElementById("productId").value;
-                const quantity = document.getElementById("product-quantity").value;
-                console.log("id and quantity:", productId, quantity);
+            function showToast(message, type = "success") {
+        Toastify({
+            text: message,
+            duration: 3000,
+            close: true,
+            gravity: "top",  
+            position: "right", 
+            backgroundColor: type === "success" ? "green" : "red",
+        }).showToast();
+    }
 
-                try {
-                    const response = await fetch("/AddToCart", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            productId: productId,
-                            quantity: quantity,
-                        }),
+
+
+            let quantity = parseInt(quantityElement.innerText);
+
+            // Increase Quantity
+            plusBtn.addEventListener("click", function () {
+                if (quantity < 5) {
+                    quantity++;
+                    quantityElement.innerText = quantity;
+                }
+            });
+
+            // Decrease Quantity
+            minusBtn.addEventListener("click", function () {
+                if (quantity > 1) {
+                    quantity--;
+                    quantityElement.innerText = quantity;
+                }
+            });
+
+            // Add to Cart Function
+            addToCartButton.addEventListener("click", function () {
+                fetch("/addToCart", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: quantity,
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast("Product added to cart successfully!", "success");
+                        } else {
+                            showToast(data.message || "Failed to add product to cart.", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        showToast("Something went wrong!", "error");
                     });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        Toastify({
-                            text: "Product added to cart!",
-                            duration: 3000,
-                            gravity: "top",
-                            position: "right",
-                            backgroundColor: "green",
-                            stopOnFocus: true,
-                        }).showToast();
-                    } else {
-                        Toastify({
-                            text: result.message || "Failed to add product",
-                            duration: 3000,
-                            gravity: "top",
-                            position: "right",
-                            backgroundColor: "red",
-                            stopOnFocus: true,
-                        }).showToast();
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    Toastify({
-                        text: "Something went wrong!",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "red",
-                        stopOnFocus: true,
-                    }).showToast();
-                }
             });
 
-           
-            const sizeButtons = document.querySelectorAll('.btn-size');
-            const productSizeInput = document.getElementById('product-size');
-
-            sizeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    sizeButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    productSizeInput.value = this.textContent;
+            if (buyButton) {
+                buyButton.addEventListener("click", function () {
+                    fetch("/checkout-direct", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ productId, quantity }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = "/checkoutPage";
+                            } else {
+                                showToast(data.message || "Failed to process order.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            showToast("Something went wrong!");
+                        });
                 });
-            });
-
-            const btnMinus = document.getElementById('btn-minus');
-            const btnPlus = document.getElementById('btn-plus');
-            const varValue = document.getElementById('var-value');
-            const productQuantity = document.getElementById('product-quantity');
-
-            btnMinus.addEventListener('click', function () {
-                let value = parseInt(varValue.textContent);
-                if (value > 1) {
-                    value--;
-                    varValue.textContent = value;
-                    productQuantity.value = value;
-                }
-            });
-
-            btnPlus.addEventListener('click', function () {
-                let value = parseInt(varValue.textContent);
-                value++;
-                varValue.textContent = value;
-                productQuantity.value = value;
-            });
+            }
         });
+
     </script>
 
 

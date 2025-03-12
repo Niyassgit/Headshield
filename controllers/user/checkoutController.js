@@ -3,6 +3,7 @@ const Address=require("../../models/addressSchema");
 const Cart=require("../../models/cartSchema");
 const Coupon=require("../../models/couponSchema");
 const Wallet=require("../../models/walletSchema");
+const Product=require("../../models/productSchema");
 const mongoose=require("mongoose");
 const { ConnectionClosedEvent } = require("mongodb");
 
@@ -24,15 +25,27 @@ const getcheckoutPage = async (req, res) => {
             addressList = addressList.concat(doc.address);
         });
 
-        const cartData = await Cart.findOne({ userId: userData._id }).populate("items.productId");
 
         let cartList = [];
         let cartTotal = 0;
         let shippingCharge=40;
 
-        if (cartData) {
-            cartList = cartData.items;  
-            cartTotal = cartData.cartTotal; 
+        if (req.session.checkoutItem) {
+            const { productId, quantity } = req.session.checkoutItem;
+            const product = await Product.findById(productId);
+            if (product) {
+                cartList = [{ productId: product, quantity, price: product.salePrice }];
+                cartTotal = product.salePrice * quantity;
+            }
+
+            delete req.session.checkoutItem;
+        } else {
+
+            const cartData = await Cart.findOne({ userId: userData._id }).populate("items.productId");
+            if (cartData) {
+                cartList = cartData.items;
+                cartTotal = cartData.cartTotal;
+            }
         }
         let finalTotal = cartTotal < 7000 ? cartTotal + shippingCharge : cartTotal;
         const currentDate = new Date();
@@ -177,10 +190,33 @@ const applyCoupon = async (req, res) => {
     }
 };
 
+const directCheckout=async(req,res)=>{
+    try {
+        const { productId, quantity } = req.body;
+        const userId = req.session.user;
+        if (!userId) return res.json({ success: false, message: "User not logged in" });
+
+        const productExists = await Product.exists({ _id: productId });
+        if (!productExists) return res.json({ success: false, message: "Product not found" });
+
+        req.session.checkoutItem = {
+            productId,
+            quantity: parseInt(quantity),
+        };
+
+        res.json({ success: true });
+
+    } catch (error) {
+        console.error("Error in checkout-direct:", error);
+        res.json({ success: false, message: "Something went wrong" });
+    }
+};
+
 
 module.exports={
     getcheckoutPage,
     postAddAddress,
     postEditAddress,
     applyCoupon,
+    directCheckout
 }
