@@ -282,6 +282,9 @@
                     backgroundColor: "linear-gradient(to right, #28a745, #218838)",
                     stopOnFocus: true,
                 }).showToast();
+
+                updateCounts(); 
+
             } else {
                 Toastify({
                     text: data.message || "Failed to remove item!",
@@ -370,6 +373,8 @@
                     backgroundColor: "linear-gradient(to right, #28a745, #218838)",
                     stopOnFocus: true,
                 }).showToast();
+                updateCounts(); 
+
             } else {
                 Toastify({
                     text: data.message || "Failed to add item!",

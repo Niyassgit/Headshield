@@ -18,7 +18,7 @@ router.get("/pageNotFound",userController.pageNotFound)
 router.get("/",isBlocked,userController.loadHomepage);
 router.get("/shop",userController.loadShoppingPage);
 router.get("/productDetails",isBlocked,productController.productDetails);
-router.get("/get-counts",userAuth,userController.getCount);
+router.get("/get-counts",userController.getCount);
 router.get("/about",userController.loadAboutPage);
 
 

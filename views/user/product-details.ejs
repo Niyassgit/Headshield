@@ -376,7 +376,7 @@
         </div>
     </section>
     <!-- End Article -->
-        <!-- Toastify CSS -->
+    <!-- Toastify CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <!-- Toastify JS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -434,15 +434,15 @@
             }
 
             function showToast(message, type = "success") {
-        Toastify({
-            text: message,
-            duration: 3000,
-            close: true,
-            gravity: "top",  
-            position: "right", 
-            backgroundColor: type === "success" ? "green" : "red",
-        }).showToast();
-    }
+                Toastify({
+                    text: message,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: type === "success" ? "green" : "red",
+                }).showToast();
+            }
 
 
 
@@ -476,17 +476,28 @@
                         quantity: quantity,
                     }),
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        // Check if redirected to login page
+                        if (response.redirected || !response.ok) {
+                            // If redirected or not OK, send user to login page
+                            window.location.href = "/login";
+                            throw new Error("Please login to continue");
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             showToast("Product added to cart successfully!", "success");
+                            updateCounts(); 
                         } else {
                             showToast(data.message || "Failed to add product to cart.", "error");
                         }
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        showToast("Something went wrong!", "error");
+                        if (!error.message.includes("login")) {
+                            showToast("Something went wrong!", "error");
+                        }
                     });
             });
 
@@ -497,7 +508,13 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ productId, quantity }),
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.redirected || !response.ok) {
+                                window.location.href = "/login";
+                                throw new Error("Please login to continue");
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             if (data.success) {
                                 window.location.href = "/checkoutPage";
@@ -507,7 +524,9 @@
                         })
                         .catch(error => {
                             console.error("Error:", error);
-                            showToast("Something went wrong!");
+                            if (!error.message.includes("login")) {
+                                showToast("Something went wrong!");
+                            }
                         });
                 });
             }

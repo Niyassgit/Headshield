@@ -202,6 +202,8 @@
                     timer: 2000,
                     showConfirmButton: false
                 });
+                updateCounts(); 
+
             } else {
                 Swal.fire({
                     title: "Error!",
@@ -249,6 +251,8 @@
                     backgroundColor: "green",
                     close: true
                 }).showToast();
+                updateCounts(); 
+
             } else {
                 Toastify({
                     text: data.message,

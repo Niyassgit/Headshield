@@ -1,5 +1,4 @@
-
- <footer class="bg-dark" id="tempaltemo_footer">
+<footer class="bg-dark" id="tempaltemo_footer">
     <div class="container">
         <div class="row">
 
@@ -52,23 +51,28 @@
             <div class="col-auto me-auto">
                 <ul class="list-inline text-left footer-icons">
                     <li class="list-inline-item border border-light rounded-circle text-center">
-                        <a class="text-light text-decoration-none" target="_blank" href="http://facebook.com/"><i class="fab fa-facebook-f fa-lg fa-fw"></i></a>
+                        <a class="text-light text-decoration-none" target="_blank" href="http://facebook.com/"><i
+                                class="fab fa-facebook-f fa-lg fa-fw"></i></a>
                     </li>
                     <li class="list-inline-item border border-light rounded-circle text-center">
-                        <a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/"><i class="fab fa-instagram fa-lg fa-fw"></i></a>
+                        <a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/"><i
+                                class="fab fa-instagram fa-lg fa-fw"></i></a>
                     </li>
                     <li class="list-inline-item border border-light rounded-circle text-center">
-                        <a class="text-light text-decoration-none" target="_blank" href="https://twitter.com/"><i class="fab fa-twitter fa-lg fa-fw"></i></a>
+                        <a class="text-light text-decoration-none" target="_blank" href="https://twitter.com/"><i
+                                class="fab fa-twitter fa-lg fa-fw"></i></a>
                     </li>
                     <li class="list-inline-item border border-light rounded-circle text-center">
-                        <a class="text-light text-decoration-none" target="_blank" href="https://www.linkedin.com/"><i class="fab fa-linkedin fa-lg fa-fw"></i></a>
+                        <a class="text-light text-decoration-none" target="_blank" href="https://www.linkedin.com/"><i
+                                class="fab fa-linkedin fa-lg fa-fw"></i></a>
                     </li>
                 </ul>
             </div>
             <div class="col-auto">
                 <label class="sr-only" for="subscribeEmail">Email address</label>
                 <div class="input-group mb-2">
-                    <input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address">
+                    <input type="text" class="form-control bg-dark border-light" id="subscribeEmail"
+                        placeholder="Email address">
                     <div class="input-group-text btn-success text-light">Subscribe</div>
                 </div>
             </div>
@@ -80,14 +84,14 @@
             <div class="row pt-2">
                 <div class="col-12">
                     <p class="text-left text-light">
-                        Copyright &copy; 2025 Headshield  
+                        Copyright &copy; 2025 Headshield
                         | Designed by <a rel="sponsored" href="https://templatemo.com" target="_blank">TemplateMo</a>
                     </p>
                 </div>
             </div>
         </div>
     </div>
-    
+
 
 </footer>
 <!-- End Footer -->
@@ -99,9 +103,9 @@
 <script src="/assets/js/templatemo.js"></script>
 <script src="/assets/js/custom.js"></script>
 <!-- End Script -->
-  <!-- Start Slider Script -->
-  <script src="/assets/js/slick.min.js"></script>
-  <script>
+<!-- Start Slider Script -->
+<script src="/assets/js/slick.min.js"></script>
+<script>
     $('#carousel-related-product').slick({
         infinite: true,
         arrows: false,
@@ -109,50 +113,97 @@
         slidesToScroll: 3,
         dots: true,
         responsive: [{
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3
-                }
-            },
-            {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 3
-                }
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 3
-                }
+            breakpoint: 1024,
+            settings: {
+                slidesToShow: 3,
+                slidesToScroll: 3
             }
+        },
+        {
+            breakpoint: 600,
+            settings: {
+                slidesToShow: 2,
+                slidesToScroll: 3
+            }
+        },
+        {
+            breakpoint: 480,
+            settings: {
+                slidesToShow: 2,
+                slidesToScroll: 3
+            }
+        }
         ]
     });
 
-    async function fetchCounts() {
-    try {
-        const response = await fetch("/get-counts");
-        if (response.ok) {
-            const data = await response.json();
-            document.getElementById("cart-count").textContent = data.cartCount > 0 ? data.cartCount : '';
-            document.getElementById("wishlist-count").textContent = data.wishlistCount > 0 ? data.wishlistCount : '';
-        }
-    } catch (error) {
-        console.error("Error fetching cart/wishlist counts:", error);
+
+    // Store counts in localStorage
+    function storeCounts(cartCount, wishlistCount) {
+        localStorage.setItem('cartCount', cartCount);
+        localStorage.setItem('wishlistCount', wishlistCount);
     }
-}
 
+    // Retrieve counts from localStorage and update UI
+    function retrieveCounts() {
+        const cartCount = localStorage.getItem('cartCount') || '';
+        const wishlistCount = localStorage.getItem('wishlistCount') || '';
 
-window.addEventListener("DOMContentLoaded", fetchCounts);
+        const cartCountElement = document.getElementById("cart-count");
+        const wishlistCountElement = document.getElementById("wishlist-count");
 
-setInterval(fetchCounts, 1000);
+        if (cartCountElement) cartCountElement.textContent = cartCount;
+        if (wishlistCountElement) wishlistCountElement.textContent = wishlistCount;
+    }
+
+    // Fetch counts from server and update both UI and localStorage
+    async function fetchCounts() {
+        try {
+            const response = await fetch("/get-counts");
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update DOM elements
+                    const cartCountElement = document.getElementById("cart-count");
+                    const wishlistCountElement = document.getElementById("wishlist-count");
+
+                    if (cartCountElement) {
+                        cartCountElement.textContent = data.cartCount > 0 ? data.cartCount : '';
+                    }
+
+                    if (wishlistCountElement) {
+                        wishlistCountElement.textContent = data.wishlistCount > 0 ? data.wishlistCount : '';
+                    }
+
+                    // Also store in localStorage
+                    storeCounts(
+                        data.cartCount > 0 ? data.cartCount : '',
+                        data.wishlistCount > 0 ? data.wishlistCount : ''
+                    );
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching counts:", error);
+        }
+    }
+
+    // Shorthand function for updating counts
+    function updateCounts() {
+        fetchCounts();
+    }
+
+    // Initialize when the page loads
+    document.addEventListener("DOMContentLoaded", function () {
+        // Show stored counts immediately
+        retrieveCounts();
+        // Then fetch fresh counts
+        fetchCounts();
+    });
 
 </script>
 <!-- End Slider Script -->
-  
+
 </body>
 
 </html>

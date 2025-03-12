@@ -405,16 +405,35 @@ const loadShoppingPage = async (req, res) => {
         res.redirect("/pageNotFound");
     }   
 };
-const getCount=async(req,res)=>{
 
-        try {
-            const { cartCount, wishlistCount } = await getUserCartAndWishlistCount(req.session.user);
-            res.json({ cartCount, wishlistCount });
-          } catch (error) {
-            console.error("Error fetching counts:", error);
-            res.status(500).json({ cartCount: 0, wishlistCount: 0 });
-          }
-      
+const getCount = async (req, res) => {
+    try {
+        if (!req.session || !req.session.user) {
+            return res.json({ 
+                success: true,
+                cartCount: 0, 
+                wishlistCount: 0,
+                isGuest: true
+            });
+        }
+
+
+        const { cartCount, wishlistCount } = await getUserCartAndWishlistCount(req.session.user);
+        res.json({ 
+            success: true,
+            cartCount, 
+            wishlistCount,
+            isGuest: false
+        });
+    } catch (error) {
+        console.error("Error fetching counts:", error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error fetching counts",
+            cartCount: 0, 
+            wishlistCount: 0 
+        });
+    }
 };
 
 const loadAboutPage= async(req,res)=>{
