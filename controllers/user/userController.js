@@ -11,7 +11,9 @@ const bcrypt=require("bcrypt");
 
 const pageNotFound = async (req, res) => {
     try {
-        return res.render("page-404");
+        const userId=req.session.user;
+        const userData=await User.findById(userId);
+        return res.render("page-404",{user:userData});
     } catch (error) {
         console.error("Error rendering 404 page:", error);
         res.status(500).send("Internal Server Error"); 
