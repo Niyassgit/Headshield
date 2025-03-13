@@ -9,16 +9,15 @@ const env=require("dotenv").config();
 const bcrypt=require("bcrypt");
 
 
-const pageNotFound=async (req,res)=>{
-
-    try{
-       
-      return  res.render("page-404");
-    }catch(error){
-
-    res.redirect("/pageNotFound")
+const pageNotFound = async (req, res) => {
+    try {
+        return res.render("page-404");
+    } catch (error) {
+        console.error("Error rendering 404 page:", error);
+        res.status(500).send("Internal Server Error"); 
     }
 };
+
 
 const loadHomepage = async (req, res) => {
     try {

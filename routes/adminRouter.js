@@ -67,7 +67,9 @@ router.get('/sales-report', adminAuth, salesReportController.getSalesReport);
 router.get('/salesReportPDF/pdf', adminAuth, salesReportController.getSalesReportPDF);
 router.get('/sales-report/excel', adminAuth, salesReportController.getSalesReportExcel);
 
-
+router.use((req, res) => {
+    res.redirect("/admin/admin-error");
+  });
 
 
 module.exports = router;

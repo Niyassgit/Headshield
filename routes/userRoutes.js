@@ -93,7 +93,8 @@ router.get("/walletHistory",userAuth,walletController.getWalletHistory);
 //razor Pay management
 router.post("/createOrder",userAuth,razorPayController.createOrder);
 
-
-
+router.use((req, res) => {
+    res.redirect("/pageNotFound");
+  });
 
 module.exports=router;

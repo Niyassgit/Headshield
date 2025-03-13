@@ -42,8 +42,11 @@ app.set('views', [
 
 
 // Route setup
-app.use("/", userRouter);
 app.use("/admin", adminRouter);
+app.use("/", userRouter);
+app.use((req, res) => {
+  res.redirect("/pageNotFound");
+});
 
 app.listen(parseInt(process.env.PORT), () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);

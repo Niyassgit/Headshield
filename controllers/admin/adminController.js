@@ -9,7 +9,12 @@ const Product=require("../../models/productSchema");
 
 const pageError = async (req, res) => {
 
-    res.render("admin-error");
+    try {
+        return res.render("admin-error"); 
+    } catch (error) {
+        console.error("Error rendering admin login:", error);
+        res.status(500).send("Internal Server Error");
+    }
 }
 
 
