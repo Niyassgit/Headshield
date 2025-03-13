@@ -248,27 +248,30 @@
                                 <div class="row">
                                     <div class="col-auto">
                                         <ul class="list-inline pb-3">
-                                            <li class="list-inline-item">Size:
-                                                <input type="hidden" id="product-size" value="S">
+                                            <li class="list-inline-item">Size:</li>
+                                            <li class="list-inline-item">
+                                                <span class="badge px-3 py-2" 
+                                                    style="background-color: #59ab6e; border: 2px solid grey; color: white;"
+                                                    id="product-size">
+                                                    <%= product.size %>
+                                                </span>
                                             </li>
-                                            <% ['S', 'M' , 'L' , 'XL' ].forEach(size=> { %>
-                                                <li class="list-inline-item">
-                                                    <span class="btn btn-success btn-size">
-                                                        <%= size %>
-                                                    </span>
-                                                </li>
-                                                <% }); %>
                                         </ul>
                                     </div>
+                                    
+                                    <!-- Replace this section in your product detail page -->
                                     <div class="col-auto">
                                         <ul class="list-inline pb-3">
                                             <li class="list-inline-item text-right">Quantity</li>
-                                            <li class="list-inline-item"><span class="btn btn-success"
-                                                    id="btn-minus">-</span></li>
-                                            <li class="list-inline-item"><span class="badge bg-secondary"
-                                                    id="var-value">1</span></li>
-                                            <li class="list-inline-item"><span class="btn btn-success"
-                                                    id="btn-plus">+</span></li>
+                                            <li class="list-inline-item">
+                                                <div class="quantity-controls d-flex align-items-center">
+                                                    <button class="btn btn-sm btn-outline-secondary btn-success minus-btn"
+                                                        data-product-id="<%= product._id %>">-</button>
+                                                    <span class="quantity-display mx-3" id="var-value">1</span>
+                                                    <button class="btn btn-sm btn-outline-secondary btn-success plus-btn"
+                                                        data-product-id="<%= product._id %>">+</button>
+                                                </div>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -392,9 +395,9 @@
             const addToCartButton = document.getElementById("addToCartButton");
             const buyButton = document.getElementById("buyButton");
             const productId = document.getElementById("productId").value;
-            const quantityElement = document.getElementById("var-value");
-            const minusBtn = document.getElementById("btn-minus");
-            const plusBtn = document.getElementById("btn-plus");
+            const quantityDisplay = document.querySelector(".quantity-display");
+            const minusBtn = document.querySelector(".minus-btn");
+            const plusBtn = document.querySelector(".plus-btn");
 
             // Initialize elevateZoom
             if (typeof $.fn.elevateZoom !== 'undefined') {
@@ -444,28 +447,33 @@
                 }).showToast();
             }
 
+            function updateQuantity(productId, change) {
+                let quantity = parseInt(quantityDisplay.innerText);
 
-
-            let quantity = parseInt(quantityElement.innerText);
-
-            // Increase Quantity
-            plusBtn.addEventListener("click", function () {
-                if (quantity < 5) {
-                    quantity++;
-                    quantityElement.innerText = quantity;
+                if ((change > 0 && quantity < 5) || (change < 0 && quantity > 1)) {
+                    quantity += change;
+                    quantityDisplay.innerText = quantity;
                 }
-            });
+            }
+            // Add event listeners to buttons
+            if (plusBtn) {
+                plusBtn.addEventListener("click", function () {
+                    const productId = this.getAttribute("data-product-id");
+                    updateQuantity(productId, 1);
+                });
+            }
 
-            // Decrease Quantity
-            minusBtn.addEventListener("click", function () {
-                if (quantity > 1) {
-                    quantity--;
-                    quantityElement.innerText = quantity;
-                }
-            });
+            if (minusBtn) {
+                minusBtn.addEventListener("click", function () {
+                    const productId = this.getAttribute("data-product-id");
+                    updateQuantity(productId, -1);
+                });
+            }
 
-            // Add to Cart Function
+
+        
             addToCartButton.addEventListener("click", function () {
+                const quantity = parseInt(quantityDisplay.innerText);
                 fetch("/addToCart", {
                     method: "POST",
                     headers: {
@@ -477,20 +485,25 @@
                     }),
                 })
                     .then(response => {
-                        // Check if redirected to login page
-                        if (response.redirected || !response.ok) {
-                            // If redirected or not OK, send user to login page
+                        // First, check if the response is redirected (login required)
+                        if (response.redirected) {
                             window.location.href = "/login";
                             throw new Error("Please login to continue");
                         }
-                        return response.json();
+
+                        // Get both the status and the JSON data
+                        return response.json().then(data => {
+                            return { status: response.status, data };
+                        });
                     })
-                    .then(data => {
-                        if (data.success) {
+                    .then(result => {
+                        // Handle different response status codes
+                        if (result.status === 200) {
                             showToast("Product added to cart successfully!", "success");
-                            updateCounts(); 
+                            updateCounts();
                         } else {
-                            showToast(data.message || "Failed to add product to cart.", "error");
+                            // Show the specific error message from the server
+                            showToast(result.data.message || "Failed to add product to cart.", "error");
                         }
                     })
                     .catch(error => {
@@ -503,6 +516,8 @@
 
             if (buyButton) {
                 buyButton.addEventListener("click", function () {
+
+                    const quantity = parseInt(quantityDisplay.innerText);
                     fetch("/checkout-direct", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
