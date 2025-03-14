@@ -604,6 +604,7 @@ const failedPage=async(req,res)=>{
         
     }
 };
+
 const invoiceDawnload=async(req,res)=>{
     try {
         const orderId = req.params.orderId;
@@ -671,28 +672,48 @@ const invoiceDawnload=async(req,res)=>{
         </html>
         `;
 
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.setContent(invoiceHTML);
-        
-        await page.pdf({ path: pdfPath, format: "A4" });
 
-        await browser.close();
-
-        res.download(pdfPath, `invoice-${orderId}.pdf`, (err) => {
-            if (err) {
-                console.error("Error sending PDF:", err);
-                res.status(500).send("Error downloading PDF");
+          let browser;
+          try {
+            browser = await puppeteer.launch({
+              headless: true,
+              args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+            });
+            const page = await browser.newPage();
+            await page.setContent(invoiceHTML);
+            await page.pdf({ path: pdfPath, format: "A4" });
+          } catch (err) {
+            console.error("Puppeteer error:", err);
+            throw err;
+          } finally {
+            if (browser) {
+              await browser.close();
             }
+          }
 
-            setTimeout(() => fs.unlinkSync(pdfPath), 5000);
-        });
+          res.download(pdfPath, `invoice-${orderId}.pdf`, (err) => {
+            if (err) {
+              console.error("Error sending PDF:", err);
+              return res.status(500).send("Error downloading PDF");
+            }
+            
+            try {
+              setTimeout(() => {
+                if (fs.existsSync(pdfPath)) {
+                  fs.unlinkSync(pdfPath);
+                }
+              }, 5000);
+            } catch (deleteErr) {
+              console.error("Error deleting temporary PDF:", deleteErr);
+            }
+          });
 
     } catch (error) {
         console.error("Error generating invoice:", error);
         res.status(500).send("Error generating invoice");
     }
 };
+
 module.exports = {
     placeOrder,
     getOrders,
