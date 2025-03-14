@@ -613,6 +613,10 @@ const invoiceDawnload=async(req,res)=>{
         if (!order || (order.status !== "Delivered" && order.status !== "Return Rejected")) {
             return res.status(403).send("Invoice access restricted");
         }
+        const missingProducts = order.orderedItems.some(item => !item.productId);
+        if (missingProducts) {
+            console.warn(`Order ${orderId} has missing products references`);
+        }
 
         const invoiceDir = path.join(__dirname, "../public/invoices");
         if (!fs.existsSync(invoiceDir)) {
@@ -653,13 +657,13 @@ const invoiceDawnload=async(req,res)=>{
                     <th>Total</th>
                 </tr>
                 ${order.orderedItems.map(item => `
-                <tr>
-                    <td>${item.productId.productName}</td>
-                    <td>${item.quantity}</td>
-                    <td>₹${item.price}</td>
-                    <td>₹${item.quantity * item.price}</td>
-                </tr>
-                `).join('')}
+                    <tr>
+                        <td>${item.productId ? item.productId.productName : 'Product Unavailable'}</td>
+                        <td>${item.quantity}</td>
+                        <td>₹${item.price}</td>
+                        <td>₹${item.quantity * item.price}</td>
+                    </tr>
+                    `).join('')}
             </table>
   
 
