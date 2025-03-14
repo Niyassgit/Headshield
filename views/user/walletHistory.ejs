@@ -1,254 +1,303 @@
 <%- include("../../views/partials/user/header") %>
-    <%- include("../../views/partials/user/sidebar") %>
+  <%- include("../../views/partials/user/sidebar") %>
 
-<!-- Wallet Balance Section -->
-<div class="wallet-container">
-  <div class="balance-card ">
-    <h2>Wallet Balance</h2>
-    <div class="balance-amount" style="font-size: 4rem; font-weight: bold; color: #1a1a1a;">
-      <% if(wallet && wallet.balance){ %>
-      ₹<%= wallet.balance.toLocaleString('en-IN') %>
-      <% } %>
-    </div>
-  </div>
-  
-  
-    <!-- Transaction History -->
-    <!-- Transaction History -->
-<div class="history-container">
-  <h2 class="history-title">Transaction History</h2>
 
-  <% if (wallet.transactions && wallet.transactions.length > 0) { %>
-    <div class="transactions">
-      <% wallet.transactions.forEach(item => { %>
-        <% if (item.transactionType == "credit") { %>
-          <div class="transaction-item credit-transaction">
-            <div class="transaction-info">
-              <div class="icon-circle credit-icon">
-                <i class="fas fa-arrow-down"></i>
-              </div>
-              <div class="transaction-content">
-                <div class="transaction-type credit">+₹<%= item.amount.toLocaleString('en-IN') %></div>
-                <div class="transaction-details">
-                  <span class="transaction-title">
-                    <% if (item.description === "Wallet recharge") { %>
-                      Wallet Top-Up
-                    <% } else { %>
-                      <%= item.description %>
-                    <% } %>
-                  </span>
-                  <span class="transaction-date">
-                    <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div class="transaction-status completed">Completed</div>
-          </div>
-        <% } else if (item.transactionType == "debit") { %>
-          <div class="transaction-item debit-transaction">
-            <div class="transaction-info">
-              <div class="icon-circle debit-icon">
-                <i class="fas fa-arrow-up"></i>
-              </div>
-              <div class="transaction-content">
-                <div class="transaction-type debit">-₹<%= item.amount.toLocaleString('en-IN') %></div>
-                <div class="transaction-details">
-                  <span class="transaction-title">Purchase - Order Id <%=item.orderId %></span>
-                  <span class="transaction-date">
-                    <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div class="transaction-status completed">Completed</div>
-          </div>
-        <% } %>
-      <% }) %>
-    </div>
-  <% } else { %>
-    <p class="no-transaction">No transactions found.</p>
-  <% } %>
-  </div>
-  
-
-  
-        
-      </div>
-    </div>
-  </div>
-  
-  <style>
-    .wallet-container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 0 20px;
-    }
-  
-    .balance-card {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 24px;
-    }
-  
-    .balance-card h2 {
-      color: #333;
-      margin: 0 0 8px 0;
-      font-size: 18px;
-    }
-  
-    .balance-amount {
-      font-size: 3rem !important;
-      font-weight: bold !important;
-      color: #1a1a1a !important;
-    }
-
-  
-    .history-container {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-  
-    .history-container h2 {
-      color: #333;
-      margin: 0 0 20px 0;
-      font-size: 18px;
-    }
-  
-    .transactions {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-  
-    .transaction-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      border-radius: 8px;
-      background: #f8f9fa;
-      transition: background-color 0.2s;
-    }
-  
-    .transaction-item:hover {
-      background: #f0f1f2;
-    }
-  
-    .transaction-info {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-  
-    .product-image {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-  
-    .product-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  
-    .transaction-content {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-  
-    .transaction-type {
-      font-weight: bold;
-      font-size: 16px;
-    }
-  
-    .credit {
-      color: #2e7d32;
-    }
-  
-    .debit {
-      color: #d32f2f;
-    }
-  
-    .transaction-details {
-      display: flex;
-      flex-direction: column;
-    }
-  
-    .transaction-title {
-      font-size: 14px;
-      color: #333;
-    }
-  
-    .transaction-date {
-      font-size: 12px;
-      color: #666;
-    }
-  
-    .transaction-status {
-      font-size: 12px;
-      padding: 4px 12px;
-      border-radius: 12px;
-    }
-  
-    .completed {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-  
-    .pending {
-      background: #fff3e0;
-      color: #ef6c00;
-    }
-  
-    .failed {
-      background: #ffebee;
-      color: #c62828;
-    }
-  
-    @media (max-width: 600px) {
+    <style>
       .wallet-container {
-        padding: 0 12px;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 20px;
       }
-  
-      .balance-amount {
-        font-size: 28px;
-      }
-  
-      .transaction-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-  
-      .transaction-info {
-        width: 100%;
-      }
-  
-      .transaction-status {
-        align-self: flex-start;
-      }
-  
-      .product-image {
-        width: 50px;
-        height: 50px;
-      }
-    }
-  </style>
 
-         <!--sidebar Footer section-->
-        </section>
+      .balance-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+      }
+
+      .balance-card h2 {
+        color: #333;
+        margin: 0 0 8px 0;
+        font-size: 18px;
+      }
+
+      .balance-amount {
+        font-size: 3rem !important;
+        font-weight: bold !important;
+        color: #1a1a1a !important;
+      }
+
+
+      .history-container {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .history-container h2 {
+        color: #333;
+        margin: 0 0 20px 0;
+        font-size: 18px;
+      }
+
+      .transactions {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .transaction-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        transition: background-color 0.2s;
+      }
+
+      .transaction-item:hover {
+        background: #f0f1f2;
+      }
+
+      .transaction-info {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .product-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .transaction-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .transaction-type {
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      .credit {
+        color: #2e7d32;
+      }
+
+      .debit {
+        color: #d32f2f;
+      }
+
+      .transaction-details {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .transaction-title {
+        font-size: 14px;
+        color: #333;
+      }
+
+      .transaction-date {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .transaction-status {
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 12px;
+      }
+
+      .completed {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .pending {
+        background: #fff3e0;
+        color: #ef6c00;
+      }
+
+      .failed {
+        background: #ffebee;
+        color: #c62828;
+      }
+
+      @media (max-width: 600px) {
+        .wallet-container {
+          padding: 0 12px;
+        }
+
+        .balance-amount {
+          font-size: 28px;
+        }
+
+        .transaction-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .transaction-info {
+          width: 100%;
+        }
+
+        .transaction-status {
+          align-self: flex-start;
+        }
+
+        .product-image {
+          width: 50px;
+          height: 50px;
+        }
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .page-link {
+        padding: 4px 7px;
+        margin: 0 5px;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .page-link:hover {
+        background: #f0f0f0;
+      }
+
+      .active {
+        background: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+      }
+    </style>
+
+
+    <!-- Wallet Balance Section -->
+    <div class="wallet-container">
+      <div class="balance-card ">
+        <h2>Wallet Balance</h2>
+        <div class="balance-amount" style="font-size: 4rem; font-weight: bold; color: #1a1a1a;">
+          <% if(wallet && wallet.balance){ %>
+            ₹<%= wallet.balance.toLocaleString('en-IN') %>
+              <% } %>
+        </div>
       </div>
+
+
+      <!-- Transaction History -->
+      <!-- Transaction History -->
+      <div class="history-container">
+        <h2 class="history-title">Transaction History</h2>
+
+        <% if (wallet.transactions && wallet.transactions.length> 0) { %>
+          <div class="transactions">
+            <% wallet.transactions.forEach(item=> { %>
+              <% if (item.transactionType=="credit" ) { %>
+                <div class="transaction-item credit-transaction">
+                  <div class="transaction-info">
+                    <div class="icon-circle credit-icon">
+                      <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="transaction-content">
+                      <div class="transaction-type credit">+₹<%= item.amount.toLocaleString('en-IN') %>
+                      </div>
+                      <div class="transaction-details">
+                        <span class="transaction-title">
+                          <% if (item.description==="Wallet recharge" ) { %>
+                            Wallet Top-Up
+                            <% } else { %>
+                              <%= item.description %>
+                                <% } %>
+                        </span>
+                        <span class="transaction-date">
+                          <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long' , year: 'numeric' ,
+                            month: 'long' , day: 'numeric' }) %>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="transaction-status completed">Completed</div>
+                </div>
+                <% } else if (item.transactionType=="debit" ) { %>
+                  <div class="transaction-item debit-transaction">
+                    <div class="transaction-info">
+                      <div class="icon-circle debit-icon">
+                        <i class="fas fa-arrow-up"></i>
+                      </div>
+                      <div class="transaction-content">
+                        <div class="transaction-type debit">-₹<%= item.amount.toLocaleString('en-IN') %>
+                        </div>
+                        <div class="transaction-details">
+                          <span class="transaction-title">Purchase - Order Id <%=item.orderId %></span>
+                          <span class="transaction-date">
+                            <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long' , year: 'numeric' ,
+                              month: 'long' , day: 'numeric' }) %>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="transaction-status completed">Completed</div>
+                  </div>
+                  <% } %>
+                    <% }) %>
+          </div>
+          <% } else { %>
+            <p class="no-transaction">No transactions found.</p>
+            <% } %>
       </div>
-      </div>
-      </main>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <% if (currentPage> 1) { %>
+      <a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a>
+      <% } %>
+
+        <% for (let i=1; i <=totalPages; i++) { %>
+          <a href="?page=<%= i %>" class="page-link <% if (i === currentPage) { %>active<% } %>">
+            <%= i %>
+          </a>
+          <% } %>
+
+            <% if (currentPage < totalPages) { %>
+              <a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a>
+              <% } %>
+  </div>
+
+
+    </div>
+    </div>
+    </div>
+
+  
+
+
+    <!--sidebar Footer section-->
+    </section>
+    </div>
+    </div>
+    </div>
+    </main>
 
     <%- include("../../views/partials/user/footer") %>

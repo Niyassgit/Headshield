@@ -85,12 +85,24 @@ const getWalletHistory = async (req, res) => {
                 transactions: [],
             });
         }
+         
+        const page = parseInt(req.query.page) || 1;
+        const limit =5;
+        const skip =(page-1)*limit;
 
-        wallet.transactions = wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+        const totalTransactions =wallet.transactions.length;
+        const totalPages=Math.ceil(totalTransactions/limit);
+ 
+        wallet.transactions = wallet.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(skip,skip+limit);
+
+        
         return res.render("WalletHistory", {
             user: userData,
             wallet: wallet,
+            currentPage:page,
+            totalPages:totalPages,
         });
     } catch (error) {
         console.error("Error while rendering Wallet History", error);
