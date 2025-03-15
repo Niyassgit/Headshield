@@ -1,5 +1,8 @@
 <%- include("../partials/admin/header") %>
 
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -9,7 +12,7 @@
                     <h4>Edit Category</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" id="editCategoryForm" action="/admin/editCategory/<%= category._id %>" onsubmit="return validateForm(event)">
+                    <form id="editCategoryForm">
                         <!-- Category Name -->
                         <div class="form-group mb-4">
                             <label for="categoryName" class="form-label font-weight-bold">Category Name</label>
@@ -49,5 +52,53 @@
         </div>
     </div>
 </div>
+
+
+<script>
+document.getElementById("editCategoryForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const categoryName = document.getElementById("categoryName").value.trim();
+    const description = document.getElementById("descriptionId").value.trim();
+    const categoryId = "<%= category._id %>"; // Get category ID
+
+    try {
+        const response = await fetch(`/admin/editCategory/${categoryId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ categoryName, description })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                title: "Success!",
+                text: "Category updated successfully!",
+                icon: "success",
+                confirmButtonText: "OK"
+            }).then(() => {
+                window.location.href = "/admin/category"; // Redirect after success
+            });
+        } else {
+            Swal.fire({
+                title: "Error!",
+                text: result.error || "Failed to update category.",
+                icon: "error",
+                confirmButtonText: "Try Again"
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: "Error!",
+            text: "Something went wrong. Please try again.",
+            icon: "error",
+            confirmButtonText: "OK"
+        });
+    }
+});
+</script>
 
 <%- include("../partials/admin/footer") %>

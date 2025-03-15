@@ -108,30 +108,37 @@ const getEditCategory = async (req, res) => {
     }
 
 }
-
-const editCategory=async(req,res)=>{
-
+const editCategory = async (req, res) => {
     try {
+        const id = req.params.id;
+        const { categoryName, description } = req.body;
 
-        const id=req.params.id;
-        const {categoryName,description}=req.body;
-        const existCategory=await Category.findOne({name:categoryName});
-        
-        if(existCategory){
-            return res.status(400).json({error:"Category exists,please Choose another name"})
-        }
-        const updateCategory=await Category.findByIdAndUpdate(id,{name:categoryName,description:description,},{new:true});
+        const existCategory = await Category.findOne({
+            name: { $regex: new RegExp(`^${categoryName}$`, "i") },
+            _id: { $ne: id }, 
+        });
 
-        if(updateCategory){
-            res.redirect("/admin/category");
-        }else{
-            res.status(404).json({error:"Category not found"})
+        if (existCategory) {
+            return res.status(400).json({ error: "Category already exists. Please choose another name." });
         }
-        
+
+        const updateCategory = await Category.findByIdAndUpdate(
+            id,
+            { name: categoryName, description: description },
+            { new: true }
+        );
+
+        if (updateCategory) {
+            return res.json({ success: true, message: "Category updated successfully!" });
+        } else {
+            return res.status(404).json({ error: "Category not found" });
+        }
     } catch (error) {
-        res.status(500).json({error:"Internl Server error"});
+        console.error("Edit Category Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
 const addCategoryOffer=async(req,res)=>{
 
     try {

@@ -165,7 +165,6 @@ const securePassword=async (password)=>{
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
-        console.log("Session OTP:", req.session.userOtp);
 
         if (otp.toString() === req.session.userOtp.toString()) {
 
@@ -453,6 +452,32 @@ const loadAboutPage= async(req,res)=>{
     }
 };
 
+const resendOtp = async (req, res) => {
+    try {
+        if (!req.session.userData) {
+            return res.status(400).json({ success: false, message: "Session expired. Please sign up again." });
+        }
+
+        const { email } = req.session.userData;
+        const newOtp = generateOtp(); 
+
+        req.session.userOtp = newOtp; 
+        await req.session.save(); 
+
+        const emailSent = await sendVerificationEmail(email, newOtp);
+        if (!emailSent) {
+            return res.status(500).json({ success: false, message: "Failed to resend OTP email." });
+        }
+
+        return res.json({ success: true, message: "New OTP sent successfully." });
+
+    } catch (error) {
+        console.error("Error Resending OTP:", error);
+        return res.status(500).json({ success: false, message: "An error occurred while resending OTP." });
+    }
+};
+
+
 
 module.exports={
 
@@ -467,4 +492,5 @@ module.exports={
     loadShoppingPage,
     getCount,
     loadAboutPage,
+    resendOtp
 }
