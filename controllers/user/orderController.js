@@ -14,8 +14,8 @@ const path = require("path");
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { address, paymentMethod, totalPrice, discount, finalAmount, couponCode, razorpay_payment_id, paymentStatus: clientPaymentStatus } = req.body;
-
+        const { address, paymentMethod, totalPrice, finalAmount, couponCode, razorpay_payment_id, paymentStatus: clientPaymentStatus } = req.body;
+  
         if (!address || !paymentMethod) {
             return res.status(400).json({
                 success: false,
@@ -139,10 +139,6 @@ const placeOrder = async (req, res) => {
         });
 
       
-        const calculatedFinalAmount = totalPrice - finalDiscount;
-        if (finalAmount !== calculatedFinalAmount) {
-            console.warn(`Final amount mismatch: Client sent ${finalAmount}, calculated ${calculatedFinalAmount}`);
-        }
 
         let paymentStatus = clientPaymentStatus || "Pending"; 
         let status = "Pending";
@@ -210,14 +206,17 @@ const placeOrder = async (req, res) => {
             }
         }
 
+    let finalTotal=totalPrice+finalDiscount+savedAmount;
+
+
 
         const order = await Order.create({
             userId,
             orderedItems,
-            totalPrice,
+            totalPrice:finalTotal,
             couponDiscount: finalDiscount,
             productDiscount: savedAmount,
-            finalAmount: calculatedFinalAmount,
+            finalAmount: finalAmount,
             address: selectedAddress,
             paymentMethod,
             invoiceDate: new Date(),
@@ -281,27 +280,41 @@ const placeOrder = async (req, res) => {
     }
 };   
 
-const getOrders= async(req,res)=>{
+const getOrders = async (req, res) => {
     try {
-        const userId=req.session.user;
-        const userData=await User.findById(userId);
-        const orderData = await Order.find({ userId: userId })
-         .populate("orderedItems.productId", "productName productImage size color")
-         .sort({createdAt:-1}); 
-        if(!orderData){
-            console.error("Error while fetching order list:",error);
-            return res.status(404).json({success:false,message:"failed to find Orders"});
-        }
+        const userId = req.session.user;
+        const userData = await User.findById(userId);
 
-        return res.render("Orders",{
-            user:userData,
-            order:orderData,
-        })
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+
+
+        const orderData = await Order.find({ userId: userId })
+            .populate("orderedItems.productId", "productName productImage size color")
+            .sort({ createdAt: -1 })
+            .skip(skip) 
+            .limit(limit); 
+
+        if (!orderData) {
+            console.error("Error while fetching order list");
+            return res.status(404).json({ success: false, message: "Failed to find Orders" });
+        }
+        const totalOrders = await Order.countDocuments({ userId: userId });
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        return res.render("Orders", {
+            user: userData,
+            order: orderData,
+            currentPage: page,
+            totalPages: totalPages,
+        });
     } catch (error) {
-        console.error("Error while rendering Orders page",error);
-        res.status(500).json({success:false,message:"Internal Server Error"});
+        console.error("Error while rendering Orders page", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 
 const getOrderDetails=async(req,res)=>{
     try {

@@ -268,29 +268,29 @@
             <% } %>
       </div>
 
-  <!-- Pagination -->
-  <div class="pagination">
-    <% if (currentPage> 1) { %>
-      <a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a>
-      <% } %>
-
-        <% for (let i=1; i <=totalPages; i++) { %>
-          <a href="?page=<%= i %>" class="page-link <% if (i === currentPage) { %>active<% } %>">
-            <%= i %>
-          </a>
+      <!-- Pagination -->
+      <div class="pagination">
+        <% if (currentPage> 1) { %>
+          <a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a>
           <% } %>
 
-            <% if (currentPage < totalPages) { %>
-              <a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a>
+            <% for (let i=1; i <=totalPages; i++) { %>
+              <a href="?page=<%= i %>" class="page-link <% if (i === currentPage) { %>active<% } %>">
+                <%= i %>
+              </a>
               <% } %>
-  </div>
+
+                <% if (currentPage < totalPages) { %>
+                  <a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a>
+                  <% } %>
+      </div>
 
 
     </div>
     </div>
     </div>
 
-  
+
 
 
     <!--sidebar Footer section-->

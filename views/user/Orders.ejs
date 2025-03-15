@@ -121,6 +121,31 @@
                 font-size: 11px;
                 margin-right: 3px;
             }
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+
+            .page-link {
+                padding: 4px 7px;
+                margin: 0 5px;
+                text-decoration: none;
+                color: #333;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+
+            .page-link:hover {
+                background: #f0f0f0;
+            }
+
+            .activeP {
+                background: #007bff;
+                color: white;
+                border: 1px solid #007bff;
+            }
         </style>
 
 
@@ -169,13 +194,13 @@
                                 </div>
 
                                 <div class="order-summary">
-                                    <% if (orderItem.orderedItems.length > 0 && orderItem.orderedItems[0].productId) { %>
+                                    <% if (orderItem.orderedItems.length> 0 && orderItem.orderedItems[0].productId) { %>
                                         <img src="/uploads/re-image/<%= orderItem.orderedItems[0].productId.productImage ? orderItem.orderedItems[0].productId.productImage[0] : '' %>"
                                             alt="Product Image">
-                                    <% } else { %>
-                                        <img src="/assets/img/Product Not Found.png" alt="Default Image">
-                                    <% } %>
-                                    
+                                        <% } else { %>
+                                            <img src="/assets/img/Product Not Found.png" alt="Default Image">
+                                            <% } %>
+
 
                                                 <div class="order-details">
                                                     <p><strong>Total Items:</strong>
@@ -198,6 +223,25 @@
 
 
         </div>
+
+        <div class="pagination">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a>
+            <% } %>
+        
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>" class="page-link <% if (i === currentPage) { %> activeP <% } %>">
+                    <%= i %>
+                </a>
+            <% } %>
+        
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a> 
+            <% } %>
+        </div>
+        
+
+
 
         <!--sidebar Footer section-->
         </section>
