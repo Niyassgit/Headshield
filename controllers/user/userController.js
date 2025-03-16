@@ -119,13 +119,13 @@ const signup = async (req, res) => {
         const { name, phone, email, password, cPassword } = req.body;
 
         if (password !== cPassword) {
-            req.session.errorMessage="Password do not match";
+            req.session.errorMessage = "Password do not match";
             return res.redirect("/signup");
         }
 
         const findUser = await User.findOne({ email });
         if (findUser) {
-            req.session.errorMessage="User with the same email already exists";
+            req.session.errorMessage = "User with the same email already exists";
             return res.redirect("signup");
         }
 
@@ -135,9 +135,17 @@ const signup = async (req, res) => {
             return res.status(500).json({ success: false, message: "Failed to send OTP email" });
         }
 
-
         req.session.userOtp = otp;
+        req.session.otpGeneratedTime = Date.now();
         req.session.userData = { name, phone, email, password };
+
+        // Set timeout to clear OTP after 1 minute
+        setTimeout(() => {
+            if (req.session && req.session.userOtp) {
+                req.session.userOtp = null;
+                req.session.save();
+            }
+        }, 60000);
 
         console.log("Session after setting OTP:", req.session);
 
@@ -147,7 +155,6 @@ const signup = async (req, res) => {
         return res.redirect("page-404");
     }
 };
-
 
 const securePassword=async (password)=>{
 
@@ -166,12 +173,14 @@ const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
 
-        if (otp.toString() === req.session.userOtp.toString()) {
+        if (!req.session.userOtp) {
+            return res.status(400).json({ success: false, message: "OTP has expired. Please request a new one." });
+        }
 
+        if (otp.toString() === req.session.userOtp.toString()) {
             const user = req.session.userData;
             const passwordHash = await securePassword(user.password);
           
-
             const saveUserData = new User({
                 name: user.name,
                 email: user.email,
@@ -183,10 +192,12 @@ const verifyOtp = async (req, res) => {
             try {
                 await saveUserData.save();
                 req.session.user = saveUserData._id;
+                // Clear the OTP data after successful verification
+                req.session.userOtp = null;
+                req.session.otpGeneratedTime = null;
                 return res.json({ success: true, redirectUrl: "/" });
             } catch (dbError) {
                 if (dbError.code === 11000) {
-                
                     return res.status(400).json({
                         success: false,
                         message: "Email or phone number already registered.",
@@ -196,7 +207,6 @@ const verifyOtp = async (req, res) => {
                 return res.status(500).json({ success: false, message: "Failed to save user data." });
             }
         } else {
-            
             return res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });
         }
     } catch (error) {
@@ -451,17 +461,39 @@ const loadAboutPage= async(req,res)=>{
         
     }
 };
-
 const resendOtp = async (req, res) => {
     try {
         if (!req.session.userData) {
             return res.status(400).json({ success: false, message: "Session expired. Please sign up again." });
         }
 
+        // Check if the OTP was generated less than 1 minute ago
+        const lastOtpTime = req.session.otpGeneratedTime || 0;
+        const currentTime = Date.now();
+        const timeDifference = (currentTime - lastOtpTime) / 1000; // in seconds
+
+        if (timeDifference < 60) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Please wait 1 minute before requesting a new OTP.",
+                timeRemaining: Math.ceil(60 - timeDifference)
+            });
+        }
+
         const { email } = req.session.userData;
         const newOtp = generateOtp(); 
 
-        req.session.userOtp = newOtp; 
+        req.session.userOtp = newOtp;
+        req.session.otpGeneratedTime = Date.now();
+        
+        // Set timeout to clear OTP after 1 minute
+        setTimeout(() => {
+            if (req.session && req.session.userOtp) {
+                req.session.userOtp = null;
+                req.session.save();
+            }
+        }, 60000);
+
         await req.session.save(); 
 
         const emailSent = await sendVerificationEmail(email, newOtp);
@@ -478,7 +510,6 @@ const resendOtp = async (req, res) => {
 };
 
 
-
 module.exports={
 
     loadHomepage,
@@ -492,5 +523,5 @@ module.exports={
     loadShoppingPage,
     getCount,
     loadAboutPage,
-    resendOtp
+    resendOtp,
 }

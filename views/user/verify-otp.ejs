@@ -156,58 +156,65 @@
             }
         });
 
-        resendLink.addEventListener('click', async (e) => {
+   // Modified resendLink event listener
+resendLink.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    Swal.fire({
-        title: 'Resend OTP?',
-        text: "Are you sure you want to resend the OTP? This will restart the timer.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, Resend',
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                const response = await fetch('/resend-otp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
+    // Check if the link is disabled
+    if (resendLink.style.pointerEvents === "none") {
+        return;
+    }
+
+    try {
+        const response = await fetch('/resend-otp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'OTP Resent',
+                text: 'A new OTP has been sent to your email.',
+            });
+
+            // Clear any existing inputs
+            inputs.forEach(input => input.value = '');
+            inputs[0].focus();
+
+            // Restart the timer
+            clearInterval(timerInterval);
+            startTimer();
+            resendLink.style.pointerEvents = "none";
+            resendLink.style.color = "grey";
+        } else {
+            if (data.timeRemaining) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please Wait',
+                    text: `Please wait ${data.timeRemaining} seconds before requesting a new OTP.`,
                 });
-
-                const data = await response.json();
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'OTP Resent',
-                        text: 'A new OTP has been sent to your email.',
-                    });
-
-                    // Restart the timer
-                    clearInterval(timerInterval);
-                    startTimer();
-                    resendLink.style.pointerEvents = "none";
-                    resendLink.style.color = "grey";
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Failed to Resend OTP',
-                        text: data.message,
-                    });
-                }
-            } catch (error) {
+            } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while resending OTP. Please try again later.',
+                    title: 'Failed to Resend OTP',
+                    text: data.message,
                 });
-                console.error('Error resending OTP:', error);
             }
         }
-    });
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while resending OTP. Please try again later.',
+        });
+        console.error('Error resending OTP:', error);
+    }
 });
+
 
     </script>
 </body>
