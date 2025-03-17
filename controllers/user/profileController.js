@@ -39,7 +39,6 @@ const sendVerificationEmail=async (email,otp)=>{
             html:`<b><h4>Your OTP: ${otp}</h4><br></b>`
         }
         const info=await transporter.sendMail(mailOptions);
-        console.log('Email sent:',info.messageId);
         return true;
 
       
@@ -81,7 +80,6 @@ const forgotEmailValid=async(req,res)=>{
             req.session.userOtp=otp;
             req.session.email=email;
             res.render("forgotPass-otp");
-            console.log("OTP:",otp);
 
 
         }else{
@@ -142,11 +140,11 @@ const resendOtp = async (req, res) => {
         req.session.otpExpiresAt = Date.now() + 60000; 
 
         const email = req.session.email;
-        console.log('Resending OTP to email:', email);
+     
 
         const emailSent = await sendVerificationEmail(email, otp);
         if (emailSent) {
-            console.log('Resend OTP:', otp);
+
             return res.status(200).json({ success: true, message: "Resend OTP Successful" });
         } else {
             return res.status(500).json({ success: false, message: "Failed to send OTP. Try again later." });
@@ -165,7 +163,6 @@ const postNewPassword = async(req,res)=>{
         const {newPassword,confirmPassword}= req.body;
         const email = req.session.email;
         if(newPassword== confirmPassword){
-            console.log("password matched")
             const passwordHash= await securePassword(newPassword);
             await User.updateOne({email:email},{$set:{password:passwordHash}});
             res.status(200).json({success:true})
@@ -244,7 +241,7 @@ const changePasswordValid = async (req,res)=>{
                 res.render("change-password-otp",{
                     user:userData,
                 });
-                console.log("Otp :",otp);
+            
             }else{
                 res.json({
 
@@ -270,7 +267,6 @@ const verifyChangePassOtp= async(req,res)=>{
     if(req.session.userOtp == EnteredOtp){
         res.json({success:true,redirectUrl:"/reset-password-user"})
     }else{
-        console.log("not matched");
         res.json({success:false, message:"Failed to match Otp"})
     }
     

@@ -14,8 +14,9 @@ const path = require("path");
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { address, paymentMethod, totalPrice, finalAmount, couponCode, razorpay_payment_id, paymentStatus: clientPaymentStatus } = req.body;
+        const { address, paymentMethod, totalPrice, discount, couponCode, razorpay_payment_id, paymentStatus: clientPaymentStatus } = req.body;
   
+      
         if (!address || !paymentMethod) {
             return res.status(400).json({
                 success: false,
@@ -80,7 +81,6 @@ const placeOrder = async (req, res) => {
 
         let couponApplied = false;
         let couponId = null;
-        let finalDiscount = 0;
 
         if (couponCode) {
             const coupon = await Coupon.findOne({ couponCode: couponCode });
@@ -111,19 +111,6 @@ const placeOrder = async (req, res) => {
                 couponApplied = true;
                 couponId = coupon._id;
 
-                let discountAmount = 0;
-                if (coupon.type === 'percentage') {
-                    discountAmount = (totalPrice * coupon.offerPrice) / 100;
-                } else {
-                    discountAmount = coupon.offerPrice;
-                }
-
-
-                if (coupon.maximumPrice && discountAmount > coupon.maximumPrice) {
-                    discountAmount = coupon.maximumPrice;
-                }
-
-                finalDiscount = discountAmount;
             } else {
                 return res.status(400).json({
                     success: false,
@@ -131,6 +118,8 @@ const placeOrder = async (req, res) => {
                 });
             }
         }
+
+       
 
 
         let savedAmount = 0;
@@ -170,7 +159,7 @@ const placeOrder = async (req, res) => {
             }
         } else if (paymentMethod === "wallet") {
             const wallet = await Wallet.findOne({ userId });
-            if (!wallet || wallet.balance < calculatedFinalAmount) {
+            if (!wallet || wallet.balance < totalPrice) {
                 return res.status(400).json({
                     success: false,
                     message: !wallet ? "Wallet not found!" : "Insufficient wallet balance!"
@@ -178,7 +167,7 @@ const placeOrder = async (req, res) => {
             }
             await Wallet.findOneAndUpdate(
                 { userId },
-                { $inc: { balance: -calculatedFinalAmount } }
+                { $inc: { balance: -totalPrice } }
             );
             paymentStatus = "Completed";
             status = "Confirmed";
@@ -206,17 +195,16 @@ const placeOrder = async (req, res) => {
             }
         }
 
-    let finalTotal=totalPrice+finalDiscount+savedAmount;
+    let finalTotal=totalPrice+discount+savedAmount;
 
-
-
+   
         const order = await Order.create({
             userId,
             orderedItems,
             totalPrice:finalTotal,
-            couponDiscount: finalDiscount,
+            couponDiscount: discount,
             productDiscount: savedAmount,
-            finalAmount: finalAmount,
+            finalAmount: totalPrice,
             address: selectedAddress,
             paymentMethod,
             invoiceDate: new Date(),
@@ -245,7 +233,7 @@ const placeOrder = async (req, res) => {
                      $push: {
                          transactions: {
                              transactionType: 'debit',
-                             amount: calculatedFinalAmount,
+                             amount: totalPrice,
                              description: 'Order placed using wallet',
                              status: 'Completed',
                              orderId: order.orderId
