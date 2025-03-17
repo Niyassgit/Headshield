@@ -136,6 +136,11 @@
                     </span>
                 </div>
                 <div id="error5" class="error-message text-danger"></div>
+                <% if (referralCode && referralCode.trim().length > 0) { %>
+                    <input type="text" name="referralCode" value="<%= referralCode %>" placeholder="Referral Code (optional)">
+                <% } %>
+                
+
         
                 <% if (locals.message && message.length > 0) { %>
                 <div class="alert alert-danger text-center"><%= message %></div>

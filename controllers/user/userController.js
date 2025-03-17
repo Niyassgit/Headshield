@@ -2,6 +2,7 @@ const User=require("../../models/userSchema");
 const Category=require("../../models/categorySchema");
 const Product=require("../../models/productSchema");
 const Brand=require("../../models/brandSchema");
+const Wallet=require("../../models/walletSchema");
 const nodemailer=require("nodemailer");
 const { applyBestOffer }=require("../../helpers/offerHelper");
 const { getUserCartAndWishlistCount } = require("../../helpers/userHelper");
@@ -55,13 +56,14 @@ const loadHomepage = async (req, res) => {
 const loadSignup= async(req,res)=>{
 
     try{
+        const referralCode = req.query.ref || "";
 
         if(req.session){
 
             const errorMessage=req.session.errorMessage;
             req.session.errorMessage=null;
 
-         return res.render("signup",{message:errorMessage});
+         return res.render("signup",{message:errorMessage,referralCode});
         }
 
     }catch(error){
@@ -78,8 +80,8 @@ function generateOtp(){
  
     return Math.floor(100000+Math.random()*900000).toString();
 
+    
 }
-
 async function sendVerificationEmail(email,otp){
 
     try {
@@ -97,7 +99,6 @@ async function sendVerificationEmail(email,otp){
             }
 
         })
-
         const info = await transporter.sendMail({
             from:process.env.NODEMAILER_EMAIL,
             to:email,
@@ -116,7 +117,7 @@ async function sendVerificationEmail(email,otp){
 
 const signup = async (req, res) => {
     try {
-        const { name, phone, email, password, cPassword } = req.body;
+        const { name, phone, email, password, cPassword, referralCode } = req.body;
 
         if (password !== cPassword) {
             req.session.errorMessage = "Password do not match";
@@ -126,10 +127,22 @@ const signup = async (req, res) => {
         const findUser = await User.findOne({ email });
         if (findUser) {
             req.session.errorMessage = "User with the same email already exists";
-            return res.redirect("signup");
+            return res.redirect("/signup");
+        }
+
+        let referredBy = null;
+        if (referralCode) {
+            const referrer = await User.findOne({ referralCode: referralCode }); 
+            if (referrer) {
+                referredBy = referrer._id;
+            } else {
+                req.session.errorMessage = "Invalid referral code"; 
+                return res.redirect("/signup");
+            }
         }
 
         const otp = generateOtp();
+        console.log("otp:",otp);
         const emailSent = await sendVerificationEmail(email, otp);
         if (!emailSent) {
             return res.status(500).json({ success: false, message: "Failed to send OTP email" });
@@ -137,9 +150,8 @@ const signup = async (req, res) => {
 
         req.session.userOtp = otp;
         req.session.otpGeneratedTime = Date.now();
-        req.session.userData = { name, phone, email, password };
+        req.session.userData = { name, phone, email, password, referredBy }; 
 
-        // Set timeout to clear OTP after 1 minute
         setTimeout(() => {
             if (req.session && req.session.userOtp) {
                 req.session.userOtp = null;
@@ -147,14 +159,13 @@ const signup = async (req, res) => {
             }
         }, 60000);
 
-        console.log("Session after setting OTP:", req.session);
-
         return res.render("Verify-otp");
     } catch (error) {
         console.error("Signup error:", error);
-        return res.redirect("page-404");
+        return res.redirect("/page-404");
     }
 };
+
 
 const securePassword=async (password)=>{
 
@@ -185,6 +196,7 @@ const verifyOtp = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 phone: user.phone,
+                referredBy: user.referredBy || null,
                 password: passwordHash,
                 ...(user.googleId && { googleId: user.googleId }), 
             });
@@ -192,9 +204,54 @@ const verifyOtp = async (req, res) => {
             try {
                 await saveUserData.save();
                 req.session.user = saveUserData._id;
-                // Clear the OTP data after successful verification
                 req.session.userOtp = null;
                 req.session.otpGeneratedTime = null;
+                
+                const newWallet = new Wallet({
+                    userId: saveUserData._id,
+                    balance: user.referredBy ? 200 : 0,
+                    transactions: user.referredBy ? [
+                        {
+                            transactionType: 'credit',
+                            amount: 200,
+                            description: 'Referral bonus for signing up',
+                            status: 'Completed'
+                        }
+                    ] : []
+                });
+                await newWallet.save();
+                
+
+                if (user.referredBy) {
+                    const referrerWallet = await Wallet.findOne({ userId: user.referredBy });
+                    
+                    if (referrerWallet) {
+
+                        referrerWallet.balance += 200;
+                        referrerWallet.transactions.push({
+                            transactionType: 'credit',
+                            amount: 200,
+                            description: `Referral bonus for inviting ${saveUserData.name}`,
+                            status: 'Completed'
+                        });
+                        await referrerWallet.save();
+                    } else {
+                        const newReferrerWallet = new Wallet({
+                            userId: user.referredBy,
+                            balance: 200,
+                            transactions: [
+                                {
+                                    transactionType: 'credit',
+                                    amount: 200,
+                                    description: `Referral bonus for inviting ${saveUserData.name}`,
+                                    status: 'Completed'
+                                }
+                            ]
+                        });
+                        await newReferrerWallet.save();
+                    }
+                }
+                
                 return res.json({ success: true, redirectUrl: "/" });
             } catch (dbError) {
                 if (dbError.code === 11000) {

@@ -59,19 +59,6 @@ const userSchema=new Schema({
             type:Date,
             default:Date.now,
         },
-        referalCode:{
-            type:String,
-
-        },
-        redeemed:{
-            type:Boolean,
-
-        },
-        redeemedUsers:[{
-            type:Schema.Types.ObjectId,
-            ref:"User"
-        }],
-        
         searchHistory:[{
          category:{
             type:Schema.Types.ObjectId,
@@ -86,9 +73,34 @@ const userSchema=new Schema({
             default:Date.now
          }
 
-        }]
+        }],
+        referralCode: { 
+            type: String,
+            unique: true 
+        },
+        referredBy: {
+             type: mongoose.Schema.Types.ObjectId, 
+             ref: "User", 
+             default: null 
+        },
 
 
+});
+
+userSchema.pre("save", async function (next) {
+    if (!this.referralCode) {
+        let newCode;
+        let isUnique = false;
+        while (!isUnique) {
+            newCode = Math.random().toString(36).substr(2, 8).toUpperCase();
+            const existingUser = await mongoose.model("User").findOne({ referralCode: newCode });
+            if (!existingUser) {
+                isUnique = true;
+            }
+        }
+        this.referralCode = newCode;
+    }
+    next();
 });
 const User=mongoose.model("User",userSchema);
 module.exports=User;

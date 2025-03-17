@@ -205,69 +205,70 @@
         </div>
       </div>
 
-
-      <!-- Transaction History -->
-      <!-- Transaction History -->
+  <!-- Transaction History -->
       <div class="history-container">
         <h2 class="history-title">Transaction History</h2>
 
-        <% if (wallet.transactions && wallet.transactions.length> 0) { %>
+        <% if (wallet.transactions && wallet.transactions.length > 0) { %>
           <div class="transactions">
-            <% wallet.transactions.forEach(item=> { %>
-              <% if (item.transactionType=="credit" ) { %>
+            <% wallet.transactions.forEach(item => { %>
+              <% if (item.transactionType == "credit") { %>
                 <div class="transaction-item credit-transaction">
                   <div class="transaction-info">
                     <div class="icon-circle credit-icon">
                       <i class="fas fa-arrow-down"></i>
                     </div>
                     <div class="transaction-content">
-                      <div class="transaction-type credit">+₹<%= item.amount.toLocaleString('en-IN') %>
-                      </div>
+                      <div class="transaction-type credit">+₹<%= item.amount.toLocaleString('en-IN') %></div>
                       <div class="transaction-details">
                         <span class="transaction-title">
-                          <% if (item.description==="Wallet recharge" ) { %>
+                          <% if (item.description === "Wallet recharge") { %>
                             Wallet Top-Up
-                            <% } else { %>
-                              <%= item.description %>
-                                <% } %>
+                          <% } else if (item.description && item.description.includes("Referral bonus")) { %>
+                            <%= item.description %>
+                          <% } else { %>
+                            <%= item.description %>
+                          <% } %>
                         </span>
                         <span class="transaction-date">
-                          <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long' , year: 'numeric' ,
-                            month: 'long' , day: 'numeric' }) %>
+                          <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
                         </span>
                       </div>
                     </div>
                   </div>
                   <div class="transaction-status completed">Completed</div>
                 </div>
-                <% } else if (item.transactionType=="debit" ) { %>
-                  <div class="transaction-item debit-transaction">
-                    <div class="transaction-info">
-                      <div class="icon-circle debit-icon">
-                        <i class="fas fa-arrow-up"></i>
-                      </div>
-                      <div class="transaction-content">
-                        <div class="transaction-type debit">-₹<%= item.amount.toLocaleString('en-IN') %>
-                        </div>
-                        <div class="transaction-details">
-                          <span class="transaction-title">Purchase - Order Id <%=item.orderId %></span>
-                          <span class="transaction-date">
-                            <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long' , year: 'numeric' ,
-                              month: 'long' , day: 'numeric' }) %>
-                          </span>
-                        </div>
+              <% } else if (item.transactionType == "debit") { %>
+                <div class="transaction-item debit-transaction">
+                  <div class="transaction-info">
+                    <div class="icon-circle debit-icon">
+                      <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="transaction-content">
+                      <div class="transaction-type debit">-₹<%= item.amount.toLocaleString('en-IN') %></div>
+                      <div class="transaction-details">
+                        <span class="transaction-title">
+                          <% if (item.orderId) { %>
+                            Purchase - Order Id <%= item.orderId %>
+                          <% } else { %>
+                            <%= item.description %>
+                          <% } %>
+                        </span>
+                        <span class="transaction-date">
+                          <%= new Date(item.createdAt).toLocaleString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                        </span>
                       </div>
                     </div>
-                    <div class="transaction-status completed">Completed</div>
                   </div>
-                  <% } %>
-                    <% }) %>
+                  <div class="transaction-status completed">Completed</div>
+                </div>
+              <% } %>
+            <% }) %>
           </div>
-          <% } else { %>
-            <p class="no-transaction">No transactions found.</p>
-            <% } %>
+        <% } else { %>
+          <p class="no-transaction">No transactions found.</p>
+        <% } %>
       </div>
-
       <!-- Pagination -->
       <div class="pagination">
         <% if (currentPage> 1) { %>
