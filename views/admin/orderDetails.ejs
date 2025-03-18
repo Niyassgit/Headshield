@@ -259,8 +259,10 @@
     
     <!-- Footer Section -->
     <div class="footer">
+        <p class="text-muted" style="font-size: small;">Orders below ₹7000 have a delivery charge of ₹40.</p>
         <p><strong>Total Price:</strong> ₹<%= orders.totalPrice %></p>
-        <p><strong>Discount:</strong> ₹<%= orders.discount %></p>
+        <p><strong>product Discount:</strong> ₹<%= orders.productDiscount %></p>
+        <p><strong>Coupon Discount:</strong> ₹<%= orders.couponDiscount %></p>
         <p><strong>Final Amount:</strong> ₹<%= orders.finalAmount %></p>
     </div>
 </div>
