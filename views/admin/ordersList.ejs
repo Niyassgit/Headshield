@@ -21,6 +21,16 @@
         border-radius: 5px;
         font-size: 14px;
     }
+    /* New style for return request hint */
+    .return-request-hint {
+        background-color: #ffc107;
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin-left: 5px;
+        display: inline-block;
+    }
 </style>
 
 <div class="container">
@@ -29,33 +39,34 @@
             <h4 class="mb-0">User Orders</h4>
         </div>
         <div class="card-body">
-         <!-- Replace your existing search input with this form -->
-<div class="mb-3 d-flex justify-content-between">
-  <form id="searchForm" class="d-flex gap-2 w-50">
-      <input 
-          type="text" 
-          id="searchInput" 
-          name="search"
-          class="form-control" 
-          placeholder="Search orders..."
-          value="<%= locals.search || '' %>"
-      >
-      <button type="submit" class="btn btn-primary">
-          Search
-      </button>
-  </form>
-  <select id="filterStatus" class="form-control w-25">
-      <option value="">All Orders</option>
-      <option value="Pending">Pending</option>
-      <option value="Processing">Processing</option>
-      <option value="Shipped">Shipped</option>
-      <option value="Delivered">Delivered</option>
-      <option value="Cancelled">Cancelled</option>
-      <option value="Return Request">Return Request</option>
-      <option value="Return Request">Return Rejected</option>
-      <option value="Returned">Returned</option>
-  </select>
-</div>
+            <!-- Search and Filter Form -->
+            <div class="mb-3 d-flex justify-content-between">
+                <form id="searchForm" class="d-flex gap-2 w-50">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        name="search"
+                        class="form-control" 
+                        placeholder="Search orders..."
+                        value="<%= locals.search || '' %>"
+                    >
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+                </form>
+                <select id="filterStatus" class="form-control w-25">
+                    <option value="">All Orders</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Return Request">Return Request</option>
+                    <option value="Return Rejected">Return Rejected</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -70,7 +81,6 @@
                         </tr>
                     </thead>
                     <tbody id="orderTable">
-
                         <% function getStatusBadgeClass(status) { 
                             switch (status) {
                                 case "Pending": return "bg-warning text-dark"; 
@@ -81,14 +91,14 @@
                                 case "Return Request": return "bg-secondary"; 
                                 case "Return Rejected": return "bg-danger text-warning"; 
                                 case "Returned": return "bg-dark"; 
-                                case "Payment Failed": 
-                                return "bg-danger text-white";
+                                case "Payment Failed": return "bg-danger text-white";
                                 default: return "bg-light text-dark"; 
                             }
                         } %>
 
                         <% if (orders.length > 0) { %>
                             <% orders.forEach((order, index) => { %>
+                                <% const hasReturnRequest = order.orderedItems.some(item => item.status === "Return Request"); %>
                                 <tr>
                                     <td><%= index + 1 %></td>
                                     <td><%= order.orderId %></td>   
@@ -98,13 +108,16 @@
                                         <span class="status-badge <%= getStatusBadgeClass(order.status) %>">
                                             <%= order.status %>
                                         </span>
+                                        <% if (hasReturnRequest) { %>
+                                            <span class="return-request-hint">Return Requested</span>
+                                        <% } %>
                                     </td>
                                     <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
                                     <td>
                                         <a href="/admin/order-details?orderId=<%= order._id %>" class="btn btn-info btn-sm">View</a>
-                                        <% if(order.status !== 'Cancelled') { %>
-                                          <a href="#" class="btn btn-danger btn-sm cancel-btn" data-order-id="<%= order._id %>">Cancel</a>
-                                      <% }  %>                                   
+                                        <% if (order.status !== 'Cancelled') { %>
+                                            <a href="#" class="btn btn-danger btn-sm cancel-btn" data-order-id="<%= order._id %>">Cancel</a>
+                                        <% } %>                                   
                                     </td>
                                 </tr>
                             <% }) %>
@@ -113,62 +126,56 @@
                                 <td colspan="7" class="text-center">No orders found.</td>
                             </tr>
                         <% } %>
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-     <!-- Pagination -->
-     <div class="pagination-area mt-30 mb-50">
+    <!-- Pagination (unchanged) -->
+    <div class="pagination-area mt-30 mb-50">
         <nav aria-label="Page navigation example">
-          <ul class="pagination justify-content-center">
-      
-            <!-- Previous Page Link -->
-            <% if (currentPage > 1) { %>
-              <li class="page-item">
-                <a class="page-link" href="/admin/orders?page=<%= currentPage - 1 %>">
-                  <i class="material-icons md-chevron_left"></i>
-                </a>
-              </li>
-            <% } else { %>
-              <li class="page-item disabled">
-                <span class="page-link"><i class="material-icons md-chevron_left"></i></span>
-              </li>
-            <% } %>
-      
-            <!-- Page Number Links -->
-            <% for (let i = 1; i <= totalPage; i++) { %>
-              <% if (i === currentPage) { %>
-                <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
-              <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
-                <li class="page-item"><a class="page-link" href="/admin/orders?page=<%= i %>">0<%= i %></a></li>
-              <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
-                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-              <% } %>
-            <% } %>
-      
-            <!-- Next Page Link -->
-            <% if (currentPage < totalPage) { %>
-              <li class="page-item">
-                <a class="page-link" href="/admin/orders?page=<%= currentPage + 1 %>">
-                  <i class="material-icons md-chevron_right"></i>
-                </a>
-              </li>
-            <% } else { %>
-              <li class="page-item disabled">
-                <span class="page-link"><i class="material-icons md-chevron_right"></i></span>
-              </li>
-            <% } %>
-      
-          </ul>
+            <ul class="pagination justify-content-center">
+                <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/admin/orders?page=<%= currentPage - 1 %>">
+                            <i class="material-icons md-chevron_left"></i>
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="material-icons md-chevron_left"></i></span>
+                    </li>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPage; i++) { %>
+                    <% if (i === currentPage) { %>
+                        <li class="page-item active"><a class="page-link" href="#">0<%= i %></a></li>
+                    <% } else if (i === 1 || i === totalPage || Math.abs(i - currentPage) <= 2) { %>
+                        <li class="page-item"><a class="page-link" href="/admin/orders?page=<%= i %>">0<%= i %></a></li>
+                    <% } else if (i === currentPage + 3 || i === currentPage - 3) { %>
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                    <% } %>
+                <% } %>
+
+                <% if (currentPage < totalPage) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/admin/orders?page=<%= currentPage + 1 %>">
+                            <i class="material-icons md-chevron_right"></i>
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="material-icons md-chevron_right"></i></span>
+                    </li>
+                <% } %>
+            </ul>
         </nav>
-      </div>
+    </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-
 const searchForm = document.getElementById('searchForm');
 const searchInput = document.getElementById('searchInput');
 
@@ -176,15 +183,12 @@ if (searchForm && searchInput) {
     searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const searchValue = searchInput.value;
-        
-       
         let url = new URL(window.location.href);
         url.searchParams.set('search', searchValue);
         url.searchParams.set('page', '1'); 
         window.location.href = url.toString();
     });
 }
-
 
 const filterStatus = document.getElementById("filterStatus");
 if (filterStatus) {
@@ -238,10 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     });
-  });
+});
 </script>
 
 <%- include('../partials/admin/footer') %>
-
-
-

@@ -1,202 +1,255 @@
 <%- include("../partials/admin/header") %>
-<style>
-    /* General Styles */
-    body {
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        background-color: #f4f4f9;
-        margin: 0;
-        padding: 0;
-        color: #333;
-    }
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
 
-    /* Admin Order Container */
-    .order-container {
-        width: 90%;
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background-color: #fff;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        border-radius: 16px;
-    }
+        /* Admin Order Container */
+        .order-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+        }
 
-    /* Header Section */
-    .order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 1.5rem;
-        margin-bottom: 2rem;
-        border-bottom: 2px solid #f1f1f1;
-    }
+        /* Header Section */
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f1f1f1;
+        }
 
-    .order-header h2 {
-        margin: 0;
-        font-weight: 600;
-    }
+        .order-header h2 {
+            margin: 0;
+            font-weight: 600;
+        }
 
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
 
-    /* Product Box - Updated */
-    .product-box {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding: 1.5rem;
-        background-color: #ffffff;
-        border: 1px solid #eaeaea;
-        border-radius: 12px;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
+        /* Product Box - Updated */
+        .product-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border: 1px solid #eaeaea;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
 
-    .product-box:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    }
+        .product-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
 
-    .product-details {
-        flex: 1;
-        padding-right: 2rem;
-    }
+        .product-details {
+            flex: 1;
+            padding-right: 2rem;
+        }
 
-    .product-details p {
-        margin: 0.5rem 0;
-        font-size: 0.95rem;
-        color: #555;
-        line-height: 1.5;
-    }
+        .product-details p {
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
 
-    .product-details strong {
-        color: #333;
-        font-weight: 600;
-    }
+        .product-details strong {
+            color: #333;
+            font-weight: 600;
+        }
 
-    /* Product Image - Updated */
-    .product-image {
-        width: 120px;
-        height: 120px;
-        flex-shrink: 0;
-        border-radius: 8px;
-        overflow: hidden;
-    }
+        /* Product Image - Updated */
+        .product-image {
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-    .product-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 8px;
-    }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
 
-    /* Status Update Section */
-    .status-update-container {
-        margin-top: 2rem;
-        padding: 1.5rem;
-        background-color: #f8f9fa;
-        border-radius: 12px;
-    }
+        /* Status Update Section */
+        .status-update-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
 
-    .status-update-container select {
-        padding: 0.75rem 1rem;
-        font-size: 0.95rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        width: 200px;
-        margin-right: 1rem;
-        background-color: white;
-    }
+        .status-update-container select {
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            width: 200px;
+            margin-right: 1rem;
+            background-color: white;
+        }
 
-    .status-update-container button {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.95rem;
-        border: none;
-        border-radius: 8px;
-        background-color: #4f46e5;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
+        .status-update-container button {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #4f46e5;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
 
-    .status-update-container button:hover {
-        background-color: #4338ca;
-    }
+        .status-update-container button:hover {
+            background-color: #4338ca;
+        }
 
-    /* Footer Section */
-    .footer {
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 2px solid #f1f1f1;
-    }
+        /* Footer Section */
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f1f1f1;
+        }
 
-    .footer p {
-        font-size: 1rem;
-        margin: 0.75rem 0;
-        color: #444;
-    }
+        .footer p {
+            font-size: 1rem;
+            margin: 0.75rem 0;
+            color: #444;
+        }
 
-    .footer p strong {
-        color: #333;
-    }
+        .footer p strong {
+            color: #333;
+        }
 
-    /* Address Section */
-    .address-section {
-        padding: 1.5rem;
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        margin: 1.5rem 0;
-    }
+        /* Address Section */
+        .address-section {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
 
-    .address-section p {
-        margin: 0.5rem 0;
-        line-height: 1.6;
-    }
-    .cancellation-description {
-    background-color: #ffe3e3;
-    color: #d9534f;
-    padding: 1rem;
-    border-left: 4px solid #d9534f;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-}
-.return-description {
-    background-color: rgb(198, 193, 193);
-    color: rgb(40, 39, 39);
-    padding: 1rem;
-    border-left: 4px solid rgb(40, 39, 39);
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-}
-</style>
+        .address-section p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .cancellation-description {
+            background-color: #ffe3e3;
+            color: #d9534f;
+            padding: 1rem;
+            border-left: 4px solid #d9534f;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .return-description {
+            background-color: rgb(198, 193, 193);
+            color: rgb(40, 39, 39);
+            padding: 1rem;
+            border-left: 4px solid rgb(40, 39, 39);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-box-cancelled {
+            border-left: 4px solid #d9534f;
+            background-color: #ffe3e3;
+        }
+
+        .product-box-returned {
+            border-left: 4px solid #6c757d;
+            background-color: #e9ecef;
+        }
+
+        .reason-text {
+            font-style: italic;
+            margin-top: 0.5rem;
+            color: #555;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .sanction-btn {
+            padding: 0.5rem 1rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .sanction-btn:hover {
+            background-color: #218838;
+        }
+
+        .reject-btn {
+            padding: 0.5rem 1rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .reject-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
 
 <body>
-<div class="order-container">
-    <!-- Order Header -->
-    <div class="order-header">
-        <% function getStatusBadgeClass(status) { 
-            switch (status) {
-                case "Pending": return "bg-warning text-dark"; 
-                case "Confirmed": return "bg-primary"; 
-                case "Shipped": return "bg-info text-dark"; 
-                case "Delivered": return "bg-success"; 
-                case "Cancelled": return "bg-danger"; 
-                case "Return Request": return "bg-secondary";
-                case "Return Rejected": return "bg-danger text-warning"; 
-                case "Returned": return "bg-dark text-white";case "Payment Failed": 
-                return "bg-danger text-white"; 
-                default: return "bg-light text-dark"; 
-            }
-        } %>
-        <p>Order ID:<%=orders.orderId %></p>
-        <span class="status-badge <%= getStatusBadgeClass(orders.status) %>">
-            <%= orders.status %>
-        </span>
-    </div>
-            <!-- Cancellation Description (Only visible if the order is cancelled) -->
+    <div class="order-container">
+        <!-- Order Header -->
+        <div class="order-header">
+            <% function getStatusBadgeClass(status) { 
+                switch (status) {
+                    case "Pending": return "bg-warning text-dark"; 
+                    case "Confirmed": return "bg-primary"; 
+                    case "Shipped": return "bg-info text-dark"; 
+                    case "Delivered": return "bg-success"; 
+                    case "Cancelled": return "bg-danger"; 
+                    case "Return Request": return "bg-secondary"; 
+                    case "Return Rejected": return "bg-danger text-warning"; 
+                    case "Returned": return "bg-dark text-white"; 
+                    case "Payment Failed": return "bg-danger text-white"; 
+                    default: return "bg-light text-dark"; 
+                }
+            } %>
+            <p>Order ID: <%= orders.orderId %></p>
+            <span class="status-badge <%= getStatusBadgeClass(orders.status) %>">
+                <%= orders.status %>
+            </span>
+        </div>
+
+        <!-- Cancellation Description (Order-level) -->
         <% if (orders.status === "Cancelled" && orders.cancelReason) { %>
             <div class="cancellation-description">
                 <p><strong>Cancellation Reason:</strong></p>
@@ -208,114 +261,224 @@
                 <p><strong>Order has been cancelled by Admin</strong></p>
             </div>
         <% } %>
-        <% if (orders.status === "Return Request"||orders.status==="Returned" && orders.returnReason) { %>
+
+        <!-- Return Description (Order-level) -->
+        <% if (orders.status === "Return Request" || (orders.status === "Returned" && orders.returnReason)) { %>
             <div class="return-description">
-                <p><strong>Cancellation Reason:</strong></p>
-                <p><%= orders.returnReason %></p>
+                <p><strong>Return Reason:</strong></p>
+                <p><%= orders.returnReason || "Pending admin action" %></p>
             </div>
         <% } %>
 
-    <p><strong>Invoice Date:</strong> <%= new Date(orders.createdAt).toLocaleDateString() %></p>
-    <p><strong>Payment Method:</strong> <%= orders.paymentMethod %></p>
-    <p><strong>Coupon Applied:</strong> <%= orders.couponApplied %></p>
+        <p><strong>Invoice Date:</strong> <%= new Date(orders.createdAt).toLocaleDateString() %></p>
+        <p><strong>Payment Method:</strong> <%= orders.paymentMethod %></p>
+        <p><strong>Coupon Applied:</strong> <%= orders.couponApplied %></p>
 
-    <div class="address-section">
-        <p><strong>Delivery Address:</strong></p>
-        <p><%= orders.address.name %><br><%= orders.address.landMark%> <%=orders.address.city%> <%=orders.address.state%>,<%=orders.address.country%> <%=orders.address.pincode%><br><%=orders.address.phone %></p>
+        <div class="address-section">
+            <p><strong>Delivery Address:</strong></p>
+            <p><%= orders.address.name %><br><%= orders.address.landMark %> <%= orders.address.city %> <%= orders.address.state %>, <%= orders.address.country %> <%= orders.address.pincode %><br><%= orders.address.phone %></p>
+        </div>
+
+        <!-- Product Boxes with Action Buttons -->
+        <% if (products && products.length > 0) { %>
+            <% products.forEach((item) => { %>
+                <div class="product-box <%= item.status === 'Cancelled' ? 'product-box-cancelled' : item.status === 'Returned' ? 'product-box-returned' : '' %>">
+                    <div class="product-details">
+                        <p><strong>Product Name:</strong> <%= item.productName %></p>
+                        <p><strong>Quantity:</strong> <%= item.quantity %></p>
+                        <p><strong>Price:</strong> ₹<%= item.price %></p>
+                        <p><strong>Total:</strong> ₹<%= item.total %></p>
+                        <p><strong>Status:</strong> <%= item.status %></p>
+
+                        <!-- Show Cancellation Reason if Cancelled (User or Admin) -->
+                        <% if (item.status === 'Cancelled' && item.cancelReason) { %>
+                            <p class="reason-text"><strong>Cancellation Reason:</strong> <%= item.cancelReason %></p>
+                        <% } %>
+
+                        <!-- Show Return Reason if Returned or Return Request (User-provided) -->
+                        <% if ((item.status === 'Return Request' || item.status === 'Returned' || item.status == 'Return Rejected') && item.returnReason) { %>
+                            <p class="reason-text"><strong>Return Reason:</strong> <%= item.returnReason %></p>
+                        <% } %>
+
+                        <!-- Action Buttons for Return Request -->
+                        <% if (item.status === "Return Request") { %>
+                            <div class="action-buttons">
+                                <button class="sanction-btn" 
+                                        data-order-id="<%= orders._id %>" 
+                                        data-product-id="<%= item.productId || 'missing' %>">
+                                    Sanction Return
+                                </button>
+                                <button class="reject-btn" 
+                                        data-order-id="<%= orders._id %>" 
+                                        data-product-id="<%= item.productId || 'missing' %>">
+                                    Reject Return
+                                </button>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="product-image">
+                        <img src="/uploads/re-image/<%= item.productImage[0] %>" 
+                             alt="<%= item.productName %>"
+                             onerror="this.src='/images/default-image.jpg'">
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <!-- Status Update Section -->
+        <div class="status-update-container">
+            <label for="orderStatus">Update Order Status: </label>
+            <select id="orderStatus" data-order-id="<%= orders._id %>">
+                <option value="Pending" <%= orders.status === "Pending" ? "selected" : "" %>>Pending</option>
+                <option value="Confirmed" <%= orders.status === "Confirmed" ? "selected" : "" %>>Confirmed</option>
+                <option value="Shipped" <%= orders.status === "Shipped" ? "selected" : "" %>>Shipped</option>
+                <option value="Delivered" <%= orders.status === "Delivered" ? "selected" : "" %>>Delivered</option>
+                <option value="Cancelled" <%= orders.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+                <option value="Return Rejected" <%= orders.status === "Return Rejected" ? "selected" : "" %>>Return Rejected</option>
+                <option value="Returned" <%= orders.status === "Returned" ? "selected" : "" %>>Returned</option>
+            </select>
+            <button id="updateStatusBtn">Update Status</button>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p class="text-muted" style="font-size: small;">Orders below ₹10,000 have a delivery charge of ₹40.</p>
+            <p><strong>Total Price:</strong> ₹<%= orders.totalPrice %></p>
+            <p><strong>Product Discount:</strong> ₹<%= orders.productDiscount %></p>
+            <p><strong>Coupon Discount:</strong> ₹<%= orders.couponDiscount %></p>
+            <p><strong>Final Amount:</strong> ₹<%= orders.finalAmount %></p>
+        </div>
     </div>
-
-    <% if (products && products.length > 0) { %>
-        <% products.forEach((item) => { %>
-            <div class="product-box">
-                <div class="product-details">
-                    <p><strong>Product Name:</strong> <%= item.productName %></p>
-                    <p><strong>Quantity:</strong> <%= item.quantity %></p>
-                    <p><strong>Price:</strong> ₹<%= item.price %></p>
-                    <p><strong>Total:</strong> ₹<%= item.total %></p>
-                </div>
-                <!-- Product Image Section -->
-                <div class="product-image">
-                    <img src="/uploads/re-image/<%= item.productImage[0] %>" 
-                         alt="<%= item.productName %>"
-                         onerror="this.src='/images/default-image.jpg'">
-                </div>
-            </div>
-        <% }) %>
-    <% } %>
-  <!-- Status Update Section -->    
-<div class="status-update-container">
-    <label for="orderStatus">Update Order Status: </label>
-    <select id="orderStatus" data-order-id="<%= orders._id %>">
-        <option value="Pending" <%= orders.status === "Pending" ? "selected" : "" %>>Pending</option>
-        <option value="Confirmed" <%= orders.status === "Confirmed" ? "selected" : "" %>>Confirmed</option>
-        <option value="Shipped" <%= orders.status === "Shipped" ? "selected" : "" %>>Shipped</option>
-        <option value="Delivered" <%= orders.status === "Delivered" ? "selected" : "" %>>Delivered</option>
-        <option value="Cancelled" <%= orders.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
-        <option value="Return Rejected" <%= orders.status === "Return Rejected" ? "selected" : "" %>>Return Rejected</option>
-        <option value="Returned" <%= orders.status === "Returned" ? "selected" : "" %>>Returned</option>
-    </select>
-    <button id="updateStatusBtn">Update Status</button>
-</div>
     
-    <!-- Footer Section -->
-    <div class="footer">
-        <p class="text-muted" style="font-size: small;">Orders below ₹7000 have a delivery charge of ₹40.</p>
-        <p><strong>Total Price:</strong> ₹<%= orders.totalPrice %></p>
-        <p><strong>product Discount:</strong> ₹<%= orders.productDiscount %></p>
-        <p><strong>Coupon Discount:</strong> ₹<%= orders.couponDiscount %></p>
-        <p><strong>Final Amount:</strong> ₹<%= orders.finalAmount %></p>
-    </div>
-</div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            // Existing updateStatusBtn logic unchanged
+            document.getElementById("updateStatusBtn").addEventListener("click", async function () {
+                const selectElement = document.getElementById("orderStatus");
+                const orderId = selectElement.getAttribute("data-order-id");
+                const newStatus = selectElement.value;
 
 
-<script>
-    document.getElementById("updateStatusBtn").addEventListener("click", async function () {
-        const selectElement = document.getElementById("orderStatus");
-        const orderId = selectElement.getAttribute("data-order-id");
-        const newStatus = selectElement.value;
+                try {
+                    const response = await fetch(`/admin/update-order-status/${orderId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ status: newStatus }),
+                    });
+                    const result = await response.json();
 
-        console.log("orderid and new status:", orderId, newStatus);
-
-        try {
-            const response = await fetch(`/admin/update-order-status/${orderId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ status: newStatus }),
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Order status updated successfully!',
+                            confirmButtonColor: '#4f46e5',
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Update Failed',
+                            text: 'Failed to update order status. Please try again.',
+                            confirmButtonColor: '#d33',
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error updating order status:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'An error occurred. Please try again.',
+                        confirmButtonColor: '#d33',
+                    });
+                }
             });
-            const result = await response.json();
 
-            if (result.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Order status updated successfully!',
-                    confirmButtonColor: '#4f46e5',
-                }).then(() => {
-                    window.location.reload(); // Reload after confirmation
+            document.querySelectorAll(".sanction-btn").forEach(btn => {
+                btn.addEventListener("click", async function () {
+                    const orderId = this.getAttribute("data-order-id");
+                    const productId = this.getAttribute("data-product-id");
+
+                    try {
+                        const response = await fetch(`/admin/return-product/${orderId}/${productId}`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ status: "Returned" }),
+                            credentials: "include"
+                        });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Return Sanctioned',
+                                text: 'Return request has been approved.',
+                                confirmButtonColor: '#28a745'
+                            }).then(() => window.location.reload());
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed',
+                                text: result.message || 'Failed to sanction return.',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Fetch error:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops!',
+                            text: 'An error occurred. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
                 });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Update Failed',
-                    text: 'Failed to update order status. Please try again.',
-                    confirmButtonColor: '#d33',
-                });
-            }
-        } catch (error) {
-            console.error("Error updating order status:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops!',
-                text: 'An error occurred. Please try again.',
-                confirmButtonColor: '#d33',
             });
-        }
-    });
-</script>
 
+            document.querySelectorAll(".reject-btn").forEach(btn => {
+                btn.addEventListener("click", async function () {
+                    const orderId = this.getAttribute("data-order-id");
+                    const productId = this.getAttribute("data-product-id");
 
-<%- include("../partials/admin/footer") %>
+                    try {
+                        const response = await fetch(`/admin/return-product/${orderId}/${productId}`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ status: "Return Rejected" })
+                        });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Return Rejected',
+                                text: 'Return request has been rejected.',
+                                confirmButtonColor: '#dc3545'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed',
+                                text: result.message || 'Failed to reject return.',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Error rejecting return:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops!',
+                            text: 'An error occurred. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                });
+            });
+        </script>
+
+        <%- include("../partials/admin/footer") %>
+    </body>

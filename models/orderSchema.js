@@ -38,6 +38,35 @@ const orderSchema = new Schema(
           default: 0,
 
         },
+        status: {
+          type: String,
+          required: true,
+          enum: [
+            "Pending",
+            "Payment Failed",
+            "Confirmed",
+            "Shipped",
+            "Out for Delivery",
+            "Delivered",
+            "Cancelled",
+            "Return Request",
+            "Return Rejected",
+            "Returned",
+          ],
+          default: "Pending",
+        },
+        cancelReason: {
+          type: String,
+          required: false
+        },
+        returnReason: {
+          type: String,
+          required: false
+        },
+        returnRequestedAt: {
+          type: Date,
+          default: null
+        }
       },
     ],
     totalPrice: {
@@ -55,6 +84,31 @@ const orderSchema = new Schema(
     finalAmount: {
       type: Number,
       required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: [
+        "Pending",
+        "Payment Failed",
+        "Confirmed",
+        "Shipped",
+        "Out for Delivery",
+        "Delivered",
+        "Cancelled",
+        "Return Request",
+        "Return Rejected",
+        "Returned",
+      ],
+      default: "Pending",
+    },
+    cancelReason: {
+      type: String,
+      required: false
+    },
+    returnReason: {
+      type: String,
+      required: false
     },
     address: {
       addressType: {
@@ -105,23 +159,7 @@ const orderSchema = new Schema(
       type: Date,
       default: Date.now,
     },
-    status: {
-      type: String,
-      required: true,
-      enum: [
-        "Pending",
-        "Payment Failed",
-        "Confirmed",
-        "Shipped",
-        "Out for Delivery",
-        "Delivered",
-        "Cancelled",
-        "Return Request",
-        "Return Rejected",
-        "Returned",
-      ],
-      default: "Pending",
-    },
+    
     paymentStatus: { 
       type: String,
       enum: ["Pending", "Completed", "Failed"],
@@ -131,14 +169,7 @@ const orderSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    cancelReason: {
-      type: String,
-      required: false
-    },
-    returnReason: {
-      type: String,
-      required: false
-    },
+   
     couponId: {
       type: Schema.Types.ObjectId,
       ref: "Coupon",

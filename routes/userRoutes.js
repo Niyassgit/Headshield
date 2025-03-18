@@ -83,6 +83,10 @@ router.get("/get-order-amount/:orderId", userAuth, orderController.getOrderAmoun
 router.patch("/update-payment/:orderId", userAuth, orderController.updatePayment);
 router.post("/mark-payment-failed", userAuth, orderController.markPaymentAsFailed);
 router.get("/generateInvoice/:orderId",userAuth,orderController.invoiceDawnload);
+
+router.patch("/cancel-product/:orderId/:productId", userAuth, orderController.cancelSingleProduct);
+router.patch("/return-product/:orderId/:productId", userAuth, orderController.returnSingleProduct);
+
 //wishlist management
 router.post("/addToWishlist",userAuth,wishlistController.addToWishlist);
 router.get("/wishlist",userAuth,wishlistController.getWishlist);

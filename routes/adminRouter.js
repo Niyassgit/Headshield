@@ -57,6 +57,8 @@ router.get("/orders", adminAuth, orderController.getOrderslist);
 router.get("/order-details", adminAuth, orderController.getOrderDetails);
 router.put("/update-order-status/:orderId", adminAuth, orderController.updateStatus);
 router.put("/cancelOrder", adminAuth, orderController.cancelOrder);
+router.patch("/return-product/:orderId/:productId", adminAuth, orderController.returnSingleProductAdmin);
+
 //coupon management
 router.get("/coupons", adminAuth, couponController.getCouponPage);
 router.post("/addCoupon", adminAuth, couponController.addCoupon);
