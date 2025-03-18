@@ -339,8 +339,8 @@
                             </p>
                             <% } %>
                     </div>
-                    
-                  <!-- Ordered Items Section -->
+
+                    <!-- Ordered Items Section -->
                     <h4>Ordered Items</h4>
                     <div class="products-container">
                         <% if (products.length> 0) { %>
@@ -360,32 +360,35 @@
                                             </p>
                                             <p>
                                                 <strong>Status:</strong>
-                                                <% if (["Cancelled", "Return Request", "Returned", "Return Rejected"].includes(item.status)) { %>
+                                                <% if (["Cancelled", "Return Request" , "Returned" , "Return Rejected"
+                                                    ].includes(item.status)) { %>
                                                     <span class="badge <%= getStatusBadgeClass(item.status) %>">
                                                         <%= item.status %>
                                                     </span>
-                                                <% } else { %>
-                                                    <%= item.status %>
-                                                <% } %>
+                                                    <% } else { %>
+                                                        <%= item.status %>
+                                                            <% } %>
                                             </p>
                                         </div>
                                     </div>
                                     <p><strong>Total: ₹<%= item.total %></strong></p>
-                                    <!-- Action Buttons -->
-                                    <% if (["Pending", "Confirmed" , "Shipped" , "Out for Delivery"
-                                        ].includes(item.status)) { %>
-                                        <button class="cancel-btn individual-cancel-btn"
-                                            data-order-id="<%= order.orderId %>"
-                                            data-product-id="<%= item.productId %>">
-                                            Cancel Product
-                                        </button>
-                                        <% } else if (item.status==="Delivered" ) { %>
-                                            <button class="return-btn individual-return-btn"
+                                    <!-- Action Buttons (Show only if more than 1 product) -->
+                                    <% if (products.length> 1) { %>
+                                        <% if (["Pending", "Confirmed" , "Shipped" , "Out for Delivery"
+                                            ].includes(item.status)) { %>
+                                            <button class="cancel-btn individual-cancel-btn"
                                                 data-order-id="<%= order.orderId %>"
                                                 data-product-id="<%= item.productId %>">
-                                                Return Product
+                                                Cancel Product
                                             </button>
-                                            <% } %>
+                                            <% } else if (item.status==="Delivered" ) { %>
+                                                <button class="return-btn individual-return-btn"
+                                                    data-order-id="<%= order.orderId %>"
+                                                    data-product-id="<%= item.productId %>">
+                                                    Return Product
+                                                </button>
+                                                <% } %>
+                                                    <% } %>
                                 </div>
                                 <% }) %>
                                     <% } else { %>
@@ -561,96 +564,96 @@
                                 });
                         });
                         // Cancel Individual Product
-        document.querySelectorAll(".individual-cancel-btn").forEach(btn => {
-            btn.addEventListener("click", function () {
-                const orderId = this.getAttribute("data-order-id");
-                const productId = this.getAttribute("data-product-id");
+                        document.querySelectorAll(".individual-cancel-btn").forEach(btn => {
+                            btn.addEventListener("click", function () {
+                                const orderId = this.getAttribute("data-order-id");
+                                const productId = this.getAttribute("data-product-id");
 
-                Swal.fire({
-                    title: "Cancel Product",
-                    input: "textarea",
-                    inputLabel: "Reason for cancellation",
-                    inputPlaceholder: "Enter reason here...",
-                    showCancelButton: true,
-                    confirmButtonText: "Cancel Product",
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    inputValidator: (value) => {
-                        if (!value) {
-                            return "You need to provide a reason!";
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`/cancel-product/${orderId}/${productId}`, {
-                            method: "PATCH",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ reason: result.value })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire("Cancelled", "Product cancelled successfully!", "success").then(() => {
-                                    location.reload();
+                                Swal.fire({
+                                    title: "Cancel Product",
+                                    input: "textarea",
+                                    inputLabel: "Reason for cancellation",
+                                    inputPlaceholder: "Enter reason here...",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Cancel Product",
+                                    confirmButtonColor: "#d33",
+                                    cancelButtonColor: "#3085d6",
+                                    inputValidator: (value) => {
+                                        if (!value) {
+                                            return "You need to provide a reason!";
+                                        }
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        fetch(`/cancel-product/${orderId}/${productId}`, {
+                                            method: "PATCH",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ reason: result.value })
+                                        })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    Swal.fire("Cancelled", "Product cancelled successfully!", "success").then(() => {
+                                                        location.reload();
+                                                    });
+                                                } else {
+                                                    Swal.fire("Error!", data.message || "Error cancelling product.", "error");
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error("Error:", error);
+                                                Swal.fire("Error!", "Error cancelling product.", "error");
+                                            });
+                                    }
                                 });
-                            } else {
-                                Swal.fire("Error!", data.message || "Error cancelling product.", "error");
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error:", error);
-                            Swal.fire("Error!", "Error cancelling product.", "error");
+                            });
                         });
-                    }
-                });
-            });
-        });
 
-        // Return Individual Product
-        document.querySelectorAll(".individual-return-btn").forEach(btn => {
-            btn.addEventListener("click", function () {
-                const orderId = this.getAttribute("data-order-id");
-                const productId = this.getAttribute("data-product-id");
+                        // Return Individual Product
+                        document.querySelectorAll(".individual-return-btn").forEach(btn => {
+                            btn.addEventListener("click", function () {
+                                const orderId = this.getAttribute("data-order-id");
+                                const productId = this.getAttribute("data-product-id");
 
-                Swal.fire({
-                    title: "Return Product",
-                    input: "textarea",
-                    inputLabel: "Reason for return",
-                    inputPlaceholder: "Enter reason here...",
-                    showCancelButton: true,
-                    confirmButtonText: "Request Return",
-                    confirmButtonColor: "#f0ad4e",
-                    cancelButtonColor: "#d33",
-                    inputValidator: (value) => {
-                        if (!value) {
-                            return "You need to provide a reason!";
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`/return-product/${orderId}/${productId}`, {
-                            method: "PATCH",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ reason: result.value })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire("Return Requested", "Return request submitted successfully!", "success").then(() => {
-                                    location.reload();
+                                Swal.fire({
+                                    title: "Return Product",
+                                    input: "textarea",
+                                    inputLabel: "Reason for return",
+                                    inputPlaceholder: "Enter reason here...",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Request Return",
+                                    confirmButtonColor: "#f0ad4e",
+                                    cancelButtonColor: "#d33",
+                                    inputValidator: (value) => {
+                                        if (!value) {
+                                            return "You need to provide a reason!";
+                                        }
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        fetch(`/return-product/${orderId}/${productId}`, {
+                                            method: "PATCH",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ reason: result.value })
+                                        })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    Swal.fire("Return Requested", "Return request submitted successfully!", "success").then(() => {
+                                                        location.reload();
+                                                    });
+                                                } else {
+                                                    Swal.fire("Error!", data.message || "Error submitting return request.", "error");
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error("Error:", error);
+                                                Swal.fire("Error!", "Error submitting return request.", "error");
+                                            });
+                                    }
                                 });
-                            } else {
-                                Swal.fire("Error!", data.message || "Error submitting return request.", "error");
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error:", error);
-                            Swal.fire("Error!", "Error submitting return request.", "error");
+                            });
                         });
-                    }
-                });
-            });
-        });
 
                         // Retry Payment
                         if (retryPaymentBtn) {
