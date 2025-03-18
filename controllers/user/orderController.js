@@ -197,6 +197,7 @@ const placeOrder = async (req, res) => {
 
     let finalTotal=totalPrice+discount+savedAmount;
 
+
    
         const order = await Order.create({
             userId,
